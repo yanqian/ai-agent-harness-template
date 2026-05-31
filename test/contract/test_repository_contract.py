@@ -78,6 +78,28 @@ class RepositoryContractTests(unittest.TestCase):
         for phrase in ["requirement_gap", "implementation_gap", "test_gap", "contract_gap", "external_behavior_gap", "state_recovery_gap", "agent_workflow_gap", "environment_gap", "Improvement Loop"]:
             self.assertIn(phrase, failure_domains)
 
+    def test_go_server_example_contract_is_documented_and_verified(self):
+        readme = (ROOT / "README.md").read_text()
+        init = (ROOT / "scripts" / "init.sh").read_text()
+        server = (ROOT / "examples" / "go-server" / "server.go").read_text()
+        tests = (ROOT / "examples" / "go-server" / "server_test.go").read_text()
+        for path in [
+            ROOT / "examples" / "go-server" / "go.mod",
+            ROOT / "examples" / "go-server" / "main.go",
+            ROOT / "examples" / "go-server" / "server.go",
+            ROOT / "examples" / "go-server" / "server_test.go",
+            ROOT / "examples" / "go-server" / "README.md",
+        ]:
+            self.assertTrue(path.exists(), f"{path} should exist")
+        for phrase in ["examples/go-server", "GET /healthz", "GET /greet?name=Codex", "go test ./..."]:
+            self.assertIn(phrase, readme)
+        for phrase in ["examples/go-server", "go test ./..."]:
+            self.assertIn(phrase, init)
+        for phrase in ["/healthz", "/greet", "http.MethodGet", "hello, "]:
+            self.assertIn(phrase, server)
+        for phrase in ["TestHealthz", "TestGreetUsesName", "TestGreetDefaultsBlankName", "TestPostIsRejected"]:
+            self.assertIn(phrase, tests)
+
     def test_feature_schema_requires_acceptance_and_state(self):
         schema = json.loads((ROOT / "schemas/feature_list.schema.json").read_text())
         feature_required = schema["properties"]["features"]["items"]["required"]

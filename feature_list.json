@@ -137,6 +137,23 @@
       "attempts": 1,
       "last_error": "",
       "priority": "P0"
+    },
+    {
+      "id": "F009",
+      "title": "Add Go server example",
+      "description": "Add a dependency-free Go HTTP server example that demonstrates how the harness can validate service-style projects with standard library tests.",
+      "acceptance": [
+        "examples/go-server contains a Go module with a small HTTP server",
+        "The server exposes GET /healthz and GET /greet?name=Codex endpoints",
+        "The Go server example has tests covering health, greeting, blank-name defaulting, and method rejection",
+        "./init.sh verifies the Go server example with go test ./... when Go is installed",
+        "README.md documents how to test and run the Go server example"
+      ],
+      "passes": true,
+      "status": "done",
+      "attempts": 1,
+      "last_error": "",
+      "priority": "P1"
     }
   ]
 }

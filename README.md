@@ -43,6 +43,7 @@ Expected result:
 - feature IDs are unique;
 - status and `passes` fields are consistent;
 - the tiny example tests pass.
+- the Go server example tests pass when Go is installed.
 - the orchestrator can run the startup protocol and preview prompts.
 - the unit, contract, and smoke layers pass.
 
@@ -126,3 +127,18 @@ For a new project, copy the template files into the project root, then replace t
 ## Tiny Example
 
 The included example lives in `examples/tiny-cli/`. It exposes a small Python function and test suite so the harness can prove validation works without third-party dependencies.
+
+## Go Server Example
+
+The included Go service example lives in `examples/go-server/`. It is a dependency-free HTTP server with:
+
+- `GET /healthz`
+- `GET /greet?name=Codex`
+
+Run it with:
+
+```bash
+cd examples/go-server
+go test ./...
+PORT=8080 go run .
+```

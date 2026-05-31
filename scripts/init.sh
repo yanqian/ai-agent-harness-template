@@ -33,7 +33,12 @@ for path in \
   scripts/summarize-runs.sh \
   scripts/check-failure-domains.sh \
   scripts/run-coding-agent.sh \
-  scripts/run-evaluator-agent.sh
+  scripts/run-evaluator-agent.sh \
+  examples/go-server/README.md \
+  examples/go-server/go.mod \
+  examples/go-server/main.go \
+  examples/go-server/server.go \
+  examples/go-server/server_test.go
 do
   test -f "$path"
 done
@@ -59,6 +64,15 @@ for path in [Path("examples/tiny-cli/tiny_cli.py"), Path("examples/tiny-cli/test
     compile(path.read_text(), str(path), "exec")
 PY
 python3 examples/tiny-cli/test_tiny_cli.py
+
+echo "== Go server example =="
+if command -v go >/dev/null 2>&1; then
+  HARNESS_GOCACHE="${HARNESS_GOCACHE:-${TMPDIR:-/tmp}/ai-agent-harness-go-build}"
+  mkdir -p "$HARNESS_GOCACHE"
+  (cd examples/go-server && GOCACHE="$HARNESS_GOCACHE" go test ./...)
+else
+  echo "skip Go server example: go not found"
+fi
 
 if [[ "${HARNESS_SKIP_TEST_LAYERS:-}" == "1" ]]; then
   echo "skip layered tests: HARNESS_SKIP_TEST_LAYERS=1"

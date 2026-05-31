@@ -22,6 +22,7 @@ The initialization baseline verifies:
 - Failed run records include failure-domain classification and harness improvement assessment.
 - `orchestrator.py` compiles.
 - The tiny example tests pass.
+- The Go server example tests pass when Go is installed.
 - Unit tests pass.
 - Contract tests pass.
 - Optional harness tests pass when `test/harness/` exists.
@@ -86,6 +87,7 @@ python3 -m unittest discover -s test/smoke -p 'test_*.py'
 | F006 | Contract tests verify explicit Coding Agent and Evaluator Agent adapters replace generic agent command dispatch. |
 | F007 | Contract and state validation verify docs knowledge map, quality rubric, and run artifact template. |
 | F008 | Contract, unit, and smoke tests verify failure-domain classification and harness improvement checks. |
+| F009 | `./init.sh` verifies the Go server example when Go is installed. |
 
 ## Manual Orchestrator Verification
 

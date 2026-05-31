@@ -24,10 +24,11 @@ Implemented components:
 - Vendor-neutral lightweight orchestrator in `orchestrator.py`.
 - Explicit Coding Agent and Evaluator Agent adapters under `scripts/`.
 - Tiny dependency-free Python CLI example in `examples/tiny-cli/`.
+- Dependency-free Go server example in `examples/go-server/`.
 
 ## Last Completed Feature
 
-`F008` - Add failure-domain to harness-improvement loop.
+`F009` - Add Go server example.
 
 ## Next Feature
 

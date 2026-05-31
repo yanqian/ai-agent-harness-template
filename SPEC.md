@@ -26,6 +26,7 @@ The harness makes project state recoverable by storing requirements, feature sta
 - Contract tests for AI agent obligations and harness boundaries.
 - A vendor-neutral lightweight `orchestrator.py`.
 - A tiny runnable example proving the harness loop works.
+- A dependency-free Go server example for service-style projects.
 
 ### Excluded
 
@@ -90,6 +91,7 @@ The template keeps automated checks in explicit layers:
 - `feature_list.json` conforms to `schemas/feature_list.schema.json`.
 - `prompts/plan.md`, `prompts/work.md`, `prompts/continue.md`, and `prompts/evaluate.md` define the standard agent roles.
 - The tiny example can be tested without installing third-party dependencies.
+- The Go server example can be tested with `go test ./...` when Go is installed.
 - `AGENTS.md` includes external behavior verification and external tool schema guardrails.
 - `./init.sh` runs unit, contract, smoke, and optional harness tests.
 - `docs/README.md`, `QUALITY.md`, and `runs/RUN_TEMPLATE.md` are present and validated.
