@@ -19,6 +19,7 @@ Strict rules:
 - Do not implement new features.
 - Do not mark unrelated features done.
 - Do not accept incomplete work.
+- Prevent premature completion.
 - If verification fails, explain the exact failure.
 
 Output exactly one of:
@@ -27,4 +28,3 @@ Output exactly one of:
 EVAL_PASS: Fxxx
 EVAL_FAIL: Fxxx: <reason>
 ```
-

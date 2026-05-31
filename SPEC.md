@@ -19,6 +19,7 @@ The harness makes project state recoverable by storing requirements, feature sta
 - Prompt templates for planning, work, continuation, and evaluation.
 - Deterministic validation scripts.
 - A test plan and dependency-free unit, contract, and smoke tests.
+- Contract tests for AI agent obligations and harness boundaries.
 - A vendor-neutral lightweight `orchestrator.py`.
 - A tiny runnable example proving the harness loop works.
 
@@ -71,6 +72,7 @@ The template keeps automated checks in explicit layers:
 - `scripts/validate-feature.sh F001` validates a feature by ID and runs the default verification entry point.
 - `scripts/summarize-progress.sh` prints a concise status summary.
 - Contract tests statically verify the orchestrator CLI and startup contract.
+- Contract tests verify AI-facing obligations for state safety, external behavior verification, prompt restrictions, and evaluator gating.
 - `feature_list.json` conforms to `schemas/feature_list.schema.json`.
 - `prompts/plan.md`, `prompts/work.md`, `prompts/continue.md`, and `prompts/evaluate.md` define the standard agent roles.
 - The tiny example can be tested without installing third-party dependencies.

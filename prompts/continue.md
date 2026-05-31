@@ -14,6 +14,10 @@ You must reconstruct context from repository state only:
 
 Do not rely on prior chat history.
 Do not reset or discard user changes.
+Do not overwrite `feature_list.json`.
+Do not reset existing feature state.
+Stop and report exact conflicts when repository state is unsafe.
+Use `orchestrator.py` according to `AGENTS.md` when implementation or evaluation is required.
 
 Return:
 
@@ -21,4 +25,3 @@ Return:
 - Working tree state.
 - Verification status.
 - Recommended next action.
-

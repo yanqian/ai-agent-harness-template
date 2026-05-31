@@ -66,6 +66,23 @@
       "attempts": 1,
       "last_error": "",
       "priority": "P0"
+    },
+    {
+      "id": "F005",
+      "title": "Strengthen contract tests for AI harness obligations",
+      "description": "Refine contract tests so they verify AI agent obligations and harness boundaries, including external behavior verification, feature state preservation, prompt restrictions, evaluator anti-premature-completion rules, and orchestrator state-transition contracts.",
+      "acceptance": [
+        "Contract tests verify AGENTS external behavior verification requirements beyond section presence",
+        "Contract tests verify feature state fields, uniqueness, done/pass consistency, and unknown-field preservation requirements",
+        "Contract tests verify work, continue, and evaluate prompts constrain AI behavior and state mutation",
+        "Contract tests verify orchestrator state-transition and eval-only boundaries by static inspection",
+        "./init.sh passes after strengthening contract coverage"
+      ],
+      "passes": true,
+      "status": "done",
+      "attempts": 1,
+      "last_error": "",
+      "priority": "P0"
     }
   ]
 }

@@ -6,15 +6,38 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class RepositoryContractTests(unittest.TestCase):
-    def test_agents_contains_core_guardrails(self):
+    def test_agents_external_behavior_verification_preserves_core_requirements(self):
+        text = (ROOT / "AGENTS.md").read_text()
+        for phrase in [
+            "## External Behavior Verification",
+            "### External Tool Schema Rules",
+            "must verify that behavior before relying on it",
+            "Do not infer unknown external behavior from intuition or local mocks.",
+            "mocks and fake children as tests of this repository's state machine only",
+            "do not prove the external tool or platform behaves that way",
+            "argv, stdio, cwd, env, timeout, signal handling, or shell mode",
+            "real command behavior or document why direct verification is not possible",
+            "real-shaped output from the source",
+            "regression tests using those captured shapes",
+            "If the schema is unknown, fail closed",
+        ]:
+            self.assertIn(phrase, text)
+
+    def test_agents_preserves_role_and_state_safety_contracts(self):
         text = (ROOT / "AGENTS.md").read_text()
         for phrase in [
             "### Initializer",
+            "### Planning Agent",
+            "### Coding Agent",
+            "### Evaluator Agent",
+            "### Orchestrator",
             "## State Safety Rules",
-            "## External Behavior Verification",
-            "### External Tool Schema Rules",
-            "## Work Rules",
-            "## Anti-Patterns",
+            "Do not overwrite the entire `feature_list.json` unnecessarily.",
+            "Update only the current feature during Coding Agent work.",
+            "Preserve feature ordering and existing fields.",
+            "Do not reset existing fields such as `passes`, `status`, `attempts`, or `last_error` unless explicitly instructed.",
+            "The Evaluator Agent verifies without implementation changes.",
+            "Marking a feature done without evaluator pass.",
             "Never rely on chat history. Always rely on project state.",
         ]:
             self.assertIn(phrase, text)
@@ -24,13 +47,53 @@ class RepositoryContractTests(unittest.TestCase):
         feature_required = schema["properties"]["features"]["items"]["required"]
         for key in ["id", "title", "description", "acceptance", "passes", "status", "attempts", "last_error"]:
             self.assertIn(key, feature_required)
+        self.assertTrue(schema["properties"]["features"]["items"]["additionalProperties"])
+
+    def test_feature_list_state_contract_is_consistent(self):
+        data = json.loads((ROOT / "feature_list.json").read_text())
+        ids = [feature["id"] for feature in data["features"]]
+        self.assertEqual(len(ids), len(set(ids)))
+        for feature in data["features"]:
+            self.assertIsInstance(feature["acceptance"], list)
+            self.assertGreater(len(feature["acceptance"]), 0)
+            self.assertIn(feature["status"], ["todo", "in_progress", "done", "blocked"])
+            if feature["passes"] is True:
+                self.assertEqual(feature["status"], "done")
+            if feature["status"] == "done":
+                self.assertIs(feature["passes"], True)
 
     def test_prompt_templates_contain_role_contracts(self):
         expectations = {
-            "plan.md": ["Act as Planning Agent", "Do not implement business logic during planning"],
-            "work.md": ["Act as Coding Agent", "Implement only the selected feature"],
-            "continue.md": ["reconstruct context from repository state only", "Do not rely on prior chat history"],
-            "evaluate.md": ["Act as Evaluator Agent", "EVAL_PASS: Fxxx", "EVAL_FAIL: Fxxx: <reason>"],
+            "plan.md": [
+                "Act as Planning Agent",
+                "Preserve existing feature IDs, ordering, `passes`, `status`, `attempts`, `last_error`, and unknown fields.",
+                "Do not implement business logic during planning",
+            ],
+            "work.md": [
+                "Act as Coding Agent",
+                "Implement only the selected feature",
+                "Do not overwrite `feature_list.json`.",
+                "Do not reset existing feature state.",
+                "Preserve existing feature IDs, ordering, `passes`, `status`, `attempts`, `last_error`, and unknown fields.",
+                "Do not stage or commit during orchestrated runs.",
+                "verify it with a primary source or real-shaped fixture before depending on it.",
+            ],
+            "continue.md": [
+                "reconstruct context from repository state only",
+                "Do not rely on prior chat history",
+                "Do not overwrite `feature_list.json`.",
+                "Do not reset existing feature state.",
+                "Stop and report exact conflicts when repository state is unsafe.",
+                "Use `orchestrator.py` according to `AGENTS.md` when implementation or evaluation is required.",
+            ],
+            "evaluate.md": [
+                "Act as Evaluator Agent",
+                "Do not implement new features.",
+                "Do not accept incomplete work.",
+                "Prevent premature completion.",
+                "EVAL_PASS: Fxxx",
+                "EVAL_FAIL: Fxxx: <reason>",
+            ],
         }
         for filename, phrases in expectations.items():
             text = (ROOT / "prompts" / filename).read_text()
@@ -47,6 +110,10 @@ class RepositoryContractTests(unittest.TestCase):
             "startup_protocol()",
             "run_agent(coding_prompt",
             "run_agent(evaluator_prompt",
+            "mark_in_progress(feature_id)",
+            "mark_done(feature_id)",
+            "mark_failed(feature_id",
+            "if args.eval_only:",
         ]:
             self.assertIn(phrase, text)
 

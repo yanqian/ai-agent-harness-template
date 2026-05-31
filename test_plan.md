@@ -41,10 +41,10 @@ python3 -m unittest discover -s test/unit -p 'test_*.py'
 
 Contract tests lock repository-level promises that should not drift accidentally:
 
-- AGENTS guardrail sections.
-- Feature schema expectations.
-- Prompt role requirements.
-- Orchestrator CLI and startup contract by static inspection.
+- AGENTS guardrail sections and external behavior verification obligations.
+- Feature schema and feature state safety expectations.
+- Prompt role requirements and AI履约 restrictions.
+- Orchestrator CLI, startup, state-transition, and eval-only contracts by static inspection.
 
 Current command:
 
@@ -80,6 +80,7 @@ python3 -m unittest discover -s test/smoke -p 'test_*.py'
 | F002 | Contract tests statically verify orchestrator CLI and startup contract; manual verification may run dry-run and eval-only dry-run outside `./init.sh`. |
 | F003 | Contract validation proves AGENTS guardrails remain present. |
 | F004 | `./init.sh` runs unit, contract, smoke, and optional harness layers. |
+| F005 | Contract tests verify AI agent obligations and harness boundaries, not only file presence. |
 
 ## Manual Orchestrator Verification
 

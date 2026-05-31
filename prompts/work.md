@@ -18,7 +18,11 @@ You must:
 10. Run `./init.sh` after changes.
 
 Do not mark unrelated features done.
-Do not stage or commit unless explicitly instructed.
+Do not overwrite `feature_list.json`.
+Do not reset existing feature state.
+Preserve existing feature IDs, ordering, `passes`, `status`, `attempts`, `last_error`, and unknown fields.
+Do not stage or commit during orchestrated runs.
+When relying on external CLI, API, runtime, or structured tool output behavior, verify it with a primary source or real-shaped fixture before depending on it.
 
 Return:
 
@@ -27,4 +31,3 @@ Return:
 - Verification commands run.
 - Remaining issues.
 - Suggested commit message.
-

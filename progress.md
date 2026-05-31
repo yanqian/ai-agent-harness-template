@@ -14,6 +14,7 @@ Implemented components:
 - Prompt templates in `prompts/`.
 - Validation scripts in `scripts/`.
 - Layered test coverage under `test/unit`, `test/contract`, and `test/smoke`.
+- Contract tests that lock AI agent obligations and harness boundaries.
 - Verification planning in `test_plan.md`.
 - Root verification wrapper at `./init.sh`.
 - Vendor-neutral lightweight orchestrator in `orchestrator.py`.
@@ -21,7 +22,7 @@ Implemented components:
 
 ## Last Completed Feature
 
-`F004` - Add testing layers to the harness template.
+`F005` - Strengthen contract tests for AI harness obligations.
 
 ## Next Feature
 
