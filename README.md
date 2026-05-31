@@ -10,6 +10,7 @@ The harness is designed for Codex, Claude Code, Cursor Agent, and similar coding
 - `AGENTS.md` defines agent rules.
 - `prompts/` contains role prompts.
 - `scripts/` validates state and examples.
+- `test/` contains unit, contract, and smoke tests.
 - `orchestrator.py` previews or runs one-feature coding/evaluation loops.
 
 ## Quick Start
@@ -31,6 +32,7 @@ Expected result:
 - status and `passes` fields are consistent;
 - the tiny example tests pass.
 - the orchestrator can run the startup protocol and preview prompts.
+- the unit, contract, and smoke layers pass.
 
 ## Development Flow
 
@@ -71,6 +73,19 @@ HARNESS_AGENT_COMMAND="claude" python3 orchestrator.py --max-rounds 1
 - `prompts/work.md` implements one selected feature.
 - `prompts/continue.md` resumes from repository state.
 - `prompts/evaluate.md` verifies one selected feature.
+
+## Test Layers
+
+- `test/unit/` covers deterministic helper behavior.
+- `test/contract/` locks repository rules, schema, prompts, and orchestrator contracts.
+- `test/harness/` is optional and intended for downstream workflow tests.
+- `test/smoke/` runs the main verification commands end to end.
+
+All default layers are run by:
+
+```bash
+./init.sh
+```
 
 ## Copying The Template
 

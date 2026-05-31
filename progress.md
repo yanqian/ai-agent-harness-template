@@ -13,13 +13,15 @@ Implemented components:
 - Feature schema in `schemas/feature_list.schema.json`.
 - Prompt templates in `prompts/`.
 - Validation scripts in `scripts/`.
+- Layered test coverage under `test/unit`, `test/contract`, and `test/smoke`.
+- Verification planning in `test_plan.md`.
 - Root verification wrapper at `./init.sh`.
 - Vendor-neutral lightweight orchestrator in `orchestrator.py`.
 - Tiny dependency-free Python CLI example in `examples/tiny-cli/`.
 
 ## Last Completed Feature
 
-`F003` - Adopt practiced AGENTS guardrails.
+`F004` - Add testing layers to the harness template.
 
 ## Next Feature
 

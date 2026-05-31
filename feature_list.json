@@ -49,6 +49,23 @@
       "attempts": 1,
       "last_error": "",
       "priority": "P0"
+    },
+    {
+      "id": "F004",
+      "title": "Add testing layers to the harness template",
+      "description": "Add an explicit test plan and dependency-free unit, contract, and smoke test layers to the template, wire them into ./init.sh, and document how downstream projects should extend the layers.",
+      "acceptance": [
+        "test_plan.md documents the verification entry point and unit, contract, harness, and smoke layers",
+        "test/unit contains tests for validation and progress helper behavior",
+        "test/contract contains tests that lock AGENTS, feature schema, prompts, and orchestrator contracts",
+        "test/smoke contains an end-to-end smoke test for the template commands",
+        "./init.sh runs unit, contract, smoke, and optional harness tests"
+      ],
+      "passes": true,
+      "status": "done",
+      "attempts": 1,
+      "last_error": "",
+      "priority": "P0"
     }
   ]
 }

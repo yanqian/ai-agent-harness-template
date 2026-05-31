@@ -10,6 +10,7 @@ for path in \
   SPEC.md \
   feature_list.json \
   progress.md \
+  test_plan.md \
   README.md \
   orchestrator.py \
   schemas/feature_list.schema.json \
@@ -42,5 +43,27 @@ for path in [Path("examples/tiny-cli/tiny_cli.py"), Path("examples/tiny-cli/test
     compile(path.read_text(), str(path), "exec")
 PY
 python3 examples/tiny-cli/test_tiny_cli.py
+
+if [[ "${HARNESS_SKIP_TEST_LAYERS:-}" == "1" ]]; then
+  echo "skip layered tests: HARNESS_SKIP_TEST_LAYERS=1"
+  echo "init verification passed"
+  exit 0
+fi
+
+run_unittest_layer() {
+  local name="$1"
+  local path="$2"
+  if [[ -d "$path" ]]; then
+    echo "== ${name} tests =="
+    python3 -m unittest discover -s "$path" -p 'test_*.py'
+  else
+    echo "skip ${name} tests: ${path} not present"
+  fi
+}
+
+run_unittest_layer "Unit" "test/unit"
+run_unittest_layer "Contract" "test/contract"
+run_unittest_layer "Harness" "test/harness"
+run_unittest_layer "Smoke" "test/smoke"
 
 echo "init verification passed"

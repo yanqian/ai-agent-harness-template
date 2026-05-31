@@ -18,6 +18,7 @@ The harness makes project state recoverable by storing requirements, feature sta
 - A JSON Schema for feature state.
 - Prompt templates for planning, work, continuation, and evaluation.
 - Deterministic validation scripts.
+- A test plan and dependency-free unit, contract, and smoke tests.
 - A vendor-neutral lightweight `orchestrator.py`.
 - A tiny runnable example proving the harness loop works.
 
@@ -55,6 +56,15 @@ Any session can resume by reading repository files and git history. Chat history
 
 When implementation relies on behavior outside repository code, agents verify that behavior through primary sources, real commands, official documentation, captured logs, or real-shaped fixtures before depending on it.
 
+### Layered Verification
+
+The template keeps automated checks in explicit layers:
+
+- Unit tests cover small deterministic helper behavior.
+- Contract tests lock repository rules, schema shape, prompt requirements, and orchestrator command guarantees.
+- Harness tests are reserved for project-level workflow behavior and are optional in the minimal template.
+- Smoke tests run the template's main user-facing verification commands end to end.
+
 ## 4. Acceptance Criteria
 
 - `./init.sh` validates harness state and runs the tiny example tests.
@@ -65,6 +75,7 @@ When implementation relies on behavior outside repository code, agents verify th
 - `prompts/plan.md`, `prompts/work.md`, `prompts/continue.md`, and `prompts/evaluate.md` define the standard agent roles.
 - The tiny example can be tested without installing third-party dependencies.
 - `AGENTS.md` includes external behavior verification and external tool schema guardrails.
+- `./init.sh` runs unit, contract, smoke, and optional harness tests.
 
 ## 5. Verification Plan
 
