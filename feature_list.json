@@ -32,6 +32,23 @@
       "attempts": 1,
       "last_error": "",
       "priority": "P0"
+    },
+    {
+      "id": "F003",
+      "title": "Adopt practiced AGENTS guardrails",
+      "description": "Refine the template AGENTS.md using proven guardrails from the production agent workflow, including initializer responsibilities, state safety rules, external behavior verification, external tool schema rules, work rules, anti-patterns, and recoverability goals.",
+      "acceptance": [
+        "AGENTS.md includes an Initializer role for bootstrapping repository state",
+        "AGENTS.md includes state safety rules for preserving feature_list.json fields and ordering",
+        "AGENTS.md includes external behavior verification rules for CLI, API, runtime, and structured tool output assumptions",
+        "AGENTS.md includes anti-patterns that prevent premature completion and chat-history reliance",
+        "./init.sh passes after the guardrail update"
+      ],
+      "passes": true,
+      "status": "done",
+      "attempts": 1,
+      "last_error": "",
+      "priority": "P0"
     }
   ]
 }

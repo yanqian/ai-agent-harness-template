@@ -11,6 +11,7 @@ The harness makes project state recoverable by storing requirements, feature sta
 ### Included
 
 - Durable project instructions in `AGENTS.md`.
+- Proven agent guardrails for state safety, external behavior verification, and anti-patterns in `AGENTS.md`.
 - Human-readable requirements in `SPEC.md`.
 - Machine-readable feature state in `feature_list.json`.
 - Human-readable recovery state in `progress.md`.
@@ -50,6 +51,10 @@ A feature is complete only when validation passes and an evaluator can justify t
 
 Any session can resume by reading repository files and git history. Chat history is not required.
 
+### Verified External Assumptions
+
+When implementation relies on behavior outside repository code, agents verify that behavior through primary sources, real commands, official documentation, captured logs, or real-shaped fixtures before depending on it.
+
 ## 4. Acceptance Criteria
 
 - `./init.sh` validates harness state and runs the tiny example tests.
@@ -59,6 +64,7 @@ Any session can resume by reading repository files and git history. Chat history
 - `feature_list.json` conforms to `schemas/feature_list.schema.json`.
 - `prompts/plan.md`, `prompts/work.md`, `prompts/continue.md`, and `prompts/evaluate.md` define the standard agent roles.
 - The tiny example can be tested without installing third-party dependencies.
+- `AGENTS.md` includes external behavior verification and external tool schema guardrails.
 
 ## 5. Verification Plan
 

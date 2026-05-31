@@ -7,6 +7,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 FEATURES_PATH = ROOT / "feature_list.json"
 SCHEMA_PATH = ROOT / "schemas" / "feature_list.schema.json"
+AGENTS_PATH = ROOT / "AGENTS.md"
 VALID_STATUSES = {"todo", "in_progress", "done", "blocked"}
 FEATURE_ID_RE = re.compile(r"^F[0-9]{3,}$")
 
@@ -33,6 +34,7 @@ def require_string(feature: dict, key: str) -> str:
 def main() -> int:
     if not SCHEMA_PATH.exists():
         fail("schemas/feature_list.schema.json is missing")
+    validate_agents_guardrails()
 
     data = load_json(FEATURES_PATH)
     if not isinstance(data, dict):
@@ -76,6 +78,25 @@ def main() -> int:
     return 0
 
 
+def validate_agents_guardrails() -> None:
+    if not AGENTS_PATH.exists():
+        fail("AGENTS.md is missing")
+    text = AGENTS_PATH.read_text()
+    required = [
+        "### Initializer",
+        "## State Safety Rules",
+        "## External Behavior Verification",
+        "### External Tool Schema Rules",
+        "## Work Rules",
+        "## Anti-Patterns",
+        "Do not infer unknown external behavior from intuition or local mocks.",
+        "real-shaped output",
+        "Recoverable at any time.",
+    ]
+    for phrase in required:
+        if phrase not in text:
+            fail(f"AGENTS.md is missing required guardrail text: {phrase}")
+
+
 if __name__ == "__main__":
     raise SystemExit(main())
-

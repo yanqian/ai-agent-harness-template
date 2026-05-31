@@ -7,6 +7,7 @@ The minimal AI agent harness template is runnable.
 Implemented components:
 
 - Durable agent rules in `AGENTS.md`.
+- Practiced AGENTS guardrails for state safety, external behavior verification, tool schema handling, and anti-pattern prevention.
 - Requirements in `SPEC.md`.
 - Feature state in `feature_list.json`.
 - Feature schema in `schemas/feature_list.schema.json`.
@@ -18,7 +19,7 @@ Implemented components:
 
 ## Last Completed Feature
 
-`F002` - Add vendor-neutral lightweight orchestrator.
+`F003` - Adopt practiced AGENTS guardrails.
 
 ## Next Feature
 
@@ -26,5 +27,5 @@ No unfinished feature remains in the template.
 
 ## Known Issues
 
-- This template intentionally does not include a full orchestrator.
+- The template orchestrator is intentionally lightweight and vendor-neutral.
 - Vendor-specific command wrappers for Codex, Claude Code, and Cursor Agent are intentionally left to downstream projects.
