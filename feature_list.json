@@ -1,0 +1,21 @@
+{
+  "features": [
+    {
+      "id": "F001",
+      "title": "Bootstrap minimal AI agent harness template",
+      "description": "Create the harness state files, schema, prompts, validation scripts, and tiny example needed to prove the template works end to end.",
+      "acceptance": [
+        "./init.sh validates required files and feature_list.json",
+        "scripts/validate-feature.sh F001 validates the selected feature",
+        "scripts/summarize-progress.sh prints feature totals and next work",
+        "examples/tiny-cli test coverage passes without third-party dependencies"
+      ],
+      "passes": true,
+      "status": "done",
+      "attempts": 1,
+      "last_error": "",
+      "priority": "P0"
+    }
+  ]
+}
+
