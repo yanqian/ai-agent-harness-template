@@ -14,6 +14,7 @@ class SmokeTests(unittest.TestCase):
         commands = [
             ["python3", "scripts/validate-state.py"],
             ["scripts/summarize-progress.sh"],
+            ["scripts/summarize-runs.sh"],
         ]
         for command in commands:
             with self.subTest(command=command):

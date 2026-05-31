@@ -18,6 +18,7 @@ The initialization baseline verifies:
 - `feature_list.json` is valid and internally consistent.
 - Feature IDs are unique.
 - `AGENTS.md` contains the core guardrails.
+- `docs/README.md`, `QUALITY.md`, and `runs/RUN_TEMPLATE.md` are present and indexed.
 - `orchestrator.py` compiles.
 - The tiny example tests pass.
 - Unit tests pass.
@@ -82,6 +83,7 @@ python3 -m unittest discover -s test/smoke -p 'test_*.py'
 | F004 | `./init.sh` runs unit, contract, smoke, and optional harness layers. |
 | F005 | Contract tests verify AI agent obligations and harness boundaries, not only file presence. |
 | F006 | Contract tests verify explicit Coding Agent and Evaluator Agent adapters replace generic agent command dispatch. |
+| F007 | Contract and state validation verify docs knowledge map, quality rubric, and run artifact template. |
 
 ## Manual Orchestrator Verification
 

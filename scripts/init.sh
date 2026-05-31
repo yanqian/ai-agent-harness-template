@@ -12,7 +12,15 @@ for path in \
   progress.md \
   test_plan.md \
   README.md \
+  QUALITY.md \
   orchestrator.py \
+  docs/README.md \
+  docs/architecture.md \
+  docs/testing.md \
+  docs/external-behavior.md \
+  docs/agent-workflow.md \
+  docs/decisions/README.md \
+  runs/RUN_TEMPLATE.md \
   schemas/feature_list.schema.json \
   prompts/plan.md \
   prompts/work.md \
@@ -21,6 +29,7 @@ for path in \
   scripts/validate-state.py \
   scripts/validate-feature.sh \
   scripts/summarize-progress.sh \
+  scripts/summarize-runs.sh \
   scripts/run-coding-agent.sh \
   scripts/run-evaluator-agent.sh
 do

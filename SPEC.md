@@ -11,6 +11,9 @@ The harness makes project state recoverable by storing requirements, feature sta
 ### Included
 
 - Durable project instructions in `AGENTS.md`.
+- Durable repository knowledge in `docs/`.
+- Evaluator quality criteria in `QUALITY.md`.
+- Per-run evidence and handoff records in `runs/`.
 - Proven agent guardrails for state safety, external behavior verification, and anti-patterns in `AGENTS.md`.
 - Human-readable requirements in `SPEC.md`.
 - Machine-readable feature state in `feature_list.json`.
@@ -36,6 +39,10 @@ The harness makes project state recoverable by storing requirements, feature sta
 ### Spec First
 
 New work is first written into `SPEC.md` so agents share a stable requirement source.
+
+### Repository Knowledge Map
+
+`AGENTS.md` acts as an entry point. Durable knowledge belongs in `docs/`, quality criteria belong in `QUALITY.md`, and run evidence belongs in `runs/`.
 
 ### Feature Tracked
 
@@ -78,6 +85,7 @@ The template keeps automated checks in explicit layers:
 - The tiny example can be tested without installing third-party dependencies.
 - `AGENTS.md` includes external behavior verification and external tool schema guardrails.
 - `./init.sh` runs unit, contract, smoke, and optional harness tests.
+- `docs/README.md`, `QUALITY.md`, and `runs/RUN_TEMPLATE.md` are present and validated.
 
 ## 5. Verification Plan
 

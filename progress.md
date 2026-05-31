@@ -7,6 +7,9 @@ The minimal AI agent harness template is runnable.
 Implemented components:
 
 - Durable agent rules in `AGENTS.md`.
+- Repository knowledge map under `docs/`.
+- Evaluator rubric in `QUALITY.md`.
+- Run artifact template under `runs/`.
 - Practiced AGENTS guardrails for state safety, external behavior verification, tool schema handling, and anti-pattern prevention.
 - Requirements in `SPEC.md`.
 - Feature state in `feature_list.json`.
@@ -23,7 +26,7 @@ Implemented components:
 
 ## Last Completed Feature
 
-`F006` - Replace generic agent command with role adapters.
+`F007` - Add repository knowledge map, quality rubric, and run artifacts.
 
 ## Next Feature
 

@@ -29,7 +29,12 @@ class ScriptUnitTests(unittest.TestCase):
         self.assertIn(f"features_total={len(data['features'])}", result.stdout)
         self.assertIn("next_feature=none", result.stdout)
 
+    def test_summarize_runs_reports_empty_records(self):
+        result = run_command(["scripts/summarize-runs.sh"])
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("run_records=0", result.stdout)
+        self.assertIn("latest_run=none", result.stdout)
+
 
 if __name__ == "__main__":
     unittest.main()
-

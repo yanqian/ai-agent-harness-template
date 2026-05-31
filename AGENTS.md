@@ -134,6 +134,20 @@ The orchestrator sends each role prompt to the corresponding adapter on stdin.
 
 ## State Files
 
+## Repository Knowledge Map
+
+`AGENTS.md` is the entry point, not the whole manual.
+
+Use these durable knowledge files:
+
+- `docs/README.md` for the repository knowledge index.
+- `docs/architecture.md` for structure and boundaries.
+- `docs/testing.md` for verification layers.
+- `docs/external-behavior.md` for CLI, API, runtime, and tool-output verification rules.
+- `docs/agent-workflow.md` for planning, coding, evaluation, continuation, and run artifacts.
+- `QUALITY.md` for evaluator criteria.
+- `runs/` for per-run evidence and handoff records.
+
 ### `feature_list.json`
 
 `feature_list.json` is the machine-readable feature scope and state.

@@ -100,6 +100,24 @@
       "attempts": 1,
       "last_error": "",
       "priority": "P0"
+    },
+    {
+      "id": "F007",
+      "title": "Add repository knowledge map, quality rubric, and run artifacts",
+      "description": "Add a docs knowledge map, evaluator quality rubric, and run artifact mechanism so the harness captures repository-local knowledge, evaluator criteria, and per-run evidence without bloating AGENTS.md or progress.md.",
+      "acceptance": [
+        "docs/README.md indexes architecture, testing, external behavior, workflow, and decision-log documents",
+        "QUALITY.md defines evaluator rubric criteria and pass/fail guidance",
+        "runs/ contains a run log template and scripts/summarize-runs.sh summarizes recorded runs",
+        "AGENTS.md points agents to docs/ and QUALITY.md instead of becoming the only knowledge source",
+        "Evaluator prompt requires applying QUALITY.md and recording run evidence when appropriate",
+        "./init.sh validates the new knowledge, quality, and run artifact files"
+      ],
+      "passes": true,
+      "status": "done",
+      "attempts": 1,
+      "last_error": "",
+      "priority": "P0"
     }
   ]
 }

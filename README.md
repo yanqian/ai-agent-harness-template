@@ -8,6 +8,9 @@ The harness is designed for Codex, Claude Code, Cursor Agent, and similar coding
 - `feature_list.json` records executable feature state.
 - `progress.md` records human-readable recovery status.
 - `AGENTS.md` defines agent rules.
+- `docs/` stores durable repository knowledge.
+- `QUALITY.md` defines the evaluator rubric.
+- `runs/` stores run evidence and handoff records.
 - `prompts/` contains role prompts.
 - `scripts/` validates state and examples.
 - `test/` contains unit, contract, and smoke tests.
@@ -85,6 +88,20 @@ All default layers are run by:
 
 ```bash
 ./init.sh
+```
+
+## Knowledge, Quality, And Runs
+
+Keep `AGENTS.md` short enough to be a map. Put durable detail in `docs/`.
+
+Use `QUALITY.md` when evaluating features. It defines correctness, completeness, maintainability, test coverage, recoverability, and safety criteria.
+
+Use `runs/RUN_TEMPLATE.md` for non-trivial work, failures, external behavior verification, and evaluator handoff.
+
+Summarize run records with:
+
+```bash
+scripts/summarize-runs.sh
 ```
 
 ## Copying The Template

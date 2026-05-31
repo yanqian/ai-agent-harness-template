@@ -8,6 +8,9 @@ ROOT = Path(__file__).resolve().parents[1]
 FEATURES_PATH = ROOT / "feature_list.json"
 SCHEMA_PATH = ROOT / "schemas" / "feature_list.schema.json"
 AGENTS_PATH = ROOT / "AGENTS.md"
+QUALITY_PATH = ROOT / "QUALITY.md"
+DOCS_INDEX_PATH = ROOT / "docs" / "README.md"
+RUN_TEMPLATE_PATH = ROOT / "runs" / "RUN_TEMPLATE.md"
 VALID_STATUSES = {"todo", "in_progress", "done", "blocked"}
 FEATURE_ID_RE = re.compile(r"^F[0-9]{3,}$")
 
@@ -35,6 +38,7 @@ def main() -> int:
     if not SCHEMA_PATH.exists():
         fail("schemas/feature_list.schema.json is missing")
     validate_agents_guardrails()
+    validate_knowledge_files()
 
     data = load_json(FEATURES_PATH)
     if not isinstance(data, dict):
@@ -96,6 +100,27 @@ def validate_agents_guardrails() -> None:
     for phrase in required:
         if phrase not in text:
             fail(f"AGENTS.md is missing required guardrail text: {phrase}")
+
+
+def validate_knowledge_files() -> None:
+    for path in [QUALITY_PATH, DOCS_INDEX_PATH, RUN_TEMPLATE_PATH]:
+        if not path.exists():
+            fail(f"{path.relative_to(ROOT)} is missing")
+
+    quality = QUALITY_PATH.read_text()
+    for phrase in ["Correctness", "Completeness", "Maintainability", "Test Coverage", "Recoverability", "Safety"]:
+        if phrase not in quality:
+            fail(f"QUALITY.md is missing rubric criterion: {phrase}")
+
+    docs_index = DOCS_INDEX_PATH.read_text()
+    for phrase in ["architecture.md", "testing.md", "external-behavior.md", "agent-workflow.md", "decisions/"]:
+        if phrase not in docs_index:
+            fail(f"docs/README.md is missing index entry: {phrase}")
+
+    run_template = RUN_TEMPLATE_PATH.read_text()
+    for phrase in ["Commands Run", "Evidence", "Evaluator Result", "Follow-Up"]:
+        if phrase not in run_template:
+            fail(f"runs/RUN_TEMPLATE.md is missing section: {phrase}")
 
 
 if __name__ == "__main__":

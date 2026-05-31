@@ -39,8 +39,24 @@ class RepositoryContractTests(unittest.TestCase):
             "The Evaluator Agent verifies without implementation changes.",
             "Marking a feature done without evaluator pass.",
             "Never rely on chat history. Always rely on project state.",
+            "`docs/README.md` for the repository knowledge index.",
+            "`QUALITY.md` for evaluator criteria.",
+            "`runs/` for per-run evidence and handoff records.",
         ]:
             self.assertIn(phrase, text)
+
+    def test_repository_knowledge_and_quality_contracts_are_indexed(self):
+        docs = (ROOT / "docs" / "README.md").read_text()
+        for phrase in ["architecture.md", "testing.md", "external-behavior.md", "agent-workflow.md", "decisions/"]:
+            self.assertIn(phrase, docs)
+
+        quality = (ROOT / "QUALITY.md").read_text()
+        for phrase in ["Correctness", "Completeness", "Maintainability", "Test Coverage", "Recoverability", "Safety"]:
+            self.assertIn(phrase, quality)
+
+        run_template = (ROOT / "runs" / "RUN_TEMPLATE.md").read_text()
+        for phrase in ["Commands Run", "Evidence", "Evaluator Result", "Follow-Up"]:
+            self.assertIn(phrase, run_template)
 
     def test_feature_schema_requires_acceptance_and_state(self):
         schema = json.loads((ROOT / "schemas/feature_list.schema.json").read_text())
@@ -77,6 +93,7 @@ class RepositoryContractTests(unittest.TestCase):
                 "Preserve existing feature IDs, ordering, `passes`, `status`, `attempts`, `last_error`, and unknown fields.",
                 "Do not stage or commit during orchestrated runs.",
                 "verify it with a primary source or real-shaped fixture before depending on it.",
+                "Record run evidence in `runs/` for non-trivial work",
             ],
             "continue.md": [
                 "reconstruct context from repository state only",
@@ -91,6 +108,8 @@ class RepositoryContractTests(unittest.TestCase):
                 "Do not implement new features.",
                 "Do not accept incomplete work.",
                 "Prevent premature completion.",
+                "Apply the rubric in `QUALITY.md`.",
+                "record or update run evidence using `runs/RUN_TEMPLATE.md`.",
                 "EVAL_PASS: Fxxx",
                 "EVAL_FAIL: Fxxx: <reason>",
             ],

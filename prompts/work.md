@@ -16,6 +16,7 @@ You must:
 8. Update `progress.md`.
 9. Update only the selected feature in `feature_list.json`.
 10. Run `./init.sh` after changes.
+11. Record run evidence in `runs/` for non-trivial work, external behavior verification, failures, or evaluator handoff.
 
 Do not mark unrelated features done.
 Do not overwrite `feature_list.json`.
