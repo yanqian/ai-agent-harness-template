@@ -21,6 +21,8 @@ Implemented components:
 - Contract tests that lock AI agent obligations and harness boundaries.
 - Verification planning in `test_plan.md`.
 - Root verification wrapper at `./init.sh`.
+- Make targets in `Makefile`.
+- GitHub Actions workflow in `.github/workflows/ci.yml`.
 - Vendor-neutral lightweight orchestrator in `orchestrator.py`.
 - Explicit Coding Agent and Evaluator Agent adapters under `scripts/`.
 - Tiny dependency-free Python CLI example in `examples/tiny-cli/`.
@@ -28,7 +30,7 @@ Implemented components:
 
 ## Last Completed Feature
 
-`F009` - Add Go server example.
+`F010` - Add Makefile and GitHub Actions CI.
 
 ## Next Feature
 

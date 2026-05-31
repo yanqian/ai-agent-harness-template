@@ -154,6 +154,23 @@
       "attempts": 1,
       "last_error": "",
       "priority": "P1"
+    },
+    {
+      "id": "F010",
+      "title": "Add Makefile and GitHub Actions CI",
+      "description": "Add a Makefile that standardizes local harness commands and a GitHub Actions workflow that runs the same CI verification path on push and pull request.",
+      "acceptance": [
+        "Makefile defines init, test, validate, unit, contract, smoke, go-example, dry-run, summarize, and ci targets",
+        "make ci runs ./init.sh, feature validation, and orchestrator dry-run",
+        ".github/workflows/ci.yml runs make ci on push, pull_request, and workflow_dispatch",
+        "README.md documents Makefile usage",
+        "./init.sh validates the Makefile and GitHub Actions workflow are present"
+      ],
+      "passes": true,
+      "status": "done",
+      "attempts": 1,
+      "last_error": "",
+      "priority": "P1"
     }
   ]
 }

@@ -30,10 +30,7 @@ The harness is designed for Codex, Claude Code, Cursor Agent, and similar coding
 Run:
 
 ```bash
-./init.sh
-scripts/validate-feature.sh F001
-scripts/summarize-progress.sh
-python3 orchestrator.py --dry-run
+make ci
 ```
 
 Expected result:
@@ -52,10 +49,20 @@ Expected result:
 1. Add new requirements to `SPEC.md`.
 2. Append new features to `feature_list.json`.
 3. Implement one feature at a time.
-4. Run `./init.sh`.
-5. Run `scripts/validate-feature.sh Fxxx`.
+4. Run `make init`.
+5. Run `make validate FEATURE=Fxxx`.
 6. Update `progress.md`.
 7. Commit only after verification passes.
+
+## Make Targets
+
+- `make init` runs `./init.sh`.
+- `make validate FEATURE=Fxxx` validates one feature.
+- `make unit`, `make contract`, and `make smoke` run individual test layers.
+- `make go-example` runs the Go server example tests.
+- `make dry-run` previews the next orchestrator round.
+- `make summarize` prints progress and run summaries.
+- `make ci` runs the same commands used by GitHub Actions.
 
 ## Orchestrator
 
@@ -97,7 +104,7 @@ claude "$(cat)"
 All default layers are run by:
 
 ```bash
-./init.sh
+make init
 ```
 
 ## Knowledge, Quality, And Runs

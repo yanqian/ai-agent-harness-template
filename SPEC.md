@@ -22,6 +22,8 @@ The harness makes project state recoverable by storing requirements, feature sta
 - A JSON Schema for feature state.
 - Prompt templates for planning, work, continuation, and evaluation.
 - Deterministic validation scripts.
+- A `Makefile` with common local and CI verification targets.
+- A GitHub Actions workflow that runs harness verification on push and pull request.
 - A test plan and dependency-free unit, contract, and smoke tests.
 - Contract tests for AI agent obligations and harness boundaries.
 - A vendor-neutral lightweight `orchestrator.py`.
@@ -96,6 +98,8 @@ The template keeps automated checks in explicit layers:
 - `./init.sh` runs unit, contract, smoke, and optional harness tests.
 - `docs/README.md`, `QUALITY.md`, and `runs/RUN_TEMPLATE.md` are present and validated.
 - `scripts/check-failure-domains.sh` verifies failed run records include failure-domain and harness-improvement fields.
+- `make ci` runs the CI verification path.
+- `.github/workflows/ci.yml` runs `make ci` on GitHub Actions.
 
 ## 5. Verification Plan
 
@@ -106,6 +110,7 @@ Run:
 scripts/validate-feature.sh F001
 scripts/summarize-progress.sh
 python3 orchestrator.py --dry-run
+make ci
 ```
 
 Run `python3 orchestrator.py --dry-run` and `scripts/validate-feature.sh F001` outside `./init.sh`; both commands call `./init.sh` and should not be nested inside tests run by `./init.sh`.

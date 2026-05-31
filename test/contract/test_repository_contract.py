@@ -100,6 +100,23 @@ class RepositoryContractTests(unittest.TestCase):
         for phrase in ["TestHealthz", "TestGreetUsesName", "TestGreetDefaultsBlankName", "TestPostIsRejected"]:
             self.assertIn(phrase, tests)
 
+    def test_makefile_and_github_actions_ci_contract(self):
+        makefile = (ROOT / "Makefile").read_text()
+        workflow = (ROOT / ".github" / "workflows" / "ci.yml").read_text()
+        readme = (ROOT / "README.md").read_text()
+        init = (ROOT / "scripts" / "init.sh").read_text()
+
+        for target in ["init:", "test:", "validate:", "unit:", "contract:", "smoke:", "go-example:", "dry-run:", "summarize:", "ci:"]:
+            self.assertIn(target, makefile)
+        for phrase in ["./init.sh", "scripts/validate-feature.sh $(FEATURE)", "python3 orchestrator.py --dry-run", "$(MAKE) validate FEATURE=F001"]:
+            self.assertIn(phrase, makefile)
+        for phrase in ["push:", "pull_request:", "workflow_dispatch:", "actions/checkout@v4", "actions/setup-go@v5", "make ci"]:
+            self.assertIn(phrase, workflow)
+        for phrase in ["Make Targets", "make ci", "make validate FEATURE=Fxxx"]:
+            self.assertIn(phrase, readme)
+        for phrase in ["Makefile", ".github/workflows/ci.yml"]:
+            self.assertIn(phrase, init)
+
     def test_feature_schema_requires_acceptance_and_state(self):
         schema = json.loads((ROOT / "schemas/feature_list.schema.json").read_text())
         feature_required = schema["properties"]["features"]["items"]["required"]

@@ -12,6 +12,8 @@ for path in \
   progress.md \
   test_plan.md \
   README.md \
+  Makefile \
+  .github/workflows/ci.yml \
   QUALITY.md \
   orchestrator.py \
   docs/README.md \
