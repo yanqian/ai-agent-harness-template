@@ -13,11 +13,12 @@ Implemented components:
 - Prompt templates in `prompts/`.
 - Validation scripts in `scripts/`.
 - Root verification wrapper at `./init.sh`.
+- Vendor-neutral lightweight orchestrator in `orchestrator.py`.
 - Tiny dependency-free Python CLI example in `examples/tiny-cli/`.
 
 ## Last Completed Feature
 
-`F001` - Bootstrap minimal AI agent harness template.
+`F002` - Add vendor-neutral lightweight orchestrator.
 
 ## Next Feature
 
@@ -27,4 +28,3 @@ No unfinished feature remains in the template.
 
 - This template intentionally does not include a full orchestrator.
 - Vendor-specific command wrappers for Codex, Claude Code, and Cursor Agent are intentionally left to downstream projects.
-

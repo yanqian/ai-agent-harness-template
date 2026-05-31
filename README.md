@@ -10,6 +10,7 @@ The harness is designed for Codex, Claude Code, Cursor Agent, and similar coding
 - `AGENTS.md` defines agent rules.
 - `prompts/` contains role prompts.
 - `scripts/` validates state and examples.
+- `orchestrator.py` previews or runs one-feature coding/evaluation loops.
 
 ## Quick Start
 
@@ -19,6 +20,7 @@ Run:
 ./init.sh
 scripts/validate-feature.sh F001
 scripts/summarize-progress.sh
+python3 orchestrator.py --dry-run
 ```
 
 Expected result:
@@ -28,6 +30,7 @@ Expected result:
 - feature IDs are unique;
 - status and `passes` fields are consistent;
 - the tiny example tests pass.
+- the orchestrator can run the startup protocol and preview prompts.
 
 ## Development Flow
 
@@ -38,6 +41,29 @@ Expected result:
 5. Run `scripts/validate-feature.sh Fxxx`.
 6. Update `progress.md`.
 7. Commit only after verification passes.
+
+## Orchestrator
+
+Preview the next one-feature round:
+
+```bash
+python3 orchestrator.py --dry-run
+```
+
+Run evaluator prompt preview only:
+
+```bash
+python3 orchestrator.py --eval-only F001 --dry-run
+```
+
+The template does not assume a specific AI coding tool. To execute a real agent instead of previewing prompts, set `HARNESS_AGENT_COMMAND` to a command that accepts the prompt as its final argv.
+
+Examples:
+
+```bash
+HARNESS_AGENT_COMMAND="codex exec" python3 orchestrator.py --max-rounds 1
+HARNESS_AGENT_COMMAND="claude" python3 orchestrator.py --max-rounds 1
+```
 
 ## Agent Prompt Files
 
@@ -53,4 +79,3 @@ For a new project, copy the template files into the project root, then replace t
 ## Tiny Example
 
 The included example lives in `examples/tiny-cli/`. It exposes a small Python function and test suite so the harness can prove validation works without third-party dependencies.
-

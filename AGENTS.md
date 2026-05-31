@@ -92,6 +92,23 @@ EVAL_PASS: Fxxx
 EVAL_FAIL: Fxxx: <reason>
 ```
 
+### Orchestrator
+
+`orchestrator.py` owns optional unattended feature execution.
+
+Responsibilities:
+
+- Follow the startup protocol before doing anything else.
+- Pick one unfinished feature per round.
+- Mark the selected feature `status="in_progress"`.
+- Increment the selected feature's `attempts`.
+- Run a Coding Agent prompt for that feature.
+- Run an Evaluator Agent prompt for that feature.
+- Mark the feature done only after evaluator pass.
+- Mark the feature failed or blocked after coding or evaluation failure.
+
+The template orchestrator is vendor-neutral. By default it supports `--dry-run` prompt preview. To execute a real agent, set `HARNESS_AGENT_COMMAND` to a command that accepts the prompt as its final argv.
+
 ## State Files
 
 ### `feature_list.json`
@@ -137,3 +154,8 @@ Feature-level validation uses:
 scripts/validate-feature.sh F001
 ```
 
+Optional orchestration preview uses:
+
+```bash
+python3 orchestrator.py --dry-run
+```

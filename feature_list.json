@@ -15,7 +15,23 @@
       "attempts": 1,
       "last_error": "",
       "priority": "P0"
+    },
+    {
+      "id": "F002",
+      "title": "Add vendor-neutral lightweight orchestrator",
+      "description": "Add a generic orchestrator that follows the startup protocol, selects one unfinished feature, previews or runs Coding Agent and Evaluator Agent prompts, supports eval-only mode, and keeps vendor-specific agent execution configurable.",
+      "acceptance": [
+        "orchestrator.py exists at the template root",
+        "python3 orchestrator.py --dry-run runs the startup protocol and exits successfully when there is no unfinished feature",
+        "python3 orchestrator.py --eval-only F001 --dry-run previews the evaluator prompt",
+        "./init.sh validates orchestrator.py syntax",
+        "README.md and SPEC.md document the orchestrator boundary"
+      ],
+      "passes": true,
+      "status": "done",
+      "attempts": 1,
+      "last_error": "",
+      "priority": "P0"
     }
   ]
 }
-

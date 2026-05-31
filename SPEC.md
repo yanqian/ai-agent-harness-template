@@ -17,6 +17,7 @@ The harness makes project state recoverable by storing requirements, feature sta
 - A JSON Schema for feature state.
 - Prompt templates for planning, work, continuation, and evaluation.
 - Deterministic validation scripts.
+- A vendor-neutral lightweight `orchestrator.py`.
 - A tiny runnable example proving the harness loop works.
 
 ### Excluded
@@ -25,7 +26,7 @@ The harness makes project state recoverable by storing requirements, feature sta
 - Cloud deployment.
 - CI provider configuration.
 - Automatic commits.
-- A full orchestrator.
+- Vendor-specific orchestration adapters.
 
 ## 3. Core Concepts
 
@@ -41,6 +42,10 @@ Every executable unit of work is represented in `feature_list.json` with explici
 
 A feature is complete only when validation passes and an evaluator can justify the result against the acceptance criteria.
 
+### Orchestrated When Needed
+
+`orchestrator.py` can preview or run the coding/evaluation loop for one unfinished feature at a time. It is intentionally vendor-neutral: `--dry-run` prints prompts, while `HARNESS_AGENT_COMMAND` lets downstream projects connect Codex, Claude Code, Cursor Agent, or another command.
+
 ### Recoverable
 
 Any session can resume by reading repository files and git history. Chat history is not required.
@@ -50,6 +55,7 @@ Any session can resume by reading repository files and git history. Chat history
 - `./init.sh` validates harness state and runs the tiny example tests.
 - `scripts/validate-feature.sh F001` validates a feature by ID and runs the default verification entry point.
 - `scripts/summarize-progress.sh` prints a concise status summary.
+- `python3 orchestrator.py --dry-run` runs the startup protocol and previews agent prompts without mutating feature state.
 - `feature_list.json` conforms to `schemas/feature_list.schema.json`.
 - `prompts/plan.md`, `prompts/work.md`, `prompts/continue.md`, and `prompts/evaluate.md` define the standard agent roles.
 - The tiny example can be tested without installing third-party dependencies.
@@ -62,5 +68,5 @@ Run:
 ./init.sh
 scripts/validate-feature.sh F001
 scripts/summarize-progress.sh
+python3 orchestrator.py --dry-run
 ```
-

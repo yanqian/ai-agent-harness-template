@@ -11,6 +11,7 @@ for path in \
   feature_list.json \
   progress.md \
   README.md \
+  orchestrator.py \
   schemas/feature_list.schema.json \
   prompts/plan.md \
   prompts/work.md \
@@ -25,6 +26,13 @@ done
 
 echo "== Harness state =="
 python3 scripts/validate-state.py
+
+echo "== Orchestrator syntax =="
+python3 - <<'PY'
+from pathlib import Path
+
+compile(Path("orchestrator.py").read_text(), "orchestrator.py", "exec")
+PY
 
 echo "== Tiny example =="
 python3 - <<'PY'
