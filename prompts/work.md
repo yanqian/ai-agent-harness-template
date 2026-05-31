@@ -17,6 +17,7 @@ You must:
 9. Update only the selected feature in `feature_list.json`.
 10. Run `./init.sh` after changes.
 11. Record run evidence in `runs/` for non-trivial work, external behavior verification, failures, or evaluator handoff.
+12. When work fails or is blocked, classify the failure using `docs/failure-domains.md` and assess whether it requires a harness improvement.
 
 Do not mark unrelated features done.
 Do not overwrite `feature_list.json`.
@@ -24,6 +25,7 @@ Do not reset existing feature state.
 Preserve existing feature IDs, ordering, `passes`, `status`, `attempts`, `last_error`, and unknown fields.
 Do not stage or commit during orchestrated runs.
 When relying on external CLI, API, runtime, or structured tool output behavior, verify it with a primary source or real-shaped fixture before depending on it.
+Do not leave repeated failures as retries only; convert harness weaknesses into docs, prompts, scripts, schemas, tests, or a new feature entry.
 
 Return:
 
@@ -31,4 +33,5 @@ Return:
 - Files changed.
 - Verification commands run.
 - Remaining issues.
+- Failure domain and harness improvement assessment when applicable.
 - Suggested commit message.

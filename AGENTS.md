@@ -124,6 +124,7 @@ Responsibilities:
 - Run an Evaluator Agent prompt for that feature.
 - Mark the feature done only after evaluator pass.
 - Mark the feature failed or blocked after coding or evaluation failure.
+- Write a failure run record when unattended coding or evaluation fails.
 
 The template orchestrator is vendor-neutral. By default it supports `--dry-run` prompt preview. To execute real agents, replace the role adapters:
 
@@ -145,6 +146,7 @@ Use these durable knowledge files:
 - `docs/testing.md` for verification layers.
 - `docs/external-behavior.md` for CLI, API, runtime, and tool-output verification rules.
 - `docs/agent-workflow.md` for planning, coding, evaluation, continuation, and run artifacts.
+- `docs/failure-domains.md` for failure classification and harness improvement rules.
 - `QUALITY.md` for evaluator criteria.
 - `runs/` for per-run evidence and handoff records.
 
@@ -193,6 +195,21 @@ Rules:
 - Recovery notes when useful.
 
 The Coding Agent updates `progress.md` after implementation work.
+
+## Failure Improvement Loop
+
+Failures must improve the harness when they reveal a weak loop.
+
+When a feature fails, is blocked, or exposes repeated evaluator feedback:
+
+- Record the concrete failure in `last_error`.
+- Record run evidence in `runs/`.
+- Assign one primary failure domain from `docs/failure-domains.md`.
+- Assess whether the failure requires a harness improvement.
+- Convert harness failures into durable changes such as docs, prompts, scripts, schemas, contract tests, smoke tests, or a new feature entry.
+- If no harness improvement is required, record why the failure is only an implementation issue.
+
+Repeated failures in the same domain must not remain only retries. They should become an explicit harness improvement feature or a committed harness rule/test change.
 
 ## External Behavior Verification
 

@@ -35,6 +35,7 @@ The feature must satisfy its `feature_list.json` acceptance criteria and preserv
 - A future agent can resume from `AGENTS.md`, `SPEC.md`, `feature_list.json`, `progress.md`, `docs/`, `QUALITY.md`, `runs/`, and git history.
 - State files remain valid and internally consistent.
 - Run evidence is recorded when the work involves non-trivial verification or failure analysis.
+- Failed or blocked work is classified with a failure domain and assessed for harness improvement.
 
 ### Safety
 
@@ -56,4 +57,4 @@ Return `EVAL_FAIL: Fxxx: <reason>` when:
 - State is inconsistent.
 - Verification was skipped or inconclusive.
 - External behavior was assumed without evidence.
-
+- A failed run lacks failure-domain classification or harness improvement assessment.

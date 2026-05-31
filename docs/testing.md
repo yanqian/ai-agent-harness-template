@@ -12,6 +12,7 @@ All automated verification starts with:
 - Contract tests: repository rules, schema, prompts, and agent obligations.
 - Harness tests: optional project-specific workflow behavior.
 - Smoke tests: non-recursive command checks.
+- Failure-domain checks: failed run records must include domain and harness improvement assessment.
 
 ## Recursive Command Boundary
 
@@ -25,6 +26,12 @@ python3 orchestrator.py --eval-only F001 --dry-run
 scripts/validate-feature.sh F001
 ```
 
+Failure-domain checks are non-recursive and run inside `./init.sh`:
+
+```bash
+scripts/check-failure-domains.sh
+```
+
 ## Adding Tests
 
 When adding a feature:
@@ -33,4 +40,3 @@ When adding a feature:
 2. Add contract tests for durable behavior boundaries.
 3. Add harness tests for multi-step workflows.
 4. Add smoke tests for stable top-level commands.
-

@@ -42,21 +42,28 @@ class RepositoryContractTests(unittest.TestCase):
             "`docs/README.md` for the repository knowledge index.",
             "`QUALITY.md` for evaluator criteria.",
             "`runs/` for per-run evidence and handoff records.",
+            "## Failure Improvement Loop",
+            "Assign one primary failure domain from `docs/failure-domains.md`.",
+            "Repeated failures in the same domain must not remain only retries.",
         ]:
             self.assertIn(phrase, text)
 
     def test_repository_knowledge_and_quality_contracts_are_indexed(self):
         docs = (ROOT / "docs" / "README.md").read_text()
-        for phrase in ["architecture.md", "testing.md", "external-behavior.md", "agent-workflow.md", "decisions/"]:
+        for phrase in ["architecture.md", "testing.md", "external-behavior.md", "agent-workflow.md", "failure-domains.md", "decisions/"]:
             self.assertIn(phrase, docs)
 
         quality = (ROOT / "QUALITY.md").read_text()
-        for phrase in ["Correctness", "Completeness", "Maintainability", "Test Coverage", "Recoverability", "Safety"]:
+        for phrase in ["Correctness", "Completeness", "Maintainability", "Test Coverage", "Recoverability", "Safety", "failure domain", "harness improvement"]:
             self.assertIn(phrase, quality)
 
         run_template = (ROOT / "runs" / "RUN_TEMPLATE.md").read_text()
-        for phrase in ["Commands Run", "Evidence", "Evaluator Result", "Follow-Up"]:
+        for phrase in ["Commands Run", "Evidence", "Failure Analysis", "Failure domain", "Harness improvement", "Evaluator Result", "Follow-Up"]:
             self.assertIn(phrase, run_template)
+
+        failure_domains = (ROOT / "docs" / "failure-domains.md").read_text()
+        for phrase in ["requirement_gap", "implementation_gap", "test_gap", "contract_gap", "external_behavior_gap", "state_recovery_gap", "agent_workflow_gap", "environment_gap", "Improvement Loop"]:
+            self.assertIn(phrase, failure_domains)
 
     def test_feature_schema_requires_acceptance_and_state(self):
         schema = json.loads((ROOT / "schemas/feature_list.schema.json").read_text())
@@ -94,6 +101,8 @@ class RepositoryContractTests(unittest.TestCase):
                 "Do not stage or commit during orchestrated runs.",
                 "verify it with a primary source or real-shaped fixture before depending on it.",
                 "Record run evidence in `runs/` for non-trivial work",
+                "classify the failure using `docs/failure-domains.md`",
+                "convert harness weaknesses into docs, prompts, scripts, schemas, tests, or a new feature entry",
             ],
             "continue.md": [
                 "reconstruct context from repository state only",
@@ -102,6 +111,7 @@ class RepositoryContractTests(unittest.TestCase):
                 "Do not reset existing feature state.",
                 "Stop and report exact conflicts when repository state is unsafe.",
                 "Use `orchestrator.py` according to `AGENTS.md` when implementation or evaluation is required.",
+                "Do not continue repeated failures without either implementing a harness improvement or adding an explicit follow-up feature.",
             ],
             "evaluate.md": [
                 "Act as Evaluator Agent",
@@ -110,6 +120,8 @@ class RepositoryContractTests(unittest.TestCase):
                 "Prevent premature completion.",
                 "Apply the rubric in `QUALITY.md`.",
                 "record or update run evidence using `runs/RUN_TEMPLATE.md`.",
+                "classify the failure using `docs/failure-domains.md`",
+                "require a durable harness improvement or a follow-up feature",
                 "EVAL_PASS: Fxxx",
                 "EVAL_FAIL: Fxxx: <reason>",
             ],
@@ -127,7 +139,9 @@ class RepositoryContractTests(unittest.TestCase):
             "--max-rounds",
             "CODING_AGENT_ADAPTER",
             "EVALUATOR_AGENT_ADAPTER",
+            "RUNS_DIR",
             "startup_protocol()",
+            "write_failure_run_record(feature_id, error)",
             "run_agent(coding_prompt",
             "run_agent(evaluator_prompt",
             "mark_in_progress(feature_id)",

@@ -10,6 +10,7 @@ Implemented components:
 - Repository knowledge map under `docs/`.
 - Evaluator rubric in `QUALITY.md`.
 - Run artifact template under `runs/`.
+- Failure-domain improvement loop in `docs/failure-domains.md` and `scripts/check-failure-domains.sh`.
 - Practiced AGENTS guardrails for state safety, external behavior verification, tool schema handling, and anti-pattern prevention.
 - Requirements in `SPEC.md`.
 - Feature state in `feature_list.json`.
@@ -26,7 +27,7 @@ Implemented components:
 
 ## Last Completed Feature
 
-`F007` - Add repository knowledge map, quality rubric, and run artifacts.
+`F008` - Add failure-domain to harness-improvement loop.
 
 ## Next Feature
 

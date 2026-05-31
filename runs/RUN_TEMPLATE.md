@@ -26,6 +26,13 @@
 - Screenshots or traces:
 - External behavior verification:
 
+## Failure Analysis
+
+- Failure domain:
+- Failure summary:
+- Harness improvement:
+- Follow-up feature:
+
 ## Files Changed
 
 -
@@ -45,4 +52,3 @@ EVAL_FAIL: Fxxx: <reason>
 ## Follow-Up
 
 -
-

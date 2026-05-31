@@ -19,6 +19,7 @@ for path in \
   docs/testing.md \
   docs/external-behavior.md \
   docs/agent-workflow.md \
+  docs/failure-domains.md \
   docs/decisions/README.md \
   runs/RUN_TEMPLATE.md \
   schemas/feature_list.schema.json \
@@ -30,6 +31,7 @@ for path in \
   scripts/validate-feature.sh \
   scripts/summarize-progress.sh \
   scripts/summarize-runs.sh \
+  scripts/check-failure-domains.sh \
   scripts/run-coding-agent.sh \
   scripts/run-evaluator-agent.sh
 do
@@ -38,6 +40,9 @@ done
 
 echo "== Harness state =="
 python3 scripts/validate-state.py
+
+echo "== Failure domains =="
+scripts/check-failure-domains.sh
 
 echo "== Orchestrator syntax =="
 python3 - <<'PY'

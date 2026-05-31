@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 import argparse
+from datetime import datetime, timezone
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -9,6 +11,7 @@ from typing import Optional
 FEATURES_PATH = Path("feature_list.json")
 PROGRESS_PATH = Path("progress.md")
 PROMPTS_DIR = Path("prompts")
+RUNS_DIR = Path("runs")
 CODING_AGENT_ADAPTER = Path("scripts/run-coding-agent.sh")
 EVALUATOR_AGENT_ADAPTER = Path("scripts/run-evaluator-agent.sh")
 MAX_ROUNDS = 1
@@ -99,6 +102,50 @@ def mark_failed(feature_id: str, error: str, max_attempts: int) -> None:
     feature["status"] = "blocked" if attempts >= max_attempts else "todo"
     feature["last_error"] = error.strip()[:2000]
     save_state(data)
+
+
+def write_failure_run_record(feature_id: str, failure_summary: str) -> None:
+    RUNS_DIR.mkdir(exist_ok=True)
+    timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    safe_feature = re.sub(r"[^A-Za-z0-9_-]+", "-", feature_id)
+    path = RUNS_DIR / f"{timestamp}-{safe_feature}-failure.md"
+    current_commit = run_capture(["git", "rev-parse", "--short", "HEAD"], check=False).stdout.strip() or "unknown"
+    status = run_capture(["git", "status", "--short"], check=False).stdout.strip() or "clean"
+    path.write_text(
+        f"# Run Record: {feature_id} - orchestrator failure\n\n"
+        "## Summary\n\n"
+        f"- Date: {timestamp}\n"
+        "- Agent role: Orchestrator\n"
+        f"- Feature: {feature_id}\n"
+        "- Result: fail\n\n"
+        "## Repository State\n\n"
+        f"- Starting commit: {current_commit}\n"
+        f"- Ending commit: {current_commit}\n"
+        f"- Working tree status: {status}\n\n"
+        "## Commands Run\n\n"
+        "```bash\n"
+        "python3 orchestrator.py\n"
+        "```\n\n"
+        "## Evidence\n\n"
+        "- Tests:\n"
+        f"- Logs: {failure_summary.strip()[:1000]}\n"
+        "- Screenshots or traces:\n"
+        "- External behavior verification:\n\n"
+        "## Failure Analysis\n\n"
+        "- Failure domain: unknown\n"
+        f"- Failure summary: {failure_summary.strip()[:1000]}\n"
+        "- Harness improvement: unknown\n"
+        "- Follow-up feature:\n\n"
+        "## Files Changed\n\n"
+        "- `feature_list.json`\n\n"
+        "## Evaluator Result\n\n"
+        "```text\n"
+        f"EVAL_FAIL: {feature_id}: {failure_summary.strip()[:1000]}\n"
+        "```\n\n"
+        "## Follow-Up\n\n"
+        "- Classify the failure domain and assess harness improvement before the next retry.\n"
+    )
+    print(f"Wrote failure run record: {path}", flush=True)
 
 
 def startup_protocol() -> None:
@@ -215,12 +262,16 @@ def main() -> int:
         mark_in_progress(feature_id)
         coding_result = run_agent(coding_prompt(feature_id), dry_run=False, label="Coding Agent", adapter_path=CODING_AGENT_ADAPTER)
         if coding_result.returncode != 0:
-            mark_failed(feature_id, f"coding agent exited with code {coding_result.returncode}", args.max_attempts)
+            error = f"coding agent exited with code {coding_result.returncode}"
+            mark_failed(feature_id, error, args.max_attempts)
+            write_failure_run_record(feature_id, error)
             continue
 
         evaluator = run_agent(evaluator_prompt(feature_id), dry_run=False, label="Evaluator Agent", adapter_path=EVALUATOR_AGENT_ADAPTER)
         if evaluator.returncode != 0:
-            mark_failed(feature_id, f"evaluator exited with code {evaluator.returncode}", args.max_attempts)
+            error = f"evaluator exited with code {evaluator.returncode}"
+            mark_failed(feature_id, error, args.max_attempts)
+            write_failure_run_record(feature_id, error)
             continue
 
         passed, reason = evaluator_result(feature_id, evaluator)
@@ -228,7 +279,9 @@ def main() -> int:
             mark_done(feature_id)
             print(f"Done: {feature_id}", flush=True)
         else:
-            mark_failed(feature_id, reason or "Evaluator rejected the feature.", args.max_attempts)
+            error = reason or "Evaluator rejected the feature."
+            mark_failed(feature_id, error, args.max_attempts)
+            write_failure_run_record(feature_id, error)
             print(f"Evaluation failed: {feature_id}: {reason}", flush=True)
 
     return 0

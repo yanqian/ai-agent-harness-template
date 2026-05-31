@@ -15,6 +15,7 @@ You must:
 7. Verify the feature against its description and acceptance criteria.
 8. Apply the rubric in `QUALITY.md`.
 9. Check relevant run evidence in `runs/` when present.
+10. For failed or blocked work, classify the failure using `docs/failure-domains.md`.
 
 Strict rules:
 
@@ -24,6 +25,7 @@ Strict rules:
 - Prevent premature completion.
 - If verification fails, explain the exact failure.
 - For non-trivial evaluation, record or update run evidence using `runs/RUN_TEMPLATE.md`.
+- If a failure reveals a harness weakness, require a durable harness improvement or a follow-up feature.
 
 Output exactly one of:
 
@@ -31,3 +33,5 @@ Output exactly one of:
 EVAL_PASS: Fxxx
 EVAL_FAIL: Fxxx: <reason>
 ```
+
+When returning `EVAL_FAIL`, include the failure domain and harness improvement assessment in the reason when known.

@@ -30,3 +30,15 @@ For non-trivial work, create a run note from `runs/RUN_TEMPLATE.md`.
 
 Run notes capture commands, evidence, decisions, failures, and next actions.
 
+## Failure Improvement
+
+When work fails, classify the failure using `docs/failure-domains.md`.
+
+Every failed or blocked run should record:
+
+- Failure domain.
+- Failure summary.
+- Harness improvement assessment.
+- Follow-up feature ID if the improvement is deferred.
+
+Use `scripts/check-failure-domains.sh` to verify failed run records include the classification and improvement assessment.

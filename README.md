@@ -11,6 +11,7 @@ The harness is designed for Codex, Claude Code, Cursor Agent, and similar coding
 - `docs/` stores durable repository knowledge.
 - `QUALITY.md` defines the evaluator rubric.
 - `runs/` stores run evidence and handoff records.
+- `docs/failure-domains.md` and `scripts/check-failure-domains.sh` turn failures into harness improvement pressure.
 - `prompts/` contains role prompts.
 - `scripts/` validates state and examples.
 - `test/` contains unit, contract, and smoke tests.
@@ -97,6 +98,12 @@ Keep `AGENTS.md` short enough to be a map. Put durable detail in `docs/`.
 Use `QUALITY.md` when evaluating features. It defines correctness, completeness, maintainability, test coverage, recoverability, and safety criteria.
 
 Use `runs/RUN_TEMPLATE.md` for non-trivial work, failures, external behavior verification, and evaluator handoff.
+
+Failed or blocked run records must include a failure domain and harness improvement assessment. Check that with:
+
+```bash
+scripts/check-failure-domains.sh
+```
 
 Summarize run records with:
 

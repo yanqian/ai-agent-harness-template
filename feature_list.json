@@ -118,6 +118,25 @@
       "attempts": 1,
       "last_error": "",
       "priority": "P0"
+    },
+    {
+      "id": "F008",
+      "title": "Add failure-domain to harness-improvement loop",
+      "description": "Add a mechanism that classifies failures by domain and forces failed or blocked run records to assess whether the harness itself needs improvement through docs, prompts, scripts, schemas, tests, or follow-up features.",
+      "acceptance": [
+        "docs/failure-domains.md defines failure domains and the improvement loop",
+        "runs/RUN_TEMPLATE.md includes Failure Analysis fields for failure domain, summary, harness improvement, and follow-up feature",
+        "scripts/check-failure-domains.sh fails when failed run records omit domain or harness improvement assessment",
+        "orchestrator.py writes a failed run record when unattended coding or evaluation fails",
+        "AGENTS.md and prompts require agents to classify failures and turn harness weaknesses into durable improvements",
+        "./init.sh runs the failure-domain check",
+        "Contract, unit, and smoke tests cover the failure-domain mechanism"
+      ],
+      "passes": true,
+      "status": "done",
+      "attempts": 1,
+      "last_error": "",
+      "priority": "P0"
     }
   ]
 }
