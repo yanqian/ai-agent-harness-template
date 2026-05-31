@@ -125,7 +125,12 @@ Responsibilities:
 - Mark the feature done only after evaluator pass.
 - Mark the feature failed or blocked after coding or evaluation failure.
 
-The template orchestrator is vendor-neutral. By default it supports `--dry-run` prompt preview. To execute a real agent, set `HARNESS_AGENT_COMMAND` to a command that accepts the prompt as its final argv.
+The template orchestrator is vendor-neutral. By default it supports `--dry-run` prompt preview. To execute real agents, replace the role adapters:
+
+- `scripts/run-coding-agent.sh`
+- `scripts/run-evaluator-agent.sh`
+
+The orchestrator sends each role prompt to the corresponding adapter on stdin.
 
 ## State Files
 

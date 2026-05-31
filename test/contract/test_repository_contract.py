@@ -106,7 +106,8 @@ class RepositoryContractTests(unittest.TestCase):
             "--dry-run",
             "--eval-only",
             "--max-rounds",
-            "HARNESS_AGENT_COMMAND",
+            "CODING_AGENT_ADAPTER",
+            "EVALUATOR_AGENT_ADAPTER",
             "startup_protocol()",
             "run_agent(coding_prompt",
             "run_agent(evaluator_prompt",
@@ -116,6 +117,15 @@ class RepositoryContractTests(unittest.TestCase):
             "if args.eval_only:",
         ]:
             self.assertIn(phrase, text)
+        self.assertNotIn("HARNESS_AGENT_COMMAND", text)
+
+    def test_orchestrator_uses_explicit_role_adapters(self):
+        coding = (ROOT / "scripts/run-coding-agent.sh").read_text()
+        evaluator = (ROOT / "scripts/run-evaluator-agent.sh").read_text()
+        self.assertIn("Coding Agent prompt on stdin", coding)
+        self.assertIn("Evaluator Agent prompt on stdin", evaluator)
+        self.assertIn("EVAL_PASS", evaluator)
+        self.assertIn("EVAL_FAIL", evaluator)
 
 
 if __name__ == "__main__":

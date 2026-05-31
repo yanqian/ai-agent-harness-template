@@ -47,7 +47,7 @@ A feature is complete only when validation passes and an evaluator can justify t
 
 ### Orchestrated When Needed
 
-`orchestrator.py` can preview or run the coding/evaluation loop for one unfinished feature at a time. It is intentionally vendor-neutral: `--dry-run` prints prompts, while `HARNESS_AGENT_COMMAND` lets downstream projects connect Codex, Claude Code, Cursor Agent, or another command.
+`orchestrator.py` can preview or run the coding/evaluation loop for one unfinished feature at a time. It is intentionally vendor-neutral: `--dry-run` prints prompts, while `scripts/run-coding-agent.sh` and `scripts/run-evaluator-agent.sh` are the explicit role adapters downstream projects replace to connect Codex, Claude Code, Cursor Agent, or another tool.
 
 ### Recoverable
 

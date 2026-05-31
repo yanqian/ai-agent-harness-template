@@ -83,6 +83,23 @@
       "attempts": 1,
       "last_error": "",
       "priority": "P0"
+    },
+    {
+      "id": "F006",
+      "title": "Replace generic agent command with role adapters",
+      "description": "Remove the generic HARNESS_AGENT_COMMAND orchestration hook and make orchestrator.py dispatch explicit Coding Agent and Evaluator Agent role adapters instead.",
+      "acceptance": [
+        "orchestrator.py no longer references HARNESS_AGENT_COMMAND",
+        "orchestrator.py dispatches scripts/run-coding-agent.sh for Coding Agent prompts",
+        "orchestrator.py dispatches scripts/run-evaluator-agent.sh for Evaluator Agent prompts",
+        "README.md, SPEC.md, and AGENTS.md document role adapters instead of a generic agent command",
+        "./init.sh passes after the adapter boundary change"
+      ],
+      "passes": true,
+      "status": "done",
+      "attempts": 1,
+      "last_error": "",
+      "priority": "P0"
     }
   ]
 }

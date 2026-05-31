@@ -18,11 +18,12 @@ Implemented components:
 - Verification planning in `test_plan.md`.
 - Root verification wrapper at `./init.sh`.
 - Vendor-neutral lightweight orchestrator in `orchestrator.py`.
+- Explicit Coding Agent and Evaluator Agent adapters under `scripts/`.
 - Tiny dependency-free Python CLI example in `examples/tiny-cli/`.
 
 ## Last Completed Feature
 
-`F005` - Strengthen contract tests for AI harness obligations.
+`F006` - Replace generic agent command with role adapters.
 
 ## Next Feature
 

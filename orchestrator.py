@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import argparse
 import json
-import os
 import subprocess
 import sys
 from pathlib import Path
@@ -10,6 +9,8 @@ from typing import Optional
 FEATURES_PATH = Path("feature_list.json")
 PROGRESS_PATH = Path("progress.md")
 PROMPTS_DIR = Path("prompts")
+CODING_AGENT_ADAPTER = Path("scripts/run-coding-agent.sh")
+EVALUATOR_AGENT_ADAPTER = Path("scripts/run-evaluator-agent.sh")
 MAX_ROUNDS = 1
 MAX_ATTEMPTS = 3
 
@@ -127,23 +128,14 @@ def evaluator_prompt(feature_id: str) -> str:
     return f"{prompt_template('evaluate.md')}\n\nSelected feature ID: `{feature_id}`\n"
 
 
-def agent_command(prompt: str) -> list[str]:
-    raw = os.environ.get("HARNESS_AGENT_COMMAND", "").strip()
-    if not raw:
-        raise OrchestratorError(
-            "HARNESS_AGENT_COMMAND is not set. Use --dry-run to preview prompts, "
-            "or set it to a command that accepts the prompt as its final argv."
-        )
-    return raw.split() + [prompt]
-
-
-def run_agent(prompt: str, dry_run: bool, label: str) -> subprocess.CompletedProcess[str]:
+def run_agent(prompt: str, dry_run: bool, label: str, adapter_path: Path) -> subprocess.CompletedProcess[str]:
     if dry_run:
         print(f"\n== {label} prompt ==")
         print(prompt)
         return subprocess.CompletedProcess(["dry-run"], 0, stdout="", stderr="")
-    command = agent_command(prompt)
-    result = subprocess.run(command, text=True, capture_output=True)
+    if not adapter_path.exists():
+        raise OrchestratorError(f"Missing {label} adapter: {adapter_path}")
+    result = subprocess.run([str(adapter_path)], input=prompt, text=True, capture_output=True)
     if result.stdout:
         print(result.stdout, end="", flush=True)
     if result.stderr:
@@ -167,7 +159,7 @@ def evaluator_result(feature_id: str, result: subprocess.CompletedProcess[str]) 
 
 def evaluate_feature(feature_id: str, dry_run: bool) -> bool:
     print(f"\n== Evaluate: {feature_id} ==", flush=True)
-    result = run_agent(evaluator_prompt(feature_id), dry_run, "Evaluator Agent")
+    result = run_agent(evaluator_prompt(feature_id), dry_run, "Evaluator Agent", EVALUATOR_AGENT_ADAPTER)
     if dry_run:
         return True
     if result.returncode != 0:
@@ -216,17 +208,17 @@ def main() -> int:
         print(f"\n== Round {round_no}: {feature_id} ==", flush=True)
 
         if args.dry_run:
-            run_agent(coding_prompt(feature_id), dry_run=True, label="Coding Agent")
-            run_agent(evaluator_prompt(feature_id), dry_run=True, label="Evaluator Agent")
+            run_agent(coding_prompt(feature_id), dry_run=True, label="Coding Agent", adapter_path=CODING_AGENT_ADAPTER)
+            run_agent(evaluator_prompt(feature_id), dry_run=True, label="Evaluator Agent", adapter_path=EVALUATOR_AGENT_ADAPTER)
             continue
 
         mark_in_progress(feature_id)
-        coding_result = run_agent(coding_prompt(feature_id), dry_run=False, label="Coding Agent")
+        coding_result = run_agent(coding_prompt(feature_id), dry_run=False, label="Coding Agent", adapter_path=CODING_AGENT_ADAPTER)
         if coding_result.returncode != 0:
             mark_failed(feature_id, f"coding agent exited with code {coding_result.returncode}", args.max_attempts)
             continue
 
-        evaluator = run_agent(evaluator_prompt(feature_id), dry_run=False, label="Evaluator Agent")
+        evaluator = run_agent(evaluator_prompt(feature_id), dry_run=False, label="Evaluator Agent", adapter_path=EVALUATOR_AGENT_ADAPTER)
         if evaluator.returncode != 0:
             mark_failed(feature_id, f"evaluator exited with code {evaluator.returncode}", args.max_attempts)
             continue
@@ -248,4 +240,3 @@ if __name__ == "__main__":
     except OrchestratorError as exc:
         print(f"orchestrator error: {exc}", file=sys.stderr)
         raise SystemExit(1)
-

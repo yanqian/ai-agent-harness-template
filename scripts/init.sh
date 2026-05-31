@@ -20,7 +20,9 @@ for path in \
   prompts/evaluate.md \
   scripts/validate-state.py \
   scripts/validate-feature.sh \
-  scripts/summarize-progress.sh
+  scripts/summarize-progress.sh \
+  scripts/run-coding-agent.sh \
+  scripts/run-evaluator-agent.sh
 do
   test -f "$path"
 done

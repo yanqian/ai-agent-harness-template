@@ -58,13 +58,13 @@ Run evaluator prompt preview only:
 python3 orchestrator.py --eval-only F001 --dry-run
 ```
 
-The template does not assume a specific AI coding tool. To execute a real agent instead of previewing prompts, set `HARNESS_AGENT_COMMAND` to a command that accepts the prompt as its final argv. Orchestrator dry-run and `scripts/validate-feature.sh` are manual checks outside `./init.sh` because they run `./init.sh` as part of their own protocol.
+The template does not assume a specific AI coding tool. To execute a real agent instead of previewing prompts, replace `scripts/run-coding-agent.sh` and `scripts/run-evaluator-agent.sh` with project-specific adapters. The orchestrator sends the selected role prompt to the adapter on stdin. Orchestrator dry-run and `scripts/validate-feature.sh` are manual checks outside `./init.sh` because they run `./init.sh` as part of their own protocol.
 
-Examples:
+Adapter examples:
 
 ```bash
-HARNESS_AGENT_COMMAND="codex exec" python3 orchestrator.py --max-rounds 1
-HARNESS_AGENT_COMMAND="claude" python3 orchestrator.py --max-rounds 1
+codex exec "$(cat)"
+claude "$(cat)"
 ```
 
 ## Agent Prompt Files
