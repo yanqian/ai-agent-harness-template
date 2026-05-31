@@ -6,6 +6,19 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class RepositoryContractTests(unittest.TestCase):
+    def test_readme_records_reference_sources(self):
+        text = (ROOT / "README.md").read_text()
+        for phrase in [
+            "## Sources",
+            "Harness engineering: leveraging Codex in an agent-first world",
+            "https://openai.com/index/harness-engineering/",
+            "Harness design for long-running application development",
+            "https://www.anthropic.com/engineering/harness-design-long-running-apps",
+            "everything is a ralph loop",
+            "https://ghuntley.com/loop/",
+        ]:
+            self.assertIn(phrase, text)
+
     def test_agents_external_behavior_verification_preserves_core_requirements(self):
         text = (ROOT / "AGENTS.md").read_text()
         for phrase in [

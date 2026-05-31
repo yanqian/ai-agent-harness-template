@@ -2,6 +2,14 @@
 
 A minimal repository template for controlled AI-agent development.
 
+## Sources
+
+This template is informed by:
+
+- OpenAI, [Harness engineering: leveraging Codex in an agent-first world](https://openai.com/index/harness-engineering/)
+- Anthropic, [Harness design for long-running application development](https://www.anthropic.com/engineering/harness-design-long-running-apps)
+- Geoff Huntley, [everything is a ralph loop](https://ghuntley.com/loop/)
+
 The harness is designed for Codex, Claude Code, Cursor Agent, and similar coding agents. It does not depend on a specific vendor. The control boundary is the repository state:
 
 - `SPEC.md` records requirements.
