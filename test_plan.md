@@ -44,7 +44,7 @@ Contract tests lock repository-level promises that should not drift accidentally
 - AGENTS guardrail sections.
 - Feature schema expectations.
 - Prompt role requirements.
-- Orchestrator CLI preview behavior.
+- Orchestrator CLI and startup contract by static inspection.
 
 Current command:
 
@@ -64,7 +64,7 @@ python3 -m unittest discover -s test/harness -p 'test_*.py'
 
 ### Smoke
 
-Smoke tests run the primary user-facing commands end to end.
+Smoke tests run primary non-recursive helper commands end to end. They do not run `orchestrator.py` or `scripts/validate-feature.sh`, because both commands run `./init.sh`; invoking them from tests that are themselves run by `./init.sh` would create recursive verification.
 
 Current command:
 
@@ -77,7 +77,16 @@ python3 -m unittest discover -s test/smoke -p 'test_*.py'
 | Feature | Verification Requirement |
 | --- | --- |
 | F001 | State validation, feature validation, progress summary, and tiny example tests pass. |
-| F002 | Orchestrator dry-run and eval-only dry-run complete without mutating feature state. |
+| F002 | Contract tests statically verify orchestrator CLI and startup contract; manual verification may run dry-run and eval-only dry-run outside `./init.sh`. |
 | F003 | Contract validation proves AGENTS guardrails remain present. |
 | F004 | `./init.sh` runs unit, contract, smoke, and optional harness layers. |
 
+## Manual Orchestrator Verification
+
+Run these outside `./init.sh` when changing `orchestrator.py` behavior:
+
+```bash
+python3 orchestrator.py --dry-run
+python3 orchestrator.py --eval-only F001 --dry-run
+scripts/validate-feature.sh F001
+```

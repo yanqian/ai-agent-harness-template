@@ -58,7 +58,7 @@ Run evaluator prompt preview only:
 python3 orchestrator.py --eval-only F001 --dry-run
 ```
 
-The template does not assume a specific AI coding tool. To execute a real agent instead of previewing prompts, set `HARNESS_AGENT_COMMAND` to a command that accepts the prompt as its final argv.
+The template does not assume a specific AI coding tool. To execute a real agent instead of previewing prompts, set `HARNESS_AGENT_COMMAND` to a command that accepts the prompt as its final argv. Orchestrator dry-run and `scripts/validate-feature.sh` are manual checks outside `./init.sh` because they run `./init.sh` as part of their own protocol.
 
 Examples:
 

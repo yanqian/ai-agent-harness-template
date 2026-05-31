@@ -70,7 +70,7 @@ The template keeps automated checks in explicit layers:
 - `./init.sh` validates harness state and runs the tiny example tests.
 - `scripts/validate-feature.sh F001` validates a feature by ID and runs the default verification entry point.
 - `scripts/summarize-progress.sh` prints a concise status summary.
-- `python3 orchestrator.py --dry-run` runs the startup protocol and previews agent prompts without mutating feature state.
+- Contract tests statically verify the orchestrator CLI and startup contract.
 - `feature_list.json` conforms to `schemas/feature_list.schema.json`.
 - `prompts/plan.md`, `prompts/work.md`, `prompts/continue.md`, and `prompts/evaluate.md` define the standard agent roles.
 - The tiny example can be tested without installing third-party dependencies.
@@ -87,3 +87,5 @@ scripts/validate-feature.sh F001
 scripts/summarize-progress.sh
 python3 orchestrator.py --dry-run
 ```
+
+Run `python3 orchestrator.py --dry-run` and `scripts/validate-feature.sh F001` outside `./init.sh`; both commands call `./init.sh` and should not be nested inside tests run by `./init.sh`.
