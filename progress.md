@@ -34,7 +34,7 @@ Implemented components:
 
 ## Next Feature
 
-No unfinished feature remains in the template.
+`F011` - Explore concurrent agent execution. This is a future/backlog item only; implement it only if the harness needs parallel agent throughput.
 
 ## Known Issues
 
