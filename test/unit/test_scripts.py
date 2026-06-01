@@ -31,8 +31,19 @@ class ScriptUnitTests(unittest.TestCase):
         result = run_command(["scripts/summarize-progress.sh"])
         self.assertEqual(result.returncode, 0, result.stderr)
         data = json.loads((ROOT / "feature_list.json").read_text())
-        self.assertIn(f"features_total={len(data['features'])}", result.stdout)
-        self.assertIn("next_feature=none", result.stdout)
+        features = data["features"]
+        unfinished = [
+            feature
+            for feature in features
+            if not (feature.get("passes") is True and feature.get("status") == "done")
+        ]
+        self.assertIn(f"features_total={len(features)}", result.stdout)
+        self.assertIn(f"features_unfinished={len(unfinished)}", result.stdout)
+        if unfinished:
+            next_feature = unfinished[0]
+            self.assertIn(f"next_feature={next_feature['id']} {next_feature['title']}", result.stdout)
+        else:
+            self.assertIn("next_feature=none", result.stdout)
 
     def test_summarize_runs_reports_empty_records(self):
         result = run_command(["scripts/summarize-runs.sh"])
