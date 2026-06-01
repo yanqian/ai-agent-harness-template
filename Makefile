@@ -1,6 +1,6 @@
 SHELL := /usr/bin/env bash
 
-.PHONY: help init test validate smoke unit contract go-example dry-run summarize ci
+.PHONY: help init test validate smoke unit contract go-example dry-run summarize clean ci
 
 FEATURE ?= F001
 
@@ -15,6 +15,7 @@ help:
 	@printf '  %-14s %s\n' 'go-example' 'run the Go server example tests'
 	@printf '  %-14s %s\n' 'dry-run' 'preview the next orchestrator round'
 	@printf '  %-14s %s\n' 'summarize' 'print progress and run summaries'
+	@printf '  %-14s %s\n' 'clean' 'reset project-specific harness state for a fresh project'
 	@printf '  %-14s %s\n' 'ci' 'run CI verification'
 
 init:
@@ -44,6 +45,9 @@ dry-run:
 summarize:
 	scripts/summarize-progress.sh
 	scripts/summarize-runs.sh
+
+clean:
+	python3 scripts/clean-state.py
 
 ci:
 	$(MAKE) init

@@ -157,9 +157,9 @@ class RepositoryContractTests(unittest.TestCase):
         readme = (ROOT / "README.md").read_text()
         init = (ROOT / "scripts" / "init.sh").read_text()
 
-        for target in ["init:", "test:", "validate:", "unit:", "contract:", "smoke:", "go-example:", "dry-run:", "summarize:", "ci:"]:
+        for target in ["init:", "test:", "validate:", "unit:", "contract:", "smoke:", "go-example:", "dry-run:", "summarize:", "clean:", "ci:"]:
             self.assertIn(target, makefile)
-        for phrase in ["./init.sh", "scripts/validate-feature.sh $(FEATURE)", "python3 orchestrator.py --dry-run", "$(MAKE) validate FEATURE=F001"]:
+        for phrase in ["./init.sh", "scripts/validate-feature.sh $(FEATURE)", "python3 orchestrator.py --dry-run", "python3 scripts/clean-state.py", "$(MAKE) validate FEATURE=F001"]:
             self.assertIn(phrase, makefile)
         for phrase in ["push:", "pull_request:", "workflow_dispatch:", "actions/checkout@v4", "actions/setup-go@v5", "make ci"]:
             self.assertIn(phrase, workflow)
@@ -167,6 +167,17 @@ class RepositoryContractTests(unittest.TestCase):
             self.assertIn(phrase, readme)
         for phrase in ["Makefile", ".github/workflows/ci.yml"]:
             self.assertIn(phrase, init)
+
+    def test_clean_state_contract_is_documented_and_verified(self):
+        readme = (ROOT / "README.md").read_text()
+        script = (ROOT / "scripts" / "clean-state.py").read_text()
+        init = (ROOT / "scripts" / "init.sh").read_text()
+
+        for phrase in ["make clean", "reset template state", "resets project-specific state"]:
+            self.assertIn(phrase, readme)
+        for phrase in ["feature_list.write_text", "{\"features\": []}", "PROGRESS_TEMPLATE", "RUN_TEMPLATE.md", ".gitkeep"]:
+            self.assertIn(phrase, script)
+        self.assertIn("scripts/clean-state.py", init)
 
     def test_feature_schema_requires_acceptance_and_state(self):
         schema = json.loads((ROOT / "schemas/feature_list.schema.json").read_text())

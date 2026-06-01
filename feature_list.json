@@ -223,6 +223,25 @@
       "attempts": 1,
       "last_error": "",
       "priority": "P0"
+    },
+    {
+      "id": "F014",
+      "title": "Add clean-state reset command",
+      "description": "Add a make clean workflow that resets project-specific harness state after copying the template into a new project while preserving the harness files, docs, scripts, tests, examples, and run template.",
+      "acceptance": [
+        "Makefile defines a clean target that calls scripts/clean-state.py",
+        "scripts/clean-state.py resets feature_list.json to an empty features array",
+        "scripts/clean-state.py resets progress.md to a fresh-project state",
+        "scripts/clean-state.py removes recorded run artifacts while preserving runs/RUN_TEMPLATE.md and runs/.gitkeep",
+        "README.md documents running make clean after copying the template",
+        "./init.sh validates scripts/clean-state.py is present",
+        "Unit and contract tests cover clean-state reset behavior"
+      ],
+      "passes": true,
+      "status": "done",
+      "attempts": 1,
+      "last_error": "",
+      "priority": "P0"
     }
   ]
 }

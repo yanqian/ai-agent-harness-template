@@ -1,5 +1,6 @@
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -84,6 +85,29 @@ class ScriptUnitTests(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertIn("failure_records=1", result.stdout)
             self.assertIn("domain[test_gap]=1", result.stdout)
+
+    def test_clean_state_resets_project_state_only(self):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            project = Path(tmp_dir)
+            shutil.copy(ROOT / "feature_list.json", project / "feature_list.json")
+            (project / "progress.md").write_text("# Progress\n\nold state\n")
+            runs = project / "runs"
+            runs.mkdir()
+            (runs / "RUN_TEMPLATE.md").write_text((ROOT / "runs" / "RUN_TEMPLATE.md").read_text())
+            (runs / ".gitkeep").write_text("")
+            (runs / "20260101T000000Z-F001.md").write_text("old run")
+
+            result = run_command([sys.executable, "scripts/clean-state.py", "--root", str(project)])
+            self.assertEqual(result.returncode, 0, result.stderr)
+
+            data = json.loads((project / "feature_list.json").read_text())
+            self.assertEqual(data, {"features": []})
+            progress = (project / "progress.md").read_text()
+            self.assertIn("Harness state has been reset for a new project.", progress)
+            self.assertIn("Add the first feature to `feature_list.json`.", progress)
+            self.assertTrue((runs / "RUN_TEMPLATE.md").exists())
+            self.assertTrue((runs / ".gitkeep").exists())
+            self.assertFalse((runs / "20260101T000000Z-F001.md").exists())
 
 
 if __name__ == "__main__":

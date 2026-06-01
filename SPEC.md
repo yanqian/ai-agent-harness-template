@@ -22,6 +22,7 @@ The harness makes project state recoverable by storing requirements, feature sta
 - A JSON Schema for feature state.
 - Prompt templates for planning, work, continuation, and evaluation.
 - Deterministic validation scripts.
+- A clean-state command for resetting template project state after copying.
 - A `Makefile` with common local and CI verification targets.
 - A GitHub Actions workflow that runs harness verification on push and pull request.
 - Public-facing README positioning for resumable AI coding projects.
@@ -102,6 +103,7 @@ The template keeps automated checks in explicit layers:
 - `scripts/check-failure-domains.sh` verifies failed run records include failure-domain and harness-improvement fields.
 - `make ci` runs the CI verification path.
 - `.github/workflows/ci.yml` runs `make ci` on GitHub Actions.
+- `make clean` resets `feature_list.json`, `progress.md`, and recorded run artifacts for a fresh project.
 - README explains the project as a repository-level harness for resumable AI coding, not a prompt collection.
 - `LICENSE`, `CONTRIBUTING.md`, `SECURITY.md`, `CHANGELOG.md`, and GitHub issue templates are present.
 

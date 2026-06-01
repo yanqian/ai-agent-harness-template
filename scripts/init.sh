@@ -36,6 +36,7 @@ for path in \
   prompts/work.md \
   prompts/continue.md \
   prompts/evaluate.md \
+  scripts/clean-state.py \
   scripts/validate-state.py \
   scripts/validate-feature.sh \
   scripts/summarize-progress.sh \

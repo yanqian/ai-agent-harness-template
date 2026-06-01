@@ -61,11 +61,12 @@ This harness keeps the durable state in files that agents, humans, and CI can al
 ### Use This Template
 
 1. Copy this template into your project root.
-2. Replace `SPEC.md` with your project goal.
-3. Add your first feature to `feature_list.json`.
-4. Run `make init`.
-5. Ask Codex, Claude Code, Cursor Agent, or another coding agent to follow `AGENTS.md`.
-6. Validate one feature with `make validate FEATURE=F001`.
+2. Run `make clean` to reset template state.
+3. Replace `SPEC.md` with your project goal.
+4. Add your first feature to `feature_list.json`.
+5. Run `make init`.
+6. Ask Codex, Claude Code, Cursor Agent, or another coding agent to follow `AGENTS.md`.
+7. Validate one feature with `make validate FEATURE=F001`.
 
 ### Verify This Repository
 
@@ -104,6 +105,7 @@ Expected result:
 - `make go-example` runs the Go server example tests.
 - `make dry-run` previews the next orchestrator round.
 - `make summarize` prints progress and run summaries.
+- `make clean` resets project-specific state after copying the template.
 - `make ci` runs the same commands used by GitHub Actions.
 
 ## Orchestrator

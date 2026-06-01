@@ -17,6 +17,7 @@ Implemented components:
 - Feature schema in `schemas/feature_list.schema.json`.
 - Prompt templates in `prompts/`.
 - Validation scripts in `scripts/`.
+- Clean-state reset command in `scripts/clean-state.py` and `make clean`.
 - Layered test coverage under `test/unit`, `test/contract`, and `test/smoke`.
 - Contract tests that lock AI agent obligations and harness boundaries.
 - Verification planning in `test_plan.md`.
@@ -31,7 +32,7 @@ Implemented components:
 
 ## Last Completed Feature
 
-`F013` - Add OSS readiness files and repository metadata.
+`F014` - Add clean-state reset command.
 
 ## Next Feature
 
