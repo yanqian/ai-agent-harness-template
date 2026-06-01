@@ -242,6 +242,24 @@
       "attempts": 1,
       "last_error": "",
       "priority": "P0"
+    },
+    {
+      "id": "F015",
+      "title": "Document real-world usage references",
+      "description": "Document the real projects that informed the harness design and link them from README and the repository knowledge map without copying full project code into examples.",
+      "acceptance": [
+        "docs/real-world-usage.md links home-guard-tg and agent-remote-tg",
+        "docs/real-world-usage.md explains the harness lessons extracted from those projects",
+        "README.md links docs/real-world-usage.md and both real project repositories",
+        "docs/README.md indexes real-world-usage.md",
+        "./init.sh validates docs/real-world-usage.md is present",
+        "Contract tests cover real-world usage references"
+      ],
+      "passes": true,
+      "status": "done",
+      "attempts": 1,
+      "last_error": "",
+      "priority": "P0"
     }
   ]
 }

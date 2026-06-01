@@ -8,6 +8,7 @@ Implemented components:
 
 - Durable agent rules in `AGENTS.md`.
 - Repository knowledge map under `docs/`.
+- Real-world usage notes in `docs/real-world-usage.md`.
 - Evaluator rubric in `QUALITY.md`.
 - Run artifact template under `runs/`.
 - Failure-domain improvement loop in `docs/failure-domains.md` and `scripts/check-failure-domains.sh`.
@@ -32,7 +33,7 @@ Implemented components:
 
 ## Last Completed Feature
 
-`F014` - Add clean-state reset command.
+`F015` - Document real-world usage references.
 
 ## Next Feature
 

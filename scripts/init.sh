@@ -29,6 +29,7 @@ for path in \
   docs/external-behavior.md \
   docs/agent-workflow.md \
   docs/failure-domains.md \
+  docs/real-world-usage.md \
   docs/decisions/README.md \
   runs/RUN_TEMPLATE.md \
   schemas/feature_list.schema.json \

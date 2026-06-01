@@ -30,6 +30,7 @@ The initialization baseline verifies:
 - `make ci` runs the same verification path as GitHub Actions.
 - README positioning and OSS readiness files are covered by contract tests.
 - `make clean` behavior is covered by unit tests using a temporary project root.
+- Real-world usage references are covered by contract tests.
 
 ## Test Layers
 
@@ -95,6 +96,7 @@ python3 -m unittest discover -s test/smoke -p 'test_*.py'
 | F012 | Contract tests verify README positioning and onboarding for resumable AI coding. |
 | F013 | Contract tests verify OSS readiness files and issue templates. |
 | F014 | Unit and contract tests verify clean-state reset behavior and Makefile wiring. |
+| F015 | Contract tests verify real-world usage references in README and docs. |
 
 ## Manual Orchestrator Verification
 

@@ -114,7 +114,7 @@ def validate_knowledge_files() -> None:
             fail(f"QUALITY.md is missing rubric criterion: {phrase}")
 
     docs_index = DOCS_INDEX_PATH.read_text()
-    for phrase in ["architecture.md", "testing.md", "external-behavior.md", "agent-workflow.md", "failure-domains.md", "decisions/"]:
+    for phrase in ["architecture.md", "testing.md", "external-behavior.md", "agent-workflow.md", "failure-domains.md", "real-world-usage.md", "decisions/"]:
         if phrase not in docs_index:
             fail(f"docs/README.md is missing index entry: {phrase}")
 

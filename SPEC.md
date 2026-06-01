@@ -12,6 +12,7 @@ The harness makes project state recoverable by storing requirements, feature sta
 
 - Durable project instructions in `AGENTS.md`.
 - Durable repository knowledge in `docs/`.
+- Real-world usage notes that link the harness to projects it was extracted from.
 - Evaluator quality criteria in `QUALITY.md`.
 - Per-run evidence and handoff records in `runs/`.
 - Failure-domain classification and harness improvement checks.
@@ -105,6 +106,7 @@ The template keeps automated checks in explicit layers:
 - `.github/workflows/ci.yml` runs `make ci` on GitHub Actions.
 - `make clean` resets `feature_list.json`, `progress.md`, and recorded run artifacts for a fresh project.
 - README explains the project as a repository-level harness for resumable AI coding, not a prompt collection.
+- README and `docs/real-world-usage.md` link real projects that informed the harness design.
 - `LICENSE`, `CONTRIBUTING.md`, `SECURITY.md`, `CHANGELOG.md`, and GitHub issue templates are present.
 
 ## 5. Verification Plan

@@ -41,6 +41,8 @@ AI coding breaks down less because models cannot write code, and more because lo
 
 This harness keeps the durable state in files that agents, humans, and CI can all inspect. The template dogfoods its own state model: every change is tracked as a feature with acceptance criteria, validation status, attempts, and recovery notes.
 
+The workflow was extracted from real agent projects such as [home-guard-tg](https://github.com/yanqian/home-guard-tg) and [agent-remote-tg](https://github.com/yanqian/agent-remote-tg). See [docs/real-world-usage.md](docs/real-world-usage.md).
+
 ## Control Boundary
 
 - `SPEC.md` records requirements.

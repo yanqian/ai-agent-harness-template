@@ -11,6 +11,7 @@ This directory is the expandable knowledge base for agents.
 - `external-behavior.md` - rules for validating CLIs, APIs, runtimes, and structured tool output.
 - `agent-workflow.md` - planning, coding, evaluation, orchestration, and recovery loop.
 - `failure-domains.md` - failure classification and rules for turning failures into harness improvements.
+- `real-world-usage.md` - real projects that informed the harness design.
 - `decisions/` - dated decision records for durable design choices.
 
 ## Maintenance Rules

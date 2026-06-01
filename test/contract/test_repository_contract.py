@@ -114,7 +114,7 @@ class RepositoryContractTests(unittest.TestCase):
 
     def test_repository_knowledge_and_quality_contracts_are_indexed(self):
         docs = (ROOT / "docs" / "README.md").read_text()
-        for phrase in ["architecture.md", "testing.md", "external-behavior.md", "agent-workflow.md", "failure-domains.md", "decisions/"]:
+        for phrase in ["architecture.md", "testing.md", "external-behavior.md", "agent-workflow.md", "failure-domains.md", "real-world-usage.md", "decisions/"]:
             self.assertIn(phrase, docs)
 
         quality = (ROOT / "QUALITY.md").read_text()
@@ -167,6 +167,30 @@ class RepositoryContractTests(unittest.TestCase):
             self.assertIn(phrase, readme)
         for phrase in ["Makefile", ".github/workflows/ci.yml"]:
             self.assertIn(phrase, init)
+
+    def test_real_world_usage_references_are_documented(self):
+        readme = (ROOT / "README.md").read_text()
+        docs_index = (ROOT / "docs" / "README.md").read_text()
+        real_world = (ROOT / "docs" / "real-world-usage.md").read_text()
+        init = (ROOT / "scripts" / "init.sh").read_text()
+
+        for phrase in [
+            "home-guard-tg",
+            "agent-remote-tg",
+            "docs/real-world-usage.md",
+            "https://github.com/yanqian/home-guard-tg",
+            "https://github.com/yanqian/agent-remote-tg",
+        ]:
+            self.assertIn(phrase, readme)
+        self.assertIn("real-world-usage.md", docs_index)
+        for phrase in [
+            "home-guard-tg",
+            "agent-remote-tg",
+            "Durable state belongs in repository files",
+            "not vendored examples",
+        ]:
+            self.assertIn(phrase, real_world)
+        self.assertIn("docs/real-world-usage.md", init)
 
     def test_clean_state_contract_is_documented_and_verified(self):
         readme = (ROOT / "README.md").read_text()
