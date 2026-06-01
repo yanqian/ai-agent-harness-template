@@ -24,6 +24,8 @@ The harness makes project state recoverable by storing requirements, feature sta
 - Deterministic validation scripts.
 - A `Makefile` with common local and CI verification targets.
 - A GitHub Actions workflow that runs harness verification on push and pull request.
+- Public-facing README positioning for resumable AI coding projects.
+- OSS readiness files for licensing, contribution, security reporting, changelog, and issue triage.
 - A test plan and dependency-free unit, contract, and smoke tests.
 - Contract tests for AI agent obligations and harness boundaries.
 - A vendor-neutral lightweight `orchestrator.py`.
@@ -100,6 +102,8 @@ The template keeps automated checks in explicit layers:
 - `scripts/check-failure-domains.sh` verifies failed run records include failure-domain and harness-improvement fields.
 - `make ci` runs the CI verification path.
 - `.github/workflows/ci.yml` runs `make ci` on GitHub Actions.
+- README explains the project as a repository-level harness for resumable AI coding, not a prompt collection.
+- `LICENSE`, `CONTRIBUTING.md`, `SECURITY.md`, `CHANGELOG.md`, and GitHub issue templates are present.
 
 ## 5. Verification Plan
 

@@ -1,6 +1,31 @@
 # AI Agent Harness Template
 
-A minimal repository template for controlled AI-agent development.
+[![CI](https://github.com/yanqian/ai-agent-harness-template/actions/workflows/ci.yml/badge.svg)](https://github.com/yanqian/ai-agent-harness-template/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+Make AI coding projects resumable.
+
+AI agents are powerful, but long-running coding work breaks when:
+
+- the session is interrupted;
+- context becomes too long;
+- the weekly quota is exhausted;
+- tomorrow's agent forgets yesterday's decisions;
+- the agent changes unrelated files;
+- the agent marks work done too early.
+
+This is not a prompt collection. It is a repository-state protocol for making AI coding work resumable, auditable, and evaluator-gated.
+
+This template keeps durable project state inside the repository:
+
+- `SPEC.md` for requirements
+- `feature_list.json` for executable feature state
+- `progress.md` for recovery notes
+- `AGENTS.md` for agent rules
+- `QUALITY.md` for evaluator criteria
+- `runs/` for evidence and handoff records
+
+It is designed for Codex, Claude Code, Cursor Agent, and similar coding agents without binding the harness to one vendor.
 
 ## Sources
 
@@ -10,7 +35,13 @@ This template is informed by:
 - Anthropic, [Harness design for long-running application development](https://www.anthropic.com/engineering/harness-design-long-running-apps)
 - Geoff Huntley, [everything is a ralph loop](https://ghuntley.com/loop/)
 
-The harness is designed for Codex, Claude Code, Cursor Agent, and similar coding agents. It does not depend on a specific vendor. The control boundary is the repository state:
+## Why This Exists
+
+AI coding breaks down less because models cannot write code, and more because long-running work loses project state.
+
+This harness keeps the durable state in files that agents, humans, and CI can all inspect. The template dogfoods its own state model: every change is tracked as a feature with acceptance criteria, validation status, attempts, and recovery notes.
+
+## Control Boundary
 
 - `SPEC.md` records requirements.
 - `feature_list.json` records executable feature state.
@@ -27,7 +58,18 @@ The harness is designed for Codex, Claude Code, Cursor Agent, and similar coding
 
 ## Quick Start
 
-Run:
+### Use This Template
+
+1. Copy this template into your project root.
+2. Replace `SPEC.md` with your project goal.
+3. Add your first feature to `feature_list.json`.
+4. Run `make init`.
+5. Ask Codex, Claude Code, Cursor Agent, or another coding agent to follow `AGENTS.md`.
+6. Validate one feature with `make validate FEATURE=F001`.
+
+### Verify This Repository
+
+Run the same command used by CI:
 
 ```bash
 make ci
@@ -79,6 +121,8 @@ python3 orchestrator.py --eval-only F001 --dry-run
 ```
 
 The template does not assume a specific AI coding tool. To execute a real agent instead of previewing prompts, replace `scripts/run-coding-agent.sh` and `scripts/run-evaluator-agent.sh` with project-specific adapters. The orchestrator sends the selected role prompt to the adapter on stdin. Orchestrator dry-run and `scripts/validate-feature.sh` are manual checks outside `./init.sh` because they run `./init.sh` as part of their own protocol.
+
+The orchestrator is intentionally boring: it does not make agents smarter. It only selects one feature, enforces the startup protocol, dispatches role prompts, and records state transitions.
 
 Adapter examples:
 

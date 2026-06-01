@@ -12,8 +12,15 @@ for path in \
   progress.md \
   test_plan.md \
   README.md \
+  LICENSE \
+  CONTRIBUTING.md \
+  SECURITY.md \
+  CHANGELOG.md \
   Makefile \
   .github/workflows/ci.yml \
+  .github/ISSUE_TEMPLATE/bug_report.md \
+  .github/ISSUE_TEMPLATE/feature_request.md \
+  .github/ISSUE_TEMPLATE/config.yml \
   QUALITY.md \
   orchestrator.py \
   docs/README.md \

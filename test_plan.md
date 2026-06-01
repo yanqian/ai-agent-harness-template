@@ -28,6 +28,7 @@ The initialization baseline verifies:
 - Optional harness tests pass when `test/harness/` exists.
 - Smoke tests pass.
 - `make ci` runs the same verification path as GitHub Actions.
+- README positioning and OSS readiness files are covered by contract tests.
 
 ## Test Layers
 
@@ -90,6 +91,8 @@ python3 -m unittest discover -s test/smoke -p 'test_*.py'
 | F008 | Contract, unit, and smoke tests verify failure-domain classification and harness improvement checks. |
 | F009 | `./init.sh` verifies the Go server example when Go is installed. |
 | F010 | `Makefile` and GitHub Actions run shared CI verification. |
+| F012 | Contract tests verify README positioning and onboarding for resumable AI coding. |
+| F013 | Contract tests verify OSS readiness files and issue templates. |
 
 ## Manual Orchestrator Verification
 

@@ -19,6 +19,57 @@ class RepositoryContractTests(unittest.TestCase):
         ]:
             self.assertIn(phrase, text)
 
+    def test_readme_positions_resumable_ai_coding_harness(self):
+        text = (ROOT / "README.md").read_text()
+        for phrase in [
+            "Make AI coding projects resumable.",
+            "the session is interrupted",
+            "context becomes too long",
+            "the weekly quota is exhausted",
+            "tomorrow's agent forgets yesterday's decisions",
+            "the agent changes unrelated files",
+            "the agent marks work done too early",
+            "This is not a prompt collection.",
+            "repository-state protocol",
+            "## Why This Exists",
+            "The template dogfoods its own state model",
+            "### Use This Template",
+            "### Verify This Repository",
+            "make validate FEATURE=F001",
+            "The orchestrator is intentionally boring",
+        ]:
+            self.assertIn(phrase, text)
+
+    def test_oss_readiness_files_are_present(self):
+        required_files = [
+            "LICENSE",
+            "CONTRIBUTING.md",
+            "SECURITY.md",
+            "CHANGELOG.md",
+            ".github/ISSUE_TEMPLATE/bug_report.md",
+            ".github/ISSUE_TEMPLATE/feature_request.md",
+            ".github/ISSUE_TEMPLATE/config.yml",
+        ]
+        for path in required_files:
+            self.assertTrue((ROOT / path).exists(), f"{path} should exist")
+
+        license_text = (ROOT / "LICENSE").read_text()
+        contributing = (ROOT / "CONTRIBUTING.md").read_text()
+        security = (ROOT / "SECURITY.md").read_text()
+        changelog = (ROOT / "CHANGELOG.md").read_text()
+        bug = (ROOT / ".github" / "ISSUE_TEMPLATE" / "bug_report.md").read_text()
+        feature = (ROOT / ".github" / "ISSUE_TEMPLATE" / "feature_request.md").read_text()
+        init = (ROOT / "scripts" / "init.sh").read_text()
+
+        self.assertIn("MIT License", license_text)
+        self.assertIn("make ci", contributing)
+        self.assertIn("Reporting Security Issues", security)
+        self.assertIn("## 0.1.0", changelog)
+        self.assertIn("Failure Domain", bug)
+        self.assertIn("Acceptance Criteria", feature)
+        for path in required_files:
+            self.assertIn(path, init)
+
     def test_agents_external_behavior_verification_preserves_core_requirements(self):
         text = (ROOT / "AGENTS.md").read_text()
         for phrase in [

@@ -23,6 +23,7 @@ Implemented components:
 - Root verification wrapper at `./init.sh`.
 - Make targets in `Makefile`.
 - GitHub Actions workflow in `.github/workflows/ci.yml`.
+- OSS readiness files: `LICENSE`, `CONTRIBUTING.md`, `SECURITY.md`, `CHANGELOG.md`, and issue templates.
 - Vendor-neutral lightweight orchestrator in `orchestrator.py`.
 - Explicit Coding Agent and Evaluator Agent adapters under `scripts/`.
 - Tiny dependency-free Python CLI example in `examples/tiny-cli/`.
@@ -30,7 +31,7 @@ Implemented components:
 
 ## Last Completed Feature
 
-`F010` - Add Makefile and GitHub Actions CI.
+`F013` - Add OSS readiness files and repository metadata.
 
 ## Next Feature
 

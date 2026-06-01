@@ -188,6 +188,41 @@
       "attempts": 0,
       "last_error": "",
       "priority": "P2"
+    },
+    {
+      "id": "F012",
+      "title": "Improve README positioning and onboarding",
+      "description": "Rewrite the README first screen and quick start so new users understand the project as a repository-level harness for resumable AI coding rather than a prompt collection.",
+      "acceptance": [
+        "README opens with Make AI coding projects resumable",
+        "README explains the concrete failure modes: interrupted sessions, long context, quota exhaustion, forgotten decisions, unrelated edits, and premature completion",
+        "README states that the project is not a prompt collection",
+        "README separates Use This Template from Verify This Repository",
+        "README explains that the orchestrator is intentionally boring and only enforces workflow boundaries",
+        "Contract tests lock the README positioning and onboarding language"
+      ],
+      "passes": true,
+      "status": "done",
+      "attempts": 1,
+      "last_error": "",
+      "priority": "P0"
+    },
+    {
+      "id": "F013",
+      "title": "Add OSS readiness files and repository metadata",
+      "description": "Add public OSS readiness files and repository metadata so the project is easier to discover, evaluate, contribute to, and maintain.",
+      "acceptance": [
+        "LICENSE, CONTRIBUTING.md, SECURITY.md, and CHANGELOG.md are present",
+        "GitHub issue templates exist for bug reports and feature requests",
+        "./init.sh validates the OSS readiness files are present",
+        "Contract tests verify OSS readiness files and issue templates",
+        "GitHub repository description and topics are set for discoverability"
+      ],
+      "passes": true,
+      "status": "done",
+      "attempts": 1,
+      "last_error": "",
+      "priority": "P0"
     }
   ]
 }
