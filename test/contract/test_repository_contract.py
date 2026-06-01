@@ -37,6 +37,9 @@ class RepositoryContractTests(unittest.TestCase):
             "### Verify This Repository",
             "make validate FEATURE=F001",
             "The orchestrator is intentionally boring",
+            "## Announcement",
+            "I Built a Small Harness to Stop AI Coding Projects From Forgetting State",
+            "https://yanqian.github.io/posts/publish/i-built-a-small-harness-to-stop-ai-coding-projects-from-forgetting-state/",
         ]:
             self.assertIn(phrase, text)
 

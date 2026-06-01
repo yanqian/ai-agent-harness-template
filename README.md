@@ -27,6 +27,10 @@ This template keeps durable project state inside the repository:
 
 It is designed for Codex, Claude Code, Cursor Agent, and similar coding agents without binding the harness to one vendor.
 
+## Announcement
+
+Read the project announcement: [I Built a Small Harness to Stop AI Coding Projects From Forgetting State](https://yanqian.github.io/posts/publish/i-built-a-small-harness-to-stop-ai-coding-projects-from-forgetting-state/).
+
 ## Sources
 
 This template is informed by:

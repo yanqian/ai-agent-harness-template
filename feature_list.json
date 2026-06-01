@@ -260,6 +260,21 @@
       "attempts": 1,
       "last_error": "",
       "priority": "P0"
+    },
+    {
+      "id": "F016",
+      "title": "Link announcement article from README",
+      "description": "Link the public announcement article from README so visitors can understand the story and motivation behind the harness.",
+      "acceptance": [
+        "README.md includes an Announcement section near the top",
+        "README.md links the public announcement article",
+        "Contract tests verify the announcement link remains present"
+      ],
+      "passes": true,
+      "status": "done",
+      "attempts": 1,
+      "last_error": "",
+      "priority": "P0"
     }
   ]
 }

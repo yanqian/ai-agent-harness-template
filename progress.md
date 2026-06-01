@@ -33,7 +33,7 @@ Implemented components:
 
 ## Last Completed Feature
 
-`F015` - Document real-world usage references.
+`F016` - Link announcement article from README.
 
 ## Next Feature
 

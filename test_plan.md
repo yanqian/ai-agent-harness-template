@@ -97,6 +97,7 @@ python3 -m unittest discover -s test/smoke -p 'test_*.py'
 | F013 | Contract tests verify OSS readiness files and issue templates. |
 | F014 | Unit and contract tests verify clean-state reset behavior and Makefile wiring. |
 | F015 | Contract tests verify real-world usage references in README and docs. |
+| F016 | Contract tests verify the README announcement article link. |
 
 ## Manual Orchestrator Verification
 
