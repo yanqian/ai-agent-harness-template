@@ -280,18 +280,32 @@ class RepositoryContractTests(unittest.TestCase):
             "### Install The Skill",
             "### Use The Installed Skill",
             "### Manual Script Usage",
+            "#### Codex",
+            "#### Claude Code",
+            "#### Cursor",
+            "python3 ~/.codex/skills/.system/skill-installer/scripts/install-skill-from-github.py",
             "install-skill-from-github.py",
             "Restart Codex to pick up the skill",
+            "~/.claude/skills/ai-agent-harness",
+            ".claude/skills/ai-agent-harness",
+            ".cursor/rules/ai-agent-harness.mdc",
+            "Cursor users can still run the manual initializer script",
             "Use $ai-agent-harness to initialize this project.",
             "repository-checkout or vendor-neutral fallback usage",
             "not the primary installed-skill experience",
         ]:
             self.assertIn(phrase, readme)
+        self.assertNotIn("/Users/", readme)
         for phrase in [
             "Use $ai-agent-harness to initialize this project.",
             "Manual `python3 .../init_harness.py` commands are for repository checkouts",
+            "~/.codex/skills",
+            "~/.claude/skills/",
+            ".claude/skills/",
+            ".cursor/rules",
         ]:
             self.assertIn(phrase, skill)
+        self.assertNotIn("/Users/", skill)
         for phrase in [
             "Skill Assisted Workflow",
             "convenience layer",

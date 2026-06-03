@@ -80,15 +80,47 @@ The workflow was extracted from real agent projects such as [home-guard-tg](http
 
 The skill lives in `skills/ai-agent-harness/`. Install that directory into your skill directory, then restart the agent surface if it loads skills at startup.
 
-For Codex, install from this repository path:
+#### Codex
+
+Install from this repository path:
 
 ```bash
-python3 /Users/armstrong/.codex/skills/.system/skill-installer/scripts/install-skill-from-github.py \
+python3 ~/.codex/skills/.system/skill-installer/scripts/install-skill-from-github.py \
   --repo yanqian/ai-agent-harness-template \
   --path skills/ai-agent-harness
 ```
 
 After installation: Restart Codex to pick up the skill.
+
+#### Claude Code
+
+Claude Code supports Agent Skills stored as `SKILL.md` directories. Install as either a personal skill:
+
+```bash
+mkdir -p ~/.claude/skills
+cp -R skills/ai-agent-harness ~/.claude/skills/ai-agent-harness
+```
+
+or as a project skill shared through git:
+
+```bash
+mkdir -p .claude/skills
+cp -R skills/ai-agent-harness .claude/skills/ai-agent-harness
+git add .claude/skills/ai-agent-harness
+```
+
+Restart Claude Code after installing or updating the skill.
+
+#### Cursor
+
+For Cursor, use project rules as the stable project-level entry point:
+
+```bash
+mkdir -p .cursor/rules
+cp skills/ai-agent-harness/SKILL.md .cursor/rules/ai-agent-harness.mdc
+```
+
+Then reference the rule from Cursor Agent or ask Cursor to follow the AI Agent Harness workflow. Cursor users can still run the manual initializer script below to install or check harness files.
 
 ### Use The Installed Skill
 

@@ -332,6 +332,25 @@
       "attempts": 1,
       "last_error": "",
       "priority": "P0"
+    },
+    {
+      "id": "F020",
+      "title": "Document portable cross-agent skill installation",
+      "description": "Update skill installation documentation to remove machine-specific absolute paths and describe portable Codex, Claude Code, Cursor, and manual fallback entry points.",
+      "acceptance": [
+        "README.md uses `~` or project-relative paths instead of machine-specific absolute paths for skill installation examples",
+        "README.md documents Codex installation with `~/.codex/skills` and the Codex skill installer helper",
+        "README.md documents Claude Code installation using personal `~/.claude/skills/ai-agent-harness/` and project `.claude/skills/ai-agent-harness/` skill locations",
+        "README.md documents Cursor usage through project rules under `.cursor/rules` and notes the manual initializer script remains the portable fallback",
+        "SKILL.md and workflow references avoid machine-specific absolute paths and remain consistent with the cross-agent entry points",
+        "Contract tests verify the portable paths and cross-agent documentation",
+        "./init.sh passes after the documentation update"
+      ],
+      "passes": true,
+      "status": "done",
+      "attempts": 1,
+      "last_error": "",
+      "priority": "P0"
     }
   ]
 }
