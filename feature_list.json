@@ -293,6 +293,26 @@
       "attempts": 1,
       "last_error": "",
       "priority": "P0"
+    },
+    {
+      "id": "F018",
+      "title": "Strengthen harness skill initializer tests and manifest semantics",
+      "description": "Strengthen the AI Agent Harness skill initializer so new, adopt, repair, and check modes are tested against realistic project boundaries, check output distinguishes normal project drift from conflicts, and installed projects record manifest metadata for future version drift handling.",
+      "acceptance": [
+        "Tests cover new, adopt, repair, and check modes for the skill initializer",
+        "Tests verify existing project files are not overwritten by default and force overwrite remains explicit",
+        "Tests verify repair mode restores missing harness-owned files while preserving project-owned state",
+        "Check mode reports missing files, conflicts, drift, installed version, template version, state validity, and next action guidance",
+        "The initializer records template and installation manifests that classify files as harness-owned static, project-owned state, merge-sensitive, or optional integration",
+        "A newly initialized project is verified as a runnable harness by semantic validation and the harness verification entry point, not only by file existence",
+        "README.md and SPEC.md document manifest-based drift handling and the stronger installed-harness definition",
+        "./init.sh passes with the expanded initializer tests"
+      ],
+      "passes": true,
+      "status": "done",
+      "attempts": 1,
+      "last_error": "",
+      "priority": "P0"
     }
   ]
 }

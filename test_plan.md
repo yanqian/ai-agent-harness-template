@@ -31,6 +31,7 @@ The initialization baseline verifies:
 - README positioning and OSS readiness files are covered by contract tests.
 - `make clean` behavior is covered by unit tests using a temporary project root.
 - Real-world usage references are covered by contract tests.
+- AI Agent Harness skill initialization modes, manifests, drift diagnostics, repair behavior, and installed-harness semantics are covered by harness tests using temporary project roots.
 
 ## Test Layers
 
@@ -61,7 +62,7 @@ python3 -m unittest discover -s test/contract -p 'test_*.py'
 
 ### Harness
 
-Harness tests are optional in the minimal template. Downstream projects should add them when they have real workflows that require multiple modules or processes.
+Harness tests cover multi-step repository workflows that require temporary project roots or copied harness installations.
 
 When `test/harness/` exists, `./init.sh` runs:
 
@@ -98,6 +99,8 @@ python3 -m unittest discover -s test/smoke -p 'test_*.py'
 | F014 | Unit and contract tests verify clean-state reset behavior and Makefile wiring. |
 | F015 | Contract tests verify real-world usage references in README and docs. |
 | F016 | Contract tests verify the README announcement article link. |
+| F017 | Contract and unit tests verify the AI Agent Harness skill exists, documents workflows, and initializes projects safely. |
+| F018 | Harness tests verify skill initializer `new`, `adopt`, `repair`, and `check` modes, manifest-based drift diagnostics, non-overwrite behavior, and runnable installed-harness semantics. |
 
 ## Manual Orchestrator Verification
 

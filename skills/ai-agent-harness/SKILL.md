@@ -31,9 +31,16 @@ Modes:
 - `new`: install the harness into a new or empty project and reset project state.
 - `adopt`: install missing harness files into an existing project and reset project state; default mode.
 - `repair`: add missing harness files but preserve existing `feature_list.json` and `progress.md`.
-- `check`: report missing files and conflicts without writing.
+- `check`: report missing files, merge-sensitive conflicts, harness-owned drift, project state changes, installed/template versions, semantic validity, runnable status, and next action guidance without writing.
 
 Default behavior never overwrites conflicting files. Use `--force` only after the user explicitly approves overwriting conflicts.
+
+The initializer writes `.agent-harness/manifest.json` into installed projects and reads `.agent-harness-template.json` from the template. File categories matter:
+
+- harness-owned static files are hash checked;
+- project-owned state is validated semantically after initialization;
+- merge-sensitive files are not overwritten by default;
+- optional integrations are reported separately from core harness validity.
 
 Examples:
 

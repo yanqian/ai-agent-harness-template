@@ -7,6 +7,7 @@ cd "$ROOT_DIR"
 echo "== Required files =="
 for path in \
   AGENTS.md \
+  .agent-harness-template.json \
   SPEC.md \
   feature_list.json \
   progress.md \

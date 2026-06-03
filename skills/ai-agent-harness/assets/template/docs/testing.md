@@ -10,7 +10,7 @@ All automated verification starts with:
 
 - Unit tests: deterministic helper behavior.
 - Contract tests: repository rules, schema, prompts, and agent obligations.
-- Harness tests: optional project-specific workflow behavior.
+- Harness tests: multi-step workflow behavior, including temporary project initialization and repair scenarios when present.
 - Smoke tests: non-recursive command checks.
 - Failure-domain checks: failed run records must include domain and harness improvement assessment.
 

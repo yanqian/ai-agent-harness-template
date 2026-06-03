@@ -15,6 +15,10 @@ Use when the target project lacks harness files or the user asks to install, ado
 
 `new` and `adopt` reset project feature state to an empty `feature_list.json` and fresh `progress.md`. `repair` preserves existing project state.
 
+Installed projects record `.agent-harness/manifest.json`. The template records `.agent-harness-template.json`. Use `check` before repair or upgrade decisions: it reports installed version, template version, missing files, merge-sensitive conflicts, harness-owned drift, project-owned state changes, semantic validity, runnable status, and next action guidance.
+
+A project is an installed harness when `./init.sh` succeeds, `feature_list.json` is valid, `progress.md` contains recovery sections, `AGENTS.md` contains the startup and safety rules, prompts and scripts are present, run templates are available, and `check` reports `runnable_harness=true`.
+
 ## Plan Requirement
 
 Use when the user describes new work before implementation.

@@ -210,6 +210,7 @@ class RepositoryContractTests(unittest.TestCase):
         skill = (ROOT / "skills" / "ai-agent-harness" / "SKILL.md").read_text()
         workflows = (ROOT / "skills" / "ai-agent-harness" / "references" / "workflows.md").read_text()
         initializer = (ROOT / "skills" / "ai-agent-harness" / "scripts" / "init_harness.py").read_text()
+        template_manifest = json.loads((ROOT / ".agent-harness-template.json").read_text())
         openai = (ROOT / "skills" / "ai-agent-harness" / "agents" / "openai.yaml").read_text()
         readme = (ROOT / "README.md").read_text()
         spec = (ROOT / "SPEC.md").read_text()
@@ -245,8 +246,26 @@ class RepositoryContractTests(unittest.TestCase):
             "Use --force only after explicit approval",
             "FRESH_FEATURE_LIST",
             "blocking_conflicts",
+            "TEMPLATE_VERSION",
+            "PROJECT_OWNED_STATE",
+            "MERGE_SENSITIVE",
+            "OPTIONAL_PREFIXES",
+            "semantic_validation",
+            "write_install_manifest",
+            "project_state_changed",
+            "next_action",
         ]:
             self.assertIn(phrase, initializer)
+        self.assertEqual(template_manifest["template_version"], "0.2.0")
+        for category in [
+            "harness-owned static",
+            "project-owned state",
+            "merge-sensitive",
+            "optional integration",
+            "template manifest",
+        ]:
+            self.assertIn(category, template_manifest["file_categories"])
+        self.assertIn(".agent-harness-template.json", init)
         for phrase in ["AI Agent Harness", "$ai-agent-harness", "allow_implicit_invocation: true"]:
             self.assertIn(phrase, openai)
         for phrase in [
@@ -254,6 +273,10 @@ class RepositoryContractTests(unittest.TestCase):
             "skills/ai-agent-harness/SKILL.md",
             "does not replace repository state",
             "does not overwrite conflicting files unless `--force` is used",
+            ".agent-harness/manifest.json",
+            "project-owned state",
+            "runnable_harness=true",
+            "version drift",
         ]:
             self.assertIn(phrase, readme)
         for phrase in [
@@ -261,6 +284,9 @@ class RepositoryContractTests(unittest.TestCase):
             "convenience layer",
             "preserve the template's vendor-neutral boundary",
             "skills/ai-agent-harness/",
+            "new`, `adopt`, `repair`, and `check` modes",
+            "version drift handling",
+            "semantically valid",
         ]:
             self.assertIn(phrase, spec)
         for path in [

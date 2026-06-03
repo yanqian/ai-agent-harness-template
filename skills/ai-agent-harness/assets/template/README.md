@@ -89,6 +89,17 @@ python3 skills/ai-agent-harness/scripts/init_harness.py --root /path/to/project 
 
 The initializer supports `new`, `adopt`, `repair`, and `check` modes. It does not overwrite conflicting files unless `--force` is used after explicit approval.
 
+The initializer writes `.agent-harness/manifest.json` in installed projects and uses `.agent-harness-template.json` from the template to classify files:
+
+- harness-owned static files are copied and drift-checked by hash;
+- project-owned state such as `SPEC.md`, `feature_list.json`, and `progress.md` is validated semantically after initialization;
+- merge-sensitive files such as `AGENTS.md`, `README.md`, and `Makefile` are not overwritten by default;
+- optional integrations such as GitHub workflow files and examples are reported separately.
+
+A project counts as an installed harness when `./init.sh` succeeds, `feature_list.json` is valid, progress and agent rules contain the required workflow sections, scripts and prompts are present, run templates are available, and skill `check` reports `runnable_harness=true`. This is stronger than checking for file existence alone.
+
+For version drift handling, run skill `check` first. Use `repair` to restore missing files and write a manifest. Review drift before using explicit overwrite or a future upgrade flow.
+
 The skill also defines a finalize-and-commit workflow. It stages and commits only after the user explicitly says they are satisfied or asks to commit.
 
 ### Verify This Repository
