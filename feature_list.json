@@ -313,6 +313,25 @@
       "attempts": 1,
       "last_error": "",
       "priority": "P0"
+    },
+    {
+      "id": "F019",
+      "title": "Clarify installed skill usage in README",
+      "description": "Clarify the README and skill documentation so users understand the difference between installing and invoking the AI Agent Harness skill, using the repository checkout's Python helper manually, and using the workflow pack from other agent tools.",
+      "acceptance": [
+        "README.md has a skill installation section that explains installing `skills/ai-agent-harness/` into a skill directory and restarting the agent surface when applicable",
+        "README.md shows an installed-skill invocation such as `Use $ai-agent-harness to initialize this project`",
+        "README.md separates installed skill usage from manual `python3 skills/ai-agent-harness/scripts/init_harness.py` fallback usage",
+        "README.md explains that manual Python commands are for repository checkout or vendor-neutral fallback usage, not the primary installed-skill experience",
+        "SKILL.md and workflow references remain consistent with the installed-skill and manual-script distinction",
+        "Contract tests verify the clarified README and skill documentation",
+        "./init.sh passes after the documentation update"
+      ],
+      "passes": true,
+      "status": "done",
+      "attempts": 1,
+      "last_error": "",
+      "priority": "P0"
     }
   ]
 }

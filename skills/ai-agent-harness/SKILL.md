@@ -11,6 +11,8 @@ Use this skill as the convenience layer for the repository-local AI Agent Harnes
 
 The repository remains the source of durable state. Do not store durable project state in the skill, in chat history, or in hidden local memory.
 
+When this skill is installed, prefer natural invocation such as `Use $ai-agent-harness to initialize this project.` Manual `python3 .../init_harness.py` commands are for repository checkouts, direct script testing, or agent tools without a skill loader.
+
 ## Core Rule
 
 Before planning, coding, evaluating, continuing, or committing harness work in a repository that already has `AGENTS.md`, follow that repository's startup protocol. For this harness, that means:

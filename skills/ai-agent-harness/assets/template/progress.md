@@ -30,12 +30,13 @@ Implemented components:
 - Explicit Coding Agent and Evaluator Agent adapters under `scripts/`.
 - Distributable AI Agent Harness skill under `skills/ai-agent-harness/` with initializer, workflow guidance, and explicit finalize-and-commit rules.
 - Manifest-aware skill initializer checks for new, adopt, repair, and check modes, including drift diagnostics and runnable installed-harness validation.
+- README guidance that separates installing the AI Agent Harness skill, invoking the installed skill, and manually running the fallback initializer script.
 - Tiny dependency-free Python CLI example in `examples/tiny-cli/`.
 - Dependency-free Go server example in `examples/go-server/`.
 
 ## Last Completed Feature
 
-`F018` - Strengthen harness skill initializer tests and manifest semantics.
+`F019` - Clarify installed skill usage in README.
 
 ## Next Feature
 

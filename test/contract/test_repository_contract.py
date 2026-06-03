@@ -277,8 +277,21 @@ class RepositoryContractTests(unittest.TestCase):
             "project-owned state",
             "runnable_harness=true",
             "version drift",
+            "### Install The Skill",
+            "### Use The Installed Skill",
+            "### Manual Script Usage",
+            "install-skill-from-github.py",
+            "Restart Codex to pick up the skill",
+            "Use $ai-agent-harness to initialize this project.",
+            "repository-checkout or vendor-neutral fallback usage",
+            "not the primary installed-skill experience",
         ]:
             self.assertIn(phrase, readme)
+        for phrase in [
+            "Use $ai-agent-harness to initialize this project.",
+            "Manual `python3 .../init_harness.py` commands are for repository checkouts",
+        ]:
+            self.assertIn(phrase, skill)
         for phrase in [
             "Skill Assisted Workflow",
             "convenience layer",
@@ -287,6 +300,8 @@ class RepositoryContractTests(unittest.TestCase):
             "new`, `adopt`, `repair`, and `check` modes",
             "version drift handling",
             "semantically valid",
+            "installed skill usage",
+            "Manual `python3 skills/.../init_harness.py` commands",
         ]:
             self.assertIn(phrase, spec)
         for path in [

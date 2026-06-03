@@ -2,6 +2,8 @@
 
 These workflows operate the repository-local harness. They are intentionally vendor-neutral; Codex, Claude Code, Cursor Agent, and other coding agents can follow the same file protocol.
 
+If the skill is installed in an agent surface, invoke it by name, for example `Use $ai-agent-harness to initialize this project.` Manual `python3 skills/ai-agent-harness/scripts/init_harness.py` usage is for repository checkouts and tools without a skill loader.
+
 ## Initialize Harness
 
 Use when the target project lacks harness files or the user asks to install, adopt, repair, or check the harness.

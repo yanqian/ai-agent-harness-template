@@ -76,16 +76,42 @@ The workflow was extracted from real agent projects such as [home-guard-tg](http
 6. Ask Codex, Claude Code, Cursor Agent, or another coding agent to follow `AGENTS.md`.
 7. Validate one feature with `make validate FEATURE=F001`.
 
-### Use The Skill
+### Install The Skill
 
-The skill lives in `skills/ai-agent-harness/` and is designed to remain vendor-neutral even when loaded by Codex as `SKILL.md`.
+The skill lives in `skills/ai-agent-harness/`. Install that directory into your skill directory, then restart the agent surface if it loads skills at startup.
 
-Initialize or inspect a project:
+For Codex, install from this repository path:
+
+```bash
+python3 /Users/armstrong/.codex/skills/.system/skill-installer/scripts/install-skill-from-github.py \
+  --repo yanqian/ai-agent-harness-template \
+  --path skills/ai-agent-harness
+```
+
+After installation: Restart Codex to pick up the skill.
+
+### Use The Installed Skill
+
+Once installed, invoke it by name:
+
+```text
+Use $ai-agent-harness to initialize this project.
+```
+
+You can also ask naturally about installing a harness, adopting `AGENTS.md`, repairing `feature_list.json`, or checking a resumable AI coding workflow.
+
+The skill is designed to remain vendor-neutral even when loaded by Codex as `SKILL.md`.
+
+### Manual Script Usage
+
+If you are using this repository checkout directly, or using another agent tool without a skill loader, call the bundled initializer script manually:
 
 ```bash
 python3 skills/ai-agent-harness/scripts/init_harness.py --root /path/to/project --mode adopt
 python3 skills/ai-agent-harness/scripts/init_harness.py --root /path/to/project --mode check
 ```
+
+Manual `python3 skills/ai-agent-harness/scripts/init_harness.py` commands are repository-checkout or vendor-neutral fallback usage, not the primary installed-skill experience.
 
 The initializer supports `new`, `adopt`, `repair`, and `check` modes. It does not overwrite conflicting files unless `--force` is used after explicit approval.
 
