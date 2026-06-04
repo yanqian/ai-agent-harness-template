@@ -114,7 +114,7 @@ def validate_knowledge_files() -> None:
             fail(f"QUALITY.md is missing rubric criterion: {phrase}")
 
     docs_index = DOCS_INDEX_PATH.read_text()
-    for phrase in ["architecture.md", "testing.md", "external-behavior.md", "agent-workflow.md", "failure-domains.md", "real-world-usage.md", "decisions/"]:
+    for phrase in ["architecture.md", "testing.md", "external-behavior.md", "capability-gaps.md", "example-boundaries.md", "agent-workflow.md", "failure-domains.md", "real-world-usage.md", "decisions/"]:
         if phrase not in docs_index:
             fail(f"docs/README.md is missing index entry: {phrase}")
 
@@ -124,7 +124,7 @@ def validate_knowledge_files() -> None:
             fail(f"runs/RUN_TEMPLATE.md is missing section: {phrase}")
 
     failure_domains = FAILURE_DOMAINS_PATH.read_text()
-    for phrase in ["requirement_gap", "implementation_gap", "test_gap", "contract_gap", "external_behavior_gap", "state_recovery_gap", "agent_workflow_gap", "environment_gap", "Improvement Loop"]:
+    for phrase in ["requirement_gap", "implementation_gap", "test_gap", "contract_gap", "external_behavior_gap", "capability_gap", "example_scope_gap", "state_recovery_gap", "agent_workflow_gap", "environment_gap", "Improvement Loop"]:
         if phrase not in failure_domains:
             fail(f"docs/failure-domains.md is missing domain or rule: {phrase}")
 

@@ -129,7 +129,7 @@ class RepositoryContractTests(unittest.TestCase):
             init: ["docs/capability-gaps.md"],
             skill: ["docs/capability-gaps.md", "local-only workarounds"],
             workflows: ["Identify required capabilities", "Check `docs/capability-gaps.md`"],
-            initializer: ["docs/capability-gaps.md", "Capability Gap Handling", "TEMPLATE_VERSION = \"0.2.2\""],
+            initializer: ["docs/capability-gaps.md", "Capability Gap Handling", "TEMPLATE_VERSION = \"0.3.0\""],
         }
         for text, phrases in checks.items():
             for phrase in phrases:
@@ -177,7 +177,7 @@ class RepositoryContractTests(unittest.TestCase):
             init: ["docs/example-boundaries.md"],
             skill: ["docs/example-boundaries.md", "Default examples are references"],
             workflows: ["Identify project-owned implementation and verification paths", "do not use default examples as the product implementation surface"],
-            initializer: ["docs/example-boundaries.md", "TEMPLATE_VERSION = \"0.2.2\""],
+            initializer: ["docs/example-boundaries.md", "TEMPLATE_VERSION = \"0.3.0\""],
         }
         for text, phrases in checks.items():
             for phrase in phrases:
@@ -332,10 +332,17 @@ class RepositoryContractTests(unittest.TestCase):
             self.assertIn(phrase, workflows)
         for phrase in [
             "MODE_CHOICES",
+            "LAYOUT_CHOICES",
+            "DEFAULT_LAYOUT",
             "new",
             "adopt",
             "repair",
             "check",
+            "--layout",
+            "hidden_agents_text",
+            "hidden_init_text",
+            "resolve_layout",
+            "layout_harness_root",
             "Use --force only after explicit approval",
             "FRESH_FEATURE_LIST",
             "blocking_conflicts",
@@ -349,7 +356,10 @@ class RepositoryContractTests(unittest.TestCase):
             "next_action",
         ]:
             self.assertIn(phrase, initializer)
-        self.assertEqual(template_manifest["template_version"], "0.2.2")
+        self.assertEqual(template_manifest["template_version"], "0.3.0")
+        self.assertEqual(template_manifest["default_layout"], "hidden")
+        self.assertIn("hidden", template_manifest["layouts"])
+        self.assertIn("visible", template_manifest["layouts"])
         for category in [
             "harness-owned static",
             "project-owned state",
@@ -367,6 +377,9 @@ class RepositoryContractTests(unittest.TestCase):
             "does not replace repository state",
             "does not overwrite conflicting files unless `--force` is used",
             ".agent-harness/manifest.json",
+            "--layout hidden",
+            "--layout visible",
+            "Root keeps thin `AGENTS.md` and `init.sh` entry points",
             "project-owned state",
             "runnable_harness=true",
             "version drift",
@@ -405,6 +418,10 @@ class RepositoryContractTests(unittest.TestCase):
             "preserve the template's vendor-neutral boundary",
             "skills/ai-agent-harness/",
             "new`, `adopt`, `repair`, and `check` modes",
+            "installation layouts",
+            "default `hidden` layout",
+            "root `AGENTS.md` and `init.sh` as thin entry points",
+            "`visible` layout",
             "version drift handling",
             "semantically valid",
             "installed skill usage",

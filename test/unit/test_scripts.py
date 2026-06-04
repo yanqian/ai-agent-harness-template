@@ -133,14 +133,15 @@ class ScriptUnitTests(unittest.TestCase):
             ])
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertIn("mode=adopt", result.stdout)
+            self.assertIn("layout=hidden", result.stdout)
 
-            data = json.loads((project / "feature_list.json").read_text())
+            data = json.loads((project / ".agent-harness" / "feature_list.json").read_text())
             self.assertEqual(data, {"features": []})
-            progress = (project / "progress.md").read_text()
+            progress = (project / ".agent-harness" / "progress.md").read_text()
             self.assertIn("Harness state has been reset for a new project.", progress)
             self.assertTrue((project / "AGENTS.md").exists())
-            self.assertTrue((project / "skills" / "ai-agent-harness" / "SKILL.md").exists())
-            self.assertFalse((project / "skills" / "ai-agent-harness" / "assets" / "template" / "AGENTS.md").exists())
+            self.assertTrue((project / ".agent-harness" / "skills" / "ai-agent-harness" / "SKILL.md").exists())
+            self.assertFalse((project / ".agent-harness" / "skills" / "ai-agent-harness" / "assets" / "template" / "AGENTS.md").exists())
 
     def test_ai_agent_harness_skill_initializer_reports_conflicts_without_force(self):
         with tempfile.TemporaryDirectory() as tmp_dir:

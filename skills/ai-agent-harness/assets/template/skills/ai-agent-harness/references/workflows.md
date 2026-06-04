@@ -9,17 +9,19 @@ If the skill is installed in an agent surface, invoke it by name, for example `U
 Use when the target project lacks harness files or the user asks to install, adopt, repair, or check the harness.
 
 1. Run `scripts/init_harness.py --mode check --root <project>` when the user only wants inspection.
-2. Run `scripts/init_harness.py --mode adopt --root <project>` for an existing project.
-3. Run `scripts/init_harness.py --mode new --root <project>` for a new project.
+2. Run `scripts/init_harness.py --mode adopt --layout hidden --root <project>` for an existing project unless the user asks for visible layout.
+3. Run `scripts/init_harness.py --mode new --layout hidden --root <project>` for a new project unless the user asks for visible layout.
 4. Run `scripts/init_harness.py --mode repair --root <project>` for an existing harness with missing files.
 5. Do not use `--force` unless the user explicitly approved overwriting conflicts.
 6. After initialization, run `<project>/init.sh` if present.
 
 `new` and `adopt` reset project feature state to an empty `feature_list.json` and fresh `progress.md`. `repair` preserves existing project state.
 
-Installed projects record `.agent-harness/manifest.json`. The template records `.agent-harness-template.json`. Use `check` before repair or upgrade decisions: it reports installed version, template version, missing files, merge-sensitive conflicts, harness-owned drift, project-owned state changes, semantic validity, runnable status, and next action guidance.
+Installed projects record `.agent-harness/manifest.json`. The template records `.agent-harness-template.json`. Use `check` before repair or upgrade decisions: it reports installed layout, installed version, template version, missing files, merge-sensitive conflicts, harness-owned drift, project-owned state changes, semantic validity, runnable status, and next action guidance.
 
-A project is an installed harness when `./init.sh` succeeds, `feature_list.json` is valid, `progress.md` contains recovery sections, `AGENTS.md` contains the startup and safety rules, prompts and scripts are present, run templates are available, and `check` reports `runnable_harness=true`.
+`hidden` layout is the default for user projects: root keeps thin `AGENTS.md` and `init.sh` entry points while the harness body lives under `.agent-harness/`. `visible` layout is for harness development and direct template inspection.
+
+A project is an installed harness when `./init.sh` succeeds, the installed layout's `feature_list.json` is valid, `progress.md` contains recovery sections, `AGENTS.md` contains the startup and safety rules, prompts and scripts are present, run templates are available, and `check` reports `runnable_harness=true`.
 
 ## Plan Requirement
 

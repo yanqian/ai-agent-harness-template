@@ -390,6 +390,26 @@
       "attempts": 1,
       "last_error": "",
       "priority": "P0"
+    },
+    {
+      "id": "F023",
+      "title": "Add hidden harness installation layout",
+      "description": "Add installation layout profiles so user projects can keep root-level business code visible while storing harness state, prompts, docs, scripts, tests, runs, schemas, and examples under .agent-harness by default, with visible layout retained for template maintenance.",
+      "acceptance": [
+        "The skill initializer accepts `--layout hidden` and `--layout visible`, defaults new installs to hidden, and records the selected layout in `.agent-harness/manifest.json`",
+        "Hidden layout creates thin root `AGENTS.md` and `init.sh` entry points while storing the harness body under `.agent-harness/`",
+        "Hidden layout `./init.sh`, check, repair, and quick semantic validation succeed without root-level `feature_list.json`, `progress.md`, `prompts/`, `runs/`, `scripts/`, or harness tests",
+        "Visible layout remains available for harness development and preserves the existing root-level template shape",
+        "README.md, SPEC.md, SKILL.md, and workflow references document layout profiles and the hidden default",
+        "Contract and harness tests verify hidden layout, visible layout, manifest layout metadata, and version drift diagnostics",
+        "The bundled skill template is synchronized with the layout-profile implementation",
+        "./init.sh passes after the update"
+      ],
+      "passes": true,
+      "status": "done",
+      "attempts": 1,
+      "last_error": "",
+      "priority": "P0"
     }
   ]
 }

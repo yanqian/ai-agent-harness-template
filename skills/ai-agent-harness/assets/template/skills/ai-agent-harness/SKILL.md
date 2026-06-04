@@ -35,6 +35,11 @@ Modes:
 - `repair`: add missing harness files but preserve existing `feature_list.json` and `progress.md`.
 - `check`: report missing files, merge-sensitive conflicts, harness-owned drift, project state changes, installed/template versions, semantic validity, runnable status, and next action guidance without writing.
 
+Layouts:
+
+- `hidden`: default for installed projects; root keeps thin `AGENTS.md` and `init.sh` entry points while harness files live under `.agent-harness/`.
+- `visible`: template-maintenance layout with harness files at repository root.
+
 Default behavior never overwrites conflicting files. Use `--force` only after the user explicitly approves overwriting conflicts.
 
 The initializer writes `.agent-harness/manifest.json` into installed projects and reads `.agent-harness-template.json` from the template. File categories matter:

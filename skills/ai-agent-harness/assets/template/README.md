@@ -147,6 +147,13 @@ Manual `python3 skills/ai-agent-harness/scripts/init_harness.py` commands are re
 
 The initializer supports `new`, `adopt`, `repair`, and `check` modes. It does not overwrite conflicting files unless `--force` is used after explicit approval.
 
+The initializer also supports layout profiles:
+
+- `--layout hidden` is the default for installed projects. Root keeps thin `AGENTS.md` and `init.sh` entry points, while harness state, prompts, docs, scripts, tests, runs, schemas, and examples live under `.agent-harness/`.
+- `--layout visible` is the template-maintenance layout. Harness files stay at the repository root for direct inspection and development.
+
+In hidden layout, commit `.agent-harness/` when you want resumability across sessions and machines. Ignore only temporary caches or logs you intentionally place under paths such as `.agent-harness/tmp/`.
+
 The initializer writes `.agent-harness/manifest.json` in installed projects and uses `.agent-harness-template.json` from the template to classify files:
 
 - harness-owned static files are copied and drift-checked by hash;
@@ -154,7 +161,7 @@ The initializer writes `.agent-harness/manifest.json` in installed projects and 
 - merge-sensitive files such as `AGENTS.md`, `README.md`, and `Makefile` are not overwritten by default;
 - optional integrations such as GitHub workflow files and examples are reported separately.
 
-A project counts as an installed harness when `./init.sh` succeeds, `feature_list.json` is valid, progress and agent rules contain the required workflow sections, scripts and prompts are present, run templates are available, and skill `check` reports `runnable_harness=true`. This is stronger than checking for file existence alone.
+A project counts as an installed harness when `./init.sh` succeeds, the installed layout's `feature_list.json` is valid, progress and agent rules contain the required workflow sections, scripts and prompts are present, run templates are available, and skill `check` reports `runnable_harness=true`. This is stronger than checking for file existence alone.
 
 For version drift handling, run skill `check` first. Use `repair` to restore missing files and write a manifest. Review drift before using explicit overwrite or a future upgrade flow.
 
