@@ -30,6 +30,25 @@ def run_initializer(project: Path, mode: str, *extra: str):
     )
 
 
+def run_initializer_with_template(project: Path, template: Path, mode: str, *extra: str):
+    return subprocess.run(
+        [
+            sys.executable,
+            str(INIT_SCRIPT),
+            "--root",
+            str(project),
+            "--template-root",
+            str(template),
+            "--mode",
+            mode,
+            *extra,
+        ],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+    )
+
+
 def run_project_init(project: Path):
     return subprocess.run(
         [str(project / "init.sh")],
@@ -41,6 +60,18 @@ def run_project_init(project: Path):
 
 
 class SkillInitializerHarnessTests(unittest.TestCase):
+    EXECUTABLE_PATHS = [
+        "init.sh",
+        ".agent-harness/init.sh",
+        ".agent-harness/scripts/check-failure-domains.sh",
+        ".agent-harness/scripts/init.sh",
+        ".agent-harness/scripts/run-coding-agent.sh",
+        ".agent-harness/scripts/run-evaluator-agent.sh",
+        ".agent-harness/scripts/summarize-progress.sh",
+        ".agent-harness/scripts/summarize-runs.sh",
+        ".agent-harness/scripts/validate-feature.sh",
+    ]
+
     def test_new_mode_creates_runnable_harness_and_clean_check(self):
         with tempfile.TemporaryDirectory() as tmp_dir:
             project = Path(tmp_dir)
@@ -55,11 +86,13 @@ class SkillInitializerHarnessTests(unittest.TestCase):
             data = json.loads((project / ".agent-harness" / "feature_list.json").read_text())
             self.assertEqual(data, {"features": []})
             manifest = json.loads((project / ".agent-harness" / "manifest.json").read_text())
-            self.assertEqual(manifest["template_version"], "0.3.2")
+            self.assertEqual(manifest["template_version"], "0.3.3")
             self.assertEqual(manifest["layout"], "hidden")
             self.assertIn("category", manifest["files"][".agent-harness/scripts/validate-state.py"])
             self.assertTrue((project / "AGENTS.md").exists())
             self.assertTrue((project / "init.sh").exists())
+            for rel in self.EXECUTABLE_PATHS:
+                self.assertTrue(os.access(project / rel, os.X_OK), f"{rel} should be executable")
             self.assertFalse((project / "feature_list.json").exists())
             self.assertFalse((project / "scripts").exists())
 
@@ -69,12 +102,43 @@ class SkillInitializerHarnessTests(unittest.TestCase):
             check = run_initializer(project, "check")
             self.assertEqual(check.returncode, 0, check.stdout + check.stderr)
             self.assertIn("layout=hidden", check.stdout)
-            self.assertIn("template_version=0.3.2", check.stdout)
-            self.assertIn("installed_version=0.3.2", check.stdout)
+            self.assertIn("template_version=0.3.3", check.stdout)
+            self.assertIn("installed_version=0.3.3", check.stdout)
             self.assertIn("state_valid=true", check.stdout)
             self.assertIn("runnable_harness=true", check.stdout)
             self.assertIn("project_state_changed=", check.stdout)
             self.assertIn("next_action=harness is installed and runnable", check.stdout)
+
+    def test_hidden_layout_repairs_executable_bits_when_template_modes_are_lost(self):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp = Path(tmp_dir)
+            template = tmp / "template"
+            project = tmp / "project"
+            shutil.copytree(
+                ROOT,
+                template,
+                ignore=shutil.ignore_patterns(".git", "__pycache__", ".pytest_cache"),
+            )
+            for rel in [
+                "init.sh",
+                "scripts/check-failure-domains.sh",
+                "scripts/init.sh",
+                "scripts/run-coding-agent.sh",
+                "scripts/run-evaluator-agent.sh",
+                "scripts/summarize-progress.sh",
+                "scripts/summarize-runs.sh",
+                "scripts/validate-feature.sh",
+            ]:
+                (template / rel).chmod(0o644)
+
+            result = run_initializer_with_template(project, template, "new")
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("state_valid=true", result.stdout)
+            self.assertIn("runnable_harness=true", result.stdout)
+            for rel in self.EXECUTABLE_PATHS:
+                self.assertTrue(os.access(project / rel, os.X_OK), f"{rel} should be executable")
+            init = run_project_init(project)
+            self.assertEqual(init.returncode, 0, init.stderr)
 
     def test_visible_layout_remains_available_for_harness_development(self):
         with tempfile.TemporaryDirectory() as tmp_dir:
@@ -167,7 +231,7 @@ class SkillInitializerHarnessTests(unittest.TestCase):
             self.assertEqual(check.returncode, 1)
             for phrase in [
                 "mode=check",
-                "template_version=0.3.2",
+                "template_version=0.3.3",
                 "installed_version=0.0.0",
                 "state_valid=false",
                 "runnable_harness=false",

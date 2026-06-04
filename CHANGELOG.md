@@ -6,6 +6,8 @@ All notable changes to this project are tracked here.
 
 - Improve public README positioning and onboarding.
 - Add OSS readiness files for contribution, security, licensing, and issue triage.
+- Add hidden-layout skill installation profiles and feature-linked commit rules.
+- Fix skill initialization so generated shell entrypoints stay executable even when distributed template modes are lost.
 
 ## 0.1.0
 

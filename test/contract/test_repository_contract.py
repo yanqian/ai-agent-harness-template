@@ -129,7 +129,7 @@ class RepositoryContractTests(unittest.TestCase):
             init: ["docs/capability-gaps.md"],
             skill: ["docs/capability-gaps.md", "local-only workarounds"],
             workflows: ["Identify required capabilities", "Check `docs/capability-gaps.md`"],
-            initializer: ["docs/capability-gaps.md", "Capability Gap Handling", "TEMPLATE_VERSION = \"0.3.2\""],
+            initializer: ["docs/capability-gaps.md", "Capability Gap Handling", "TEMPLATE_VERSION = \"0.3.3\""],
         }
         for text, phrases in checks.items():
             for phrase in phrases:
@@ -179,7 +179,7 @@ class RepositoryContractTests(unittest.TestCase):
             init: ["docs/feature-decomposition.md"],
             skill: ["docs/feature-decomposition.md", "Split independently verifiable behavior"],
             workflows: ["Use `docs/feature-decomposition.md`", "reject over-bundled features"],
-            initializer: ["docs/feature-decomposition.md", "TEMPLATE_VERSION = \"0.3.2\""],
+            initializer: ["docs/feature-decomposition.md", "TEMPLATE_VERSION = \"0.3.3\""],
         }
         for text, phrases in checks.items():
             for phrase in phrases:
@@ -227,7 +227,7 @@ class RepositoryContractTests(unittest.TestCase):
             init: ["docs/commit-messages.md"],
             skill: ["docs/commit-messages.md", "Fxxx <Action> <concise summary>"],
             workflows: ["Read `docs/commit-messages.md`", "starts with the feature ID", "Verify every feature ID referenced"],
-            initializer: ["docs/commit-messages.md", "TEMPLATE_VERSION = \"0.3.2\""],
+            initializer: ["docs/commit-messages.md", "TEMPLATE_VERSION = \"0.3.3\""],
         }
         for text, phrases in checks.items():
             for phrase in phrases:
@@ -275,7 +275,7 @@ class RepositoryContractTests(unittest.TestCase):
             init: ["docs/example-boundaries.md"],
             skill: ["docs/example-boundaries.md", "Default examples are references"],
             workflows: ["Identify project-owned implementation and verification paths", "do not use default examples as the product implementation surface"],
-            initializer: ["docs/example-boundaries.md", "TEMPLATE_VERSION = \"0.3.2\""],
+            initializer: ["docs/example-boundaries.md", "TEMPLATE_VERSION = \"0.3.3\""],
         }
         for text, phrases in checks.items():
             for phrase in phrases:
@@ -448,13 +448,16 @@ class RepositoryContractTests(unittest.TestCase):
             "PROJECT_OWNED_STATE",
             "MERGE_SENSITIVE",
             "OPTIONAL_PREFIXES",
+            "EXECUTABLE_TEMPLATE_PATHS",
+            "ensure_executable_mode",
+            "item_should_be_executable",
             "semantic_validation",
             "write_install_manifest",
             "project_state_changed",
             "next_action",
         ]:
             self.assertIn(phrase, initializer)
-        self.assertEqual(template_manifest["template_version"], "0.3.2")
+        self.assertEqual(template_manifest["template_version"], "0.3.3")
         self.assertEqual(template_manifest["default_layout"], "hidden")
         self.assertIn("hidden", template_manifest["layouts"])
         self.assertIn("visible", template_manifest["layouts"])

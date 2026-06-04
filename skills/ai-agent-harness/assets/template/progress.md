@@ -37,12 +37,13 @@ Implemented components:
 - Installation layout profiles, with hidden layout as the default for user projects and visible layout retained for template maintenance.
 - Feature-decomposition governance that requires broad requirements to become independently verifiable feature entries instead of over-bundled features.
 - Feature-linked commit message governance that ties approved feature commits back to `feature_list.json`.
+- Installer executable-bit repair that makes generated shell entrypoints executable even when source template modes are lost.
 - Tiny dependency-free Python CLI example in `examples/tiny-cli/`.
 - Dependency-free Go server example in `examples/go-server/`.
 
 ## Last Completed Feature
 
-`F025` - Add feature-linked commit message rules.
+`F026` - Preserve executable script modes during installation.
 
 ## Next Feature
 

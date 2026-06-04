@@ -14,10 +14,20 @@ SKILL_DIR = Path(__file__).resolve().parents[1]
 BUNDLED_TEMPLATE = SKILL_DIR / "assets" / "template"
 TEMPLATE_MANIFEST = ".agent-harness-template.json"
 INSTALL_MANIFEST = ".agent-harness/manifest.json"
-TEMPLATE_VERSION = "0.3.2"
+TEMPLATE_VERSION = "0.3.3"
 MODE_CHOICES = {"new", "adopt", "repair", "check"}
 LAYOUT_CHOICES = {"hidden", "visible"}
 DEFAULT_LAYOUT = "hidden"
+EXECUTABLE_TEMPLATE_PATHS = {
+    "init.sh",
+    "scripts/check-failure-domains.sh",
+    "scripts/init.sh",
+    "scripts/run-coding-agent.sh",
+    "scripts/run-evaluator-agent.sh",
+    "scripts/summarize-progress.sh",
+    "scripts/summarize-runs.sh",
+    "scripts/validate-feature.sh",
+}
 
 REQUIRED_TEMPLATE_FILES = [
     TEMPLATE_MANIFEST,
@@ -222,8 +232,16 @@ def write_item(item: dict, target_root: Path, dry_run: bool) -> None:
         shutil.copy2(item["source"], dst)
     else:
         dst.write_text(item["content"])
-        if dst.name == "init.sh":
-            dst.chmod(dst.stat().st_mode | 0o755)
+    ensure_executable_mode(item, dst)
+
+
+def ensure_executable_mode(item: dict, path: Path) -> None:
+    if item_should_be_executable(item):
+        path.chmod(path.stat().st_mode | 0o755)
+
+
+def item_should_be_executable(item: dict) -> bool:
+    return item["logical"].as_posix() in EXECUTABLE_TEMPLATE_PATHS
 
 
 def iter_template_files(template_root: Path):
@@ -380,11 +398,10 @@ def semantic_validation(root: Path, layout: str) -> dict:
     if not feature_ok:
         checks.append(feature_reason)
 
-    script_root = harness_root
-    for script in ["init.sh", "scripts/validate-state.py", "scripts/check-failure-domains.sh"]:
-        if not (script_root / script).exists():
+    for script in sorted(EXECUTABLE_TEMPLATE_PATHS):
+        if not (harness_root / script).exists():
             continue
-        if script.endswith(".sh") and not is_executable(script_root / script):
+        if not is_executable(harness_root / script):
             checks.append(f"{script} is not executable")
     if layout == "hidden" and (root / "init.sh").exists() and not is_executable(root / "init.sh"):
         checks.append("init.sh is not executable")

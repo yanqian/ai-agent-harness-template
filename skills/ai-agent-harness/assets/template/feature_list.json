@@ -448,6 +448,25 @@
       "attempts": 1,
       "last_error": "",
       "priority": "P0"
+    },
+    {
+      "id": "F026",
+      "title": "Preserve executable script modes during installation",
+      "description": "Fix the skill initializer so hidden and visible harness installs make required shell entrypoints executable even when the installed skill template lost executable bits during download or extraction.",
+      "acceptance": [
+        "The initializer defines required executable harness paths and chmods them after copying or generating files",
+        "Hidden layout installs produce executable root `init.sh`, `.agent-harness/init.sh`, and `.agent-harness/scripts/*.sh` entrypoints",
+        "Semantic validation checks all required shell entrypoints for executable bits instead of only a subset",
+        "Harness tests simulate a template source with non-executable shell scripts and verify the installed harness is runnable",
+        "The bundled skill template is synchronized with the executable-bit fix",
+        "Contract tests verify the initializer keeps executable-bit handling logic",
+        "./init.sh passes after the update"
+      ],
+      "passes": true,
+      "status": "done",
+      "attempts": 1,
+      "last_error": "",
+      "priority": "P0"
     }
   ]
 }
