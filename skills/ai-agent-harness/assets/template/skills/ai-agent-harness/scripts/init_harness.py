@@ -20,6 +20,7 @@ LAYOUT_CHOICES = {"hidden", "visible"}
 DEFAULT_LAYOUT = "hidden"
 EXECUTABLE_TEMPLATE_PATHS = {
     "init.sh",
+    "scripts/check-evaluator-evidence.sh",
     "scripts/check-failure-domains.sh",
     "scripts/init.sh",
     "scripts/run-coding-agent.sh",
@@ -178,6 +179,10 @@ Before planning, coding, evaluating, or resuming work:
 
 Full harness rules live in `.agent-harness/AGENTS.md`.
 Project-specific implementation should live in project-owned source and test paths, not in `.agent-harness/` unless the selected feature explicitly changes the harness.
+
+Root `./init.sh` starts as harness verification only. Before a minspec exists, it proves the harness can plan and resume. After minspec acceptance, plan a runnable-skeleton feature that turns root `./init.sh` into the project recovery contract described in `.agent-harness/docs/project-recovery-init.md`.
+
+Spec Normalization rules live in `.agent-harness/docs/spec-normalization.md`. Planning must define goal, included scope, excluded scope, core flows, constraints, ambiguities or assumptions, required capabilities, implementation paths, and verification surface before appending feature entries.
 """
 
 
@@ -186,6 +191,10 @@ def hidden_init_text() -> str:
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Pre-minspec state: verify the harness is installed and runnable.
+# After minspec acceptance, project work should adapt this root entrypoint
+# into the project recovery contract described in
+# .agent-harness/docs/project-recovery-init.md.
 exec "$ROOT_DIR/.agent-harness/scripts/init.sh" "$@"
 """
 
@@ -361,12 +370,15 @@ def semantic_validation(root: Path, layout: str) -> dict:
         "QUALITY.md",
         "orchestrator.py",
         "scripts/validate-state.py",
+        "scripts/check-evaluator-evidence.sh",
         "scripts/check-failure-domains.sh",
         "prompts/work.md",
         "prompts/evaluate.md",
         "docs/README.md",
+        "docs/spec-normalization.md",
         "docs/feature-decomposition.md",
         "docs/commit-messages.md",
+        "docs/evaluator-evidence.md",
         "docs/capability-gaps.md",
         "docs/example-boundaries.md",
         "runs/RUN_TEMPLATE.md",

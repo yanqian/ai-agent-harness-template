@@ -165,9 +165,13 @@ A project counts as an installed harness when `./init.sh` succeeds, the installe
 
 For version drift handling, run skill `check` first. Use `repair` to restore missing files and write a manifest. Review drift before using explicit overwrite or a future upgrade flow.
 
+After installation, distinguish harness recovery from project recovery. In hidden layout, root `./init.sh` starts as a thin wrapper around `.agent-harness/scripts/init.sh`; before a minspec exists, that only proves the harness can plan and resume. Once a minspec is accepted, the first project setup feature should turn root `./init.sh` into the project recovery contract: install dependencies, start required services, run a real endpoint or core-function smoke test, print clear logs, and fail non-zero on setup, startup, or verification failure. See [docs/project-recovery-init.md](docs/project-recovery-init.md).
+
 The skill also defines a finalize-and-commit workflow. It stages and commits only after the user explicitly says they are satisfied or asks to commit.
 
 Feature commits use feature-linked subjects such as `F025 Add feature-linked commit messages`. Batch commits include every approved feature ID, and explicitly non-feature commits use `No-feature: <summary>`. See `docs/commit-messages.md`.
+
+Completed features after the evaluator-evidence baseline must also have run-level `EVAL_PASS: Fxxx` evidence. See [docs/evaluator-evidence.md](docs/evaluator-evidence.md).
 
 ### Verify This Repository
 
@@ -187,17 +191,19 @@ Expected result:
 - the Go server example tests pass when Go is installed.
 - the orchestrator can run the startup protocol and preview prompts.
 - the unit, contract, and smoke layers pass.
+- completed features after the evaluator-evidence baseline have matching evaluator pass evidence.
 
 ## Development Flow
 
 1. Add new requirements to `SPEC.md`.
 2. Decompose broad requirements into independently verifiable features using `docs/feature-decomposition.md`.
-3. Append new features to `feature_list.json`.
-4. Implement one feature at a time.
-5. Run `make init`.
-6. Run `make validate FEATURE=Fxxx`.
-7. Update `progress.md`.
-8. Commit only after verification passes.
+3. For a fresh project with an accepted minspec, add a runnable-skeleton feature using `docs/project-recovery-init.md`.
+4. Append new features to `feature_list.json`.
+5. Implement one feature at a time.
+6. Run `make init`.
+7. Run `make validate FEATURE=Fxxx`.
+8. Update `progress.md`.
+9. Commit only after verification passes.
 
 ## Make Targets
 

@@ -72,7 +72,13 @@ Use the workflow names as intent detectors:
 
 When an installed harness reports a missing tool, permission, generator, dependency, service, credential, runtime setting, CI resource, or verification fixture, follow the target repository's `docs/capability-gaps.md`. Do not treat local-only workarounds as durable completion.
 
+When planning new requirements, follow the target repository's `docs/spec-normalization.md` before feature decomposition. Normalize vague user input into explicit goal, included scope, excluded scope, core flows, constraints, ambiguities or assumptions, required capabilities, implementation paths, and verification surface. Do not turn vague requirements directly into feature entries.
+
 When planning broad requirements, follow the target repository's `docs/feature-decomposition.md`. Split independently verifiable behavior, capability, implementation-boundary, risk-domain, and verification-surface work into separate features.
+
+When a project has just been initialized or a minspec has just been accepted, follow the target repository's `docs/project-recovery-init.md`. Treat `.agent-harness/scripts/init.sh` as harness verification and root `./init.sh` as the project recovery entry point. Before a minspec exists, root `./init.sh` may only prove the harness is runnable. After minspec acceptance, plan a runnable-skeleton feature that installs dependencies, starts required services, runs a real endpoint or core-function smoke test, emits clear logs, and exits non-zero on failure.
+
+When completing or evaluating a feature, follow the target repository's `docs/evaluator-evidence.md`. From the enforcement baseline onward, a feature should not be marked done unless `runs/` contains `EVAL_PASS: Fxxx` for that feature.
 
 When project work touches `examples/`, follow the target repository's `docs/example-boundaries.md`. Default examples are references, not the default place for product requirements.
 

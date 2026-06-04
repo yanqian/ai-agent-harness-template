@@ -28,7 +28,10 @@ for path in \
   docs/architecture.md \
   docs/testing.md \
   docs/external-behavior.md \
+  docs/spec-normalization.md \
   docs/feature-decomposition.md \
+  docs/project-recovery-init.md \
+  docs/evaluator-evidence.md \
   docs/commit-messages.md \
   docs/capability-gaps.md \
   docs/example-boundaries.md \
@@ -68,6 +71,9 @@ python3 scripts/validate-state.py
 
 echo "== Failure domains =="
 scripts/check-failure-domains.sh
+
+echo "== Evaluator evidence =="
+scripts/check-evaluator-evidence.sh
 
 echo "== Orchestrator syntax =="
 python3 - <<'PY'

@@ -185,6 +185,166 @@ class RepositoryContractTests(unittest.TestCase):
             for phrase in phrases:
                 self.assertIn(phrase, text)
 
+    def test_project_recovery_init_governance_is_documented_and_enforced(self):
+        agents = (ROOT / "AGENTS.md").read_text()
+        spec = (ROOT / "SPEC.md").read_text()
+        docs_index = (ROOT / "docs" / "README.md").read_text()
+        project_recovery = (ROOT / "docs" / "project-recovery-init.md").read_text()
+        workflow = (ROOT / "docs" / "agent-workflow.md").read_text()
+        plan = (ROOT / "prompts" / "plan.md").read_text()
+        readme = (ROOT / "README.md").read_text()
+        init = (ROOT / "scripts" / "init.sh").read_text()
+        skill = (ROOT / "skills" / "ai-agent-harness" / "SKILL.md").read_text()
+        workflows = (ROOT / "skills" / "ai-agent-harness" / "references" / "workflows.md").read_text()
+        initializer = (ROOT / "skills" / "ai-agent-harness" / "scripts" / "init_harness.py").read_text()
+        template_agents = (ROOT / "skills" / "ai-agent-harness" / "assets" / "template" / "AGENTS.md").read_text()
+        template_doc = (ROOT / "skills" / "ai-agent-harness" / "assets" / "template" / "docs" / "project-recovery-init.md").read_text()
+        template_init = (ROOT / "skills" / "ai-agent-harness" / "assets" / "template" / "scripts" / "init.sh").read_text()
+
+        for phrase in [
+            "## Project Recovery Init",
+            "root project recovery entry point",
+            "`.agent-harness/scripts/init.sh` verifies harness health",
+            "runnable-skeleton feature",
+            "Harness verification alone must not be treated as project completion",
+        ]:
+            self.assertIn(phrase, agents)
+
+        for phrase in [
+            "# Project Recovery Init",
+            "Two Init Layers",
+            "Before Minspec",
+            "After Minspec",
+            "starts as a thin wrapper",
+            "at least one real smoke test",
+            "exits non-zero",
+        ]:
+            self.assertIn(phrase, project_recovery)
+
+        checks = {
+            spec: ["Project Recovery Init", "root `./init.sh` is the project recovery entry point"],
+            docs_index: ["project-recovery-init.md", "root project recovery entry point"],
+            workflow: ["docs/project-recovery-init.md", "runnable-skeleton feature"],
+            plan: ["Use `docs/project-recovery-init.md`", "Harness verification alone is acceptable only before a minspec exists"],
+            readme: ["distinguish harness recovery from project recovery", "docs/project-recovery-init.md"],
+            init: ["docs/project-recovery-init.md"],
+            skill: ["docs/project-recovery-init.md", "root `./init.sh` as the project recovery entry point"],
+            workflows: ["docs/project-recovery-init.md", "root `./init.sh` starts as harness verification only"],
+            initializer: [".agent-harness/docs/project-recovery-init.md", "Pre-minspec state"],
+            template_agents: ["## Project Recovery Init", "runnable-skeleton feature"],
+            template_doc: ["# Project Recovery Init", "The root project init may call `.agent-harness/scripts/init.sh`"],
+            template_init: ["docs/project-recovery-init.md"],
+        }
+        for text, phrases in checks.items():
+            for phrase in phrases:
+                self.assertIn(phrase, text)
+
+    def test_spec_normalization_governance_is_documented_and_enforced(self):
+        agents = (ROOT / "AGENTS.md").read_text()
+        spec = (ROOT / "SPEC.md").read_text()
+        docs_index = (ROOT / "docs" / "README.md").read_text()
+        normalization = (ROOT / "docs" / "spec-normalization.md").read_text()
+        workflow = (ROOT / "docs" / "agent-workflow.md").read_text()
+        quality = (ROOT / "QUALITY.md").read_text()
+        failure_domains = (ROOT / "docs" / "failure-domains.md").read_text()
+        plan = (ROOT / "prompts" / "plan.md").read_text()
+        evaluate = (ROOT / "prompts" / "evaluate.md").read_text()
+        init = (ROOT / "scripts" / "init.sh").read_text()
+        skill = (ROOT / "skills" / "ai-agent-harness" / "SKILL.md").read_text()
+        workflows = (ROOT / "skills" / "ai-agent-harness" / "references" / "workflows.md").read_text()
+        template_agents = (ROOT / "skills" / "ai-agent-harness" / "assets" / "template" / "AGENTS.md").read_text()
+        template_doc = (ROOT / "skills" / "ai-agent-harness" / "assets" / "template" / "docs" / "spec-normalization.md").read_text()
+        template_plan = (ROOT / "skills" / "ai-agent-harness" / "assets" / "template" / "prompts" / "plan.md").read_text()
+
+        for phrase in [
+            "## Spec Normalization",
+            "goal, included scope, excluded scope, core flows, constraints",
+            "Vague requirements must not become executable features",
+            "Use `docs/spec-normalization.md` before feature decomposition.",
+        ]:
+            self.assertIn(phrase, agents)
+
+        for phrase in [
+            "# Spec Normalization",
+            "Required Fields",
+            "Goal:",
+            "Scope included:",
+            "Scope excluded:",
+            "Core flows:",
+            "Constraints:",
+            "Ambiguities or assumptions:",
+            "Required capabilities:",
+            "Implementation paths:",
+            "Verification surface:",
+            "Spec normalization happens before feature decomposition.",
+            "Use `requirement_gap`",
+        ]:
+            self.assertIn(phrase, normalization)
+
+        checks = {
+            spec: ["Spec Normalization", "goal, included scope, excluded scope, core flows, constraints"],
+            docs_index: ["spec-normalization.md", "explicit SPEC additions"],
+            workflow: ["docs/spec-normalization.md", "goal, included scope, excluded scope"],
+            quality: ["source requirement was normalized", "vague or incomplete SPEC entry"],
+            failure_domains: ["requirement_gap", "missing required spec normalization fields"],
+            plan: ["Use `docs/spec-normalization.md`", "Reject vague requirements"],
+            evaluate: ["Check `docs/spec-normalization.md`", "Use `requirement_gap`"],
+            init: ["docs/spec-normalization.md"],
+            skill: ["docs/spec-normalization.md", "Do not turn vague requirements directly into feature entries"],
+            workflows: ["docs/spec-normalization.md", "Reject vague requirements"],
+            template_agents: ["## Spec Normalization", "Vague requirements must not become executable features"],
+            template_doc: ["# Spec Normalization", "Required Fields"],
+            template_plan: ["Use `docs/spec-normalization.md`", "Reject vague requirements"],
+        }
+        for text, phrases in checks.items():
+            for phrase in phrases:
+                self.assertIn(phrase, text)
+
+    def test_evaluator_evidence_governance_is_documented_and_enforced(self):
+        agents = (ROOT / "AGENTS.md").read_text()
+        spec = (ROOT / "SPEC.md").read_text()
+        docs_index = (ROOT / "docs" / "README.md").read_text()
+        evidence = (ROOT / "docs" / "evaluator-evidence.md").read_text()
+        workflow = (ROOT / "docs" / "agent-workflow.md").read_text()
+        quality = (ROOT / "QUALITY.md").read_text()
+        readme = (ROOT / "README.md").read_text()
+        evaluate = (ROOT / "prompts" / "evaluate.md").read_text()
+        init = (ROOT / "scripts" / "init.sh").read_text()
+        check_script = (ROOT / "scripts" / "check-evaluator-evidence.sh").read_text()
+        skill = (ROOT / "skills" / "ai-agent-harness" / "SKILL.md").read_text()
+        workflows = (ROOT / "skills" / "ai-agent-harness" / "references" / "workflows.md").read_text()
+        failure_domains = (ROOT / "docs" / "failure-domains.md").read_text()
+        template_doc = (ROOT / "skills" / "ai-agent-harness" / "assets" / "template" / "docs" / "evaluator-evidence.md").read_text()
+        template_script = (ROOT / "skills" / "ai-agent-harness" / "assets" / "template" / "scripts" / "check-evaluator-evidence.sh").read_text()
+
+        for phrase in [
+            "From the evaluator-evidence enforcement baseline onward",
+            "`EVAL_PASS: Fxxx`",
+            "The default enforcement baseline is `F027`.",
+            "agent_workflow_gap",
+        ]:
+            self.assertIn(phrase, evidence)
+
+        checks = {
+            agents: ["docs/evaluator-evidence.md", "Marking a feature done without evaluator evidence"],
+            spec: ["Completed features must have durable evaluator evidence", "EVAL_PASS: Fxxx"],
+            docs_index: ["evaluator-evidence.md", "durable `EVAL_PASS: Fxxx` evidence"],
+            workflow: ["docs/evaluator-evidence.md", "scripts/check-evaluator-evidence.sh"],
+            quality: ["Completed features after the evaluator-evidence baseline", "marked done without required evaluator evidence"],
+            readme: ["evaluator-evidence baseline", "docs/evaluator-evidence.md"],
+            evaluate: ["Check `docs/evaluator-evidence.md`", "Use `agent_workflow_gap`"],
+            init: ["scripts/check-evaluator-evidence.sh"],
+            check_script: ["HARNESS_EVALUATOR_EVIDENCE_BASELINE", "missing_evaluator_evidence"],
+            skill: ["docs/evaluator-evidence.md", "EVAL_PASS: Fxxx"],
+            workflows: ["docs/evaluator-evidence.md", "matching `EVAL_PASS: Fxxx` run evidence"],
+            failure_domains: ["agent_workflow_gap", "evaluator-evidence gating"],
+            template_doc: ["# Evaluator Evidence", "The default enforcement baseline is `F027`."],
+            template_script: ["HARNESS_EVALUATOR_EVIDENCE_BASELINE", "missing_evaluator_evidence"],
+        }
+        for text, phrases in checks.items():
+            for phrase in phrases:
+                self.assertIn(phrase, text)
+
     def test_commit_message_governance_is_documented_and_enforced(self):
         agents = (ROOT / "AGENTS.md").read_text()
         spec = (ROOT / "SPEC.md").read_text()
@@ -561,6 +721,9 @@ class RepositoryContractTests(unittest.TestCase):
         expectations = {
             "plan.md": [
                 "Act as Planning Agent",
+                "Use `docs/spec-normalization.md`",
+                "Reject vague requirements",
+                "Spec normalization happens before feature decomposition.",
                 "Use `docs/feature-decomposition.md`",
                 "Do not append a generic \"implement all requirements\" feature",
                 "Identify required capabilities",
@@ -598,6 +761,7 @@ class RepositoryContractTests(unittest.TestCase):
             ],
             "evaluate.md": [
                 "Act as Evaluator Agent",
+                "Check `docs/spec-normalization.md`",
                 "Check `docs/feature-decomposition.md`",
                 "Do not implement new features.",
                 "Do not accept incomplete work.",
@@ -610,6 +774,7 @@ class RepositoryContractTests(unittest.TestCase):
                 "Use `capability_gap`",
                 "Use `example_scope_gap`",
                 "Use `feature_decomposition_gap`",
+                "Use `requirement_gap`",
                 "require a durable harness improvement or a follow-up feature",
                 "EVAL_PASS: Fxxx",
                 "EVAL_FAIL: Fxxx: <reason>",

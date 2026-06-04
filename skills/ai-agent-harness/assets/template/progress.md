@@ -38,18 +38,22 @@ Implemented components:
 - Feature-decomposition governance that requires broad requirements to become independently verifiable feature entries instead of over-bundled features.
 - Feature-linked commit message governance that ties approved feature commits back to `feature_list.json`.
 - Installer executable-bit repair that makes generated shell entrypoints executable even when source template modes are lost.
+- Project recovery init governance so installed projects distinguish harness verification from the root project recovery contract.
+- Minspec-to-SPEC normalization governance so planners must clarify goal, scope, flows, constraints, ambiguities, capabilities, implementation paths, and verification before appending features.
+- Evaluator-evidence guardrail so features cannot be marked done without durable `EVAL_PASS: Fxxx` run evidence.
 - Tiny dependency-free Python CLI example in `examples/tiny-cli/`.
 - Dependency-free Go server example in `examples/go-server/`.
 
 ## Last Completed Feature
 
-`F026` - Preserve executable script modes during installation.
+`F029` - Require evaluator evidence before completion.
 
 ## Next Feature
 
-`F011` - Explore concurrent agent execution. This is a future/backlog item only; implement it only if the harness needs parallel agent throughput.
+`F011` - Explore concurrent agent execution. This is a P2 backlog item only; implement it only if the harness needs parallel agent throughput.
 
 ## Known Issues
 
 - The template orchestrator is intentionally lightweight and vendor-neutral.
 - Vendor-specific command wrappers for Codex, Claude Code, and Cursor Agent are intentionally left to downstream projects.
+- `F011` remains a P2 backlog item and should not preempt the new P0 governance work.

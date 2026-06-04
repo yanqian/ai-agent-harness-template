@@ -44,6 +44,7 @@ Responsibilities:
 - Create or adapt `init.sh`.
 - Initialize git when the repository has no git history.
 - Do not implement business logic during initialization.
+- Before a project minspec exists, `init.sh` may only verify the harness and must not claim project business behavior is runnable.
 
 ### Planning Agent
 
@@ -54,8 +55,9 @@ Responsibilities:
 - Read `AGENTS.md`.
 - Read `SPEC.md`.
 - Read `feature_list.json`.
-- Append the new requirement to `SPEC.md`.
+- Normalize the new requirement into explicit SPEC additions.
 - Decompose broad requirements into independently verifiable feature entries.
+- Use `docs/project-recovery-init.md` when planning a fresh project or runnable skeleton.
 - Append new feature entries to `feature_list.json`.
 - Preserve all existing feature IDs, order, status fields, attempts, errors, and unknown fields.
 
@@ -65,8 +67,11 @@ Strict rules:
 - Do not reorder existing features.
 - Do not reset existing feature state.
 - Only append new feature entries unless explicitly instructed otherwise.
+- Use `docs/spec-normalization.md` before feature decomposition.
+- Do not turn vague requirements into feature entries without explicit goal, included scope, excluded scope, core flows, constraints, ambiguities or assumptions, required capabilities, implementation paths, and verification surface.
 - Do not collapse unrelated or independently verifiable work into one feature.
 - Use `docs/feature-decomposition.md` to decide whether to split or intentionally merge work.
+- If a minspec has been accepted and the project has no runnable skeleton, append a project recovery feature before product behavior depends on runtime assumptions.
 - Ensure `feature_list.json` remains valid JSON.
 - Ensure feature IDs remain unique.
 
@@ -147,7 +152,10 @@ Use these durable knowledge files:
 - `docs/README.md` for the repository knowledge index.
 - `docs/architecture.md` for structure and boundaries.
 - `docs/testing.md` for verification layers.
+- `docs/spec-normalization.md` for converting vague requirements into clear SPEC additions before feature decomposition.
 - `docs/feature-decomposition.md` for requirement-to-feature splitting rules.
+- `docs/project-recovery-init.md` for separating harness verification from project recovery.
+- `docs/evaluator-evidence.md` for requiring durable evaluator pass evidence before feature completion.
 - `docs/commit-messages.md` for linking commits to feature IDs.
 - `docs/external-behavior.md` for CLI, API, runtime, and tool-output verification rules.
 - `docs/capability-gaps.md` for missing tools, permissions, dependencies, generators, environment setup, and required project capabilities.
@@ -192,6 +200,12 @@ Rules:
 - Preserve feature ordering and existing fields.
 - Do not remove metadata fields.
 - Do not reset existing fields such as `passes`, `status`, `attempts`, or `last_error` unless explicitly instructed.
+
+## Spec Normalization
+
+Planning Agents must normalize new requirements before appending feature entries. The normalized SPEC addition must define goal, included scope, excluded scope, core flows, constraints, ambiguities or assumptions, required capabilities, project-owned implementation paths, and verification surface.
+
+If a requirement cannot be normalized without guessing, the Planning Agent must ask for clarification, record explicit assumptions, mark planning risks, or append capability, blocker, or follow-up features before product behavior work. Vague requirements must not become executable features merely because they sound actionable.
 
 ### `progress.md`
 
@@ -243,6 +257,14 @@ Rules:
 - Use examples as references only. If fresh project setup removes or replaces default examples, record that as setup work and update verification accordingly.
 - Evaluators must reject project-level work that passes only because an example was repurposed.
 
+## Project Recovery Init
+
+`init.sh` is the root project recovery entry point. In hidden layout, `.agent-harness/scripts/init.sh` verifies harness health; root `./init.sh` starts as a thin harness wrapper only before a project minspec exists.
+
+Once a minspec is accepted, Planning Agents must add a runnable-skeleton feature that turns root `./init.sh` into the project recovery contract. That contract must install or verify dependencies, start required services itself, run at least one real smoke test against an endpoint or core function, print clear logs, be idempotent, avoid manual steps and TODO placeholders, and exit non-zero on failure.
+
+Harness verification alone must not be treated as project completion after the accepted scope requires runnable business behavior.
+
 ## External Behavior Verification
 
 When implementation depends on behavior outside this repository's own code, agents must verify that behavior before relying on it.
@@ -280,6 +302,7 @@ When implementing behavior that parses output from external tools such as Codex 
 - The Coding Agent updates state and progress for its target feature.
 - The Evaluator Agent verifies without implementation changes.
 - The orchestrator owns unattended feature state transitions.
+- From the evaluator-evidence baseline onward, do not mark a feature done unless `runs/` contains `EVAL_PASS: Fxxx` evidence for that feature.
 
 ## Commit Message Rules
 
@@ -295,13 +318,16 @@ When the user explicitly asks to commit approved feature work:
 
 - Doing multiple features in one Coding Agent run.
 - Collapsing unrelated or independently verifiable requirements into one over-bundled feature.
+- Turning vague requirements into feature entries without spec normalization.
 - Relying on previous chat instead of repository files.
 - Skipping `./init.sh`.
 - Leaving broken code.
 - Bypassing missing required capabilities with hand-written generated code, skipped verification, weakened scope, or local-only environment changes.
+- Treating harness verification as project recovery after a minspec requires a runnable skeleton.
 - Implementing project-level requirements inside default examples instead of project-owned source and tests.
 - Coding Agent committing during orchestrated runs.
 - Committing approved feature work without the feature ID in the commit subject.
+- Marking a feature done without evaluator evidence in `runs/`.
 - Evaluator Agent accepting incomplete work.
 - Marking a feature done without evaluator pass.
 

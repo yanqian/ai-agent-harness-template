@@ -6,7 +6,11 @@ Use `prompts/plan.md` for new requirements.
 
 Planning appends to `SPEC.md` and `feature_list.json`. It does not implement business logic.
 
+Planning follows `docs/spec-normalization.md` before decomposition. New requirements must become SPEC additions with goal, included scope, excluded scope, core flows, constraints, ambiguities or assumptions, required capabilities, implementation paths, and verification surface.
+
 Planning follows `docs/feature-decomposition.md` so broad requirements become independently verifiable feature entries instead of one over-bundled feature.
+
+Planning follows `docs/project-recovery-init.md` for fresh projects and accepted minspecs. Before a minspec exists, root `./init.sh` may verify only the harness. After minspec acceptance, planning must add a runnable-skeleton feature that turns root `./init.sh` into the project recovery contract before product behavior depends on runtime assumptions.
 
 ## Coding
 
@@ -24,11 +28,17 @@ Use `prompts/evaluate.md`.
 
 The Evaluator Agent checks the feature against acceptance criteria and `QUALITY.md`. It must output exactly one pass or fail line.
 
+Evaluation follows `docs/evaluator-evidence.md`. From the evaluator-evidence baseline onward, a feature cannot be marked done unless a run record contains `EVAL_PASS: Fxxx` for that feature.
+
 Evaluation rejects over-bundled features that should have been decomposed before implementation.
+
+Evaluation rejects features whose SPEC source was vague and should have been normalized before feature entries were appended.
 
 Evaluation rejects features that bypass required capability gaps instead of making them durable or tracking them as blocked or follow-up work.
 
 Evaluation rejects project-level features that pass only by repurposing default examples.
+
+Evaluation rejects project-level completion when accepted minspec work only verifies the harness and leaves root `./init.sh` without dependency setup, service startup, and a real smoke test.
 
 ## Continuation
 
@@ -58,3 +68,5 @@ Every failed or blocked run should record:
 - Follow-up feature ID if the improvement is deferred.
 
 Use `scripts/check-failure-domains.sh` to verify failed run records include the classification and improvement assessment.
+
+Use `scripts/check-evaluator-evidence.sh` to verify completed features after the enforcement baseline have durable evaluator pass evidence.

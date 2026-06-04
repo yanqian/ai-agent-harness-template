@@ -94,6 +94,59 @@ class ScriptUnitTests(unittest.TestCase):
             self.assertIn("failure_records=1", result.stdout)
             self.assertIn("domain[test_gap]=1", result.stdout)
 
+    def test_check_evaluator_evidence_requires_matching_pass_record(self):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp = Path(tmp_dir)
+            feature_list = tmp / "feature_list.json"
+            runs_dir = tmp / "runs"
+            runs_dir.mkdir()
+            feature_list.write_text(json.dumps({
+                "features": [
+                    {
+                        "id": "F026",
+                        "title": "historical feature",
+                        "description": "before baseline",
+                        "acceptance": ["historical features are not checked"],
+                        "passes": True,
+                        "status": "done",
+                        "attempts": 1,
+                        "last_error": "",
+                    },
+                    {
+                        "id": "F027",
+                        "title": "needs evaluator evidence",
+                        "description": "at baseline",
+                        "acceptance": ["must have EVAL_PASS"],
+                        "passes": True,
+                        "status": "done",
+                        "attempts": 1,
+                        "last_error": "",
+                    },
+                ]
+            }) + "\n")
+            env = {
+                "HARNESS_FEATURE_LIST": str(feature_list),
+                "HARNESS_RUNS_DIR": str(runs_dir),
+                "HARNESS_EVALUATOR_EVIDENCE_BASELINE": "F027",
+            }
+
+            result = run_command(["scripts/check-evaluator-evidence.sh"], env=env)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("missing_evaluator_evidence=1", result.stdout)
+            self.assertIn("missing evaluator evidence: F027", result.stderr)
+
+            (runs_dir / "F027.md").write_text(
+                "# Run Record: F027\n\n"
+                "## Evaluator Result\n\n"
+                "```text\n"
+                "EVAL_PASS: F027\n"
+                "```\n"
+            )
+            result = run_command(["scripts/check-evaluator-evidence.sh"], env=env)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn("evaluator_evidence_checked=1", result.stdout)
+            self.assertIn("missing_evaluator_evidence=0", result.stdout)
+
     def test_clean_state_resets_project_state_only(self):
         with tempfile.TemporaryDirectory() as tmp_dir:
             project = Path(tmp_dir)

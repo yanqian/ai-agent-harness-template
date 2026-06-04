@@ -9,7 +9,10 @@ This directory is the expandable knowledge base for agents.
 - `architecture.md` - repository structure, boundaries, and extension points.
 - `testing.md` - verification layers and how to add project-specific tests.
 - `external-behavior.md` - rules for validating CLIs, APIs, runtimes, and structured tool output.
+- `spec-normalization.md` - rules for turning vague user input into explicit SPEC additions.
 - `feature-decomposition.md` - rules for splitting broad requirements into independently verifiable feature entries.
+- `project-recovery-init.md` - rules separating harness verification from the root project recovery entry point.
+- `evaluator-evidence.md` - rules requiring durable `EVAL_PASS: Fxxx` evidence before completion.
 - `commit-messages.md` - rules for linking commits back to feature IDs.
 - `capability-gaps.md` - rules for turning missing tools, permissions, generators, dependencies, and environment setup into durable project capabilities.
 - `example-boundaries.md` - rules for keeping default examples as harness demonstrations rather than project implementation shortcuts.

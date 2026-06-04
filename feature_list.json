@@ -467,6 +467,63 @@
       "attempts": 1,
       "last_error": "",
       "priority": "P0"
+    },
+    {
+      "id": "F027",
+      "title": "Separate harness verification from project recovery init",
+      "description": "Strengthen the harness initialization flow so installed projects distinguish the internal harness health check from the root project recovery entry point, and require root init.sh to become a real dependency install, service startup, and smoke-test contract once a minspec is accepted.",
+      "acceptance": [
+        "AGENTS.md and docs define `.agent-harness/scripts/init.sh` as harness verification and root `./init.sh` as the project recovery entry point",
+        "Initialization guidance states that before a minspec exists, root `./init.sh` may only verify the harness and must not claim project business behavior is runnable",
+        "Planning guidance requires the first post-minspec project feature to create or adapt a runnable skeleton and update root `./init.sh` to install dependencies, start required services, and run a real smoke test",
+        "Project recovery init requirements include clear logs, idempotency, no manual steps, no assumption that services are already running, and non-zero exit on failure",
+        "README.md, SPEC.md, SKILL.md, workflow references, and bundled template files stay consistent for hidden and visible layouts",
+        "Contract and harness tests verify the project recovery init governance remains present",
+        "./init.sh passes after the update"
+      ],
+      "passes": true,
+      "status": "done",
+      "attempts": 1,
+      "last_error": "",
+      "priority": "P0"
+    },
+    {
+      "id": "F028",
+      "title": "Add minspec-to-SPEC normalization governance",
+      "description": "Require Planning Agent work to normalize new requirements into explicit goal, included scope, excluded scope, core flows, constraints, ambiguity handling, required capabilities, implementation paths, and verification surfaces before appending feature entries.",
+      "acceptance": [
+        "AGENTS.md requires Planning Agents to normalize requirements before feature decomposition",
+        "docs/spec-normalization.md defines required SPEC fields: goal, included scope, excluded scope, core flows, constraints, ambiguities or assumptions, required capabilities, implementation paths, and verification surface",
+        "prompts/plan.md rejects vague requirements instead of turning them directly into feature entries",
+        "docs/agent-workflow.md, QUALITY.md, docs/failure-domains.md, SKILL.md, and workflow references document planner and evaluator expectations for spec normalization",
+        "The bundled skill template includes spec-normalization governance so newly initialized projects receive the rule",
+        "Contract tests verify the spec-normalization requirements for AGENTS.md, docs, prompts, quality, failure domains, skill docs, and bundled template files",
+        "./init.sh passes after the governance update"
+      ],
+      "passes": true,
+      "status": "done",
+      "attempts": 1,
+      "last_error": "",
+      "priority": "P0"
+    },
+    {
+      "id": "F029",
+      "title": "Require evaluator evidence before completion",
+      "description": "Add a durable guardrail that fails verification when features at or after the evaluator-evidence baseline are marked done without a run record containing the matching evaluator pass line.",
+      "acceptance": [
+        "AGENTS.md and docs define evaluator evidence as required before a feature may be marked done",
+        "A verification script checks done features at or after the enforcement baseline for matching `EVAL_PASS: Fxxx` run evidence",
+        "./init.sh runs the evaluator-evidence check",
+        "Unit or contract tests prove the evaluator-evidence check fails for missing pass evidence and passes when evidence exists",
+        "Planning, coding, evaluation, progress, README, SKILL.md, workflow references, and bundled template files document the guardrail",
+        "The bundled skill template includes the evaluator-evidence guardrail so newly initialized projects receive it",
+        "./init.sh and scripts/validate-feature.sh F029 pass after evaluator evidence is recorded"
+      ],
+      "passes": true,
+      "status": "done",
+      "attempts": 1,
+      "last_error": "",
+      "priority": "P0"
     }
   ]
 }

@@ -15,6 +15,7 @@ The feature must satisfy its `feature_list.json` acceptance criteria and preserv
 ### Completeness
 
 - The implemented surface matches the requested scope.
+- The source requirement was normalized with clear goal, included scope, excluded scope, core flows, constraints, ambiguities or assumptions, required capabilities, implementation paths, and verification surface.
 - The selected feature is not over-bundled with unrelated or independently verifiable work.
 - Documentation, prompts, scripts, examples, and tests are updated when affected.
 - No required follow-up is hidden as "future work" unless explicitly accepted.
@@ -38,6 +39,7 @@ The feature must satisfy its `feature_list.json` acceptance criteria and preserv
 - A future agent can resume from `AGENTS.md`, `SPEC.md`, `feature_list.json`, `progress.md`, `docs/`, `QUALITY.md`, `runs/`, and git history.
 - State files remain valid and internally consistent.
 - Feature commits can be traced back to `feature_list.json` through their commit subject.
+- Completed features after the evaluator-evidence baseline have `EVAL_PASS: Fxxx` evidence in `runs/`.
 - Run evidence is recorded when the work involves non-trivial verification or failure analysis.
 - Failed or blocked work is classified with a failure domain and assessed for harness improvement.
 
@@ -60,6 +62,7 @@ Return `EVAL_PASS: Fxxx` only when:
 Return `EVAL_FAIL: Fxxx: <reason>` when:
 
 - A required behavior is missing.
+- The feature depends on a vague or incomplete SPEC entry that should have been normalized before implementation.
 - The feature is over-bundled and should have been decomposed before implementation.
 - State is inconsistent.
 - Verification was skipped or inconclusive.
@@ -67,3 +70,4 @@ Return `EVAL_FAIL: Fxxx: <reason>` when:
 - A required capability gap was bypassed instead of made durable or tracked.
 - A project-level requirement was implemented inside default examples instead of project-owned source and tests.
 - A failed run lacks failure-domain classification or harness improvement assessment.
+- A feature was marked done without required evaluator evidence.

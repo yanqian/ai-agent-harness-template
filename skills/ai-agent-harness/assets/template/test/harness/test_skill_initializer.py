@@ -62,6 +62,7 @@ def run_project_init(project: Path):
 class SkillInitializerHarnessTests(unittest.TestCase):
     EXECUTABLE_PATHS = [
         "init.sh",
+        ".agent-harness/scripts/check-evaluator-evidence.sh",
         ".agent-harness/init.sh",
         ".agent-harness/scripts/check-failure-domains.sh",
         ".agent-harness/scripts/init.sh",
@@ -91,6 +92,23 @@ class SkillInitializerHarnessTests(unittest.TestCase):
             self.assertIn("category", manifest["files"][".agent-harness/scripts/validate-state.py"])
             self.assertTrue((project / "AGENTS.md").exists())
             self.assertTrue((project / "init.sh").exists())
+            self.assertTrue((project / ".agent-harness" / "docs" / "project-recovery-init.md").exists())
+            self.assertTrue((project / ".agent-harness" / "docs" / "spec-normalization.md").exists())
+            self.assertIn("project recovery contract", (project / "AGENTS.md").read_text())
+            self.assertIn("Spec Normalization", (project / "AGENTS.md").read_text())
+            self.assertIn("Pre-minspec state", (project / "init.sh").read_text())
+            self.assertIn(
+                "root `./init.sh` may only verify the harness",
+                (project / ".agent-harness" / "docs" / "project-recovery-init.md").read_text(),
+            )
+            self.assertIn(
+                "Required Fields",
+                (project / ".agent-harness" / "docs" / "spec-normalization.md").read_text(),
+            )
+            self.assertIn(
+                "Reject vague requirements",
+                (project / ".agent-harness" / "prompts" / "plan.md").read_text(),
+            )
             for rel in self.EXECUTABLE_PATHS:
                 self.assertTrue(os.access(project / rel, os.X_OK), f"{rel} should be executable")
             self.assertFalse((project / "feature_list.json").exists())
@@ -121,6 +139,7 @@ class SkillInitializerHarnessTests(unittest.TestCase):
             )
             for rel in [
                 "init.sh",
+                "scripts/check-evaluator-evidence.sh",
                 "scripts/check-failure-domains.sh",
                 "scripts/init.sh",
                 "scripts/run-coding-agent.sh",

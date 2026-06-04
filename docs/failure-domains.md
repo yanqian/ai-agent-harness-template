@@ -6,7 +6,7 @@ The harness improves when failures are classified and converted into durable cha
 
 ## Domains
 
-- `requirement_gap` - the spec, feature description, or acceptance criteria were ambiguous or incomplete.
+- `requirement_gap` - the spec, feature description, or acceptance criteria were ambiguous, incomplete, or missing required spec normalization fields such as goal, scope, core flows, constraints, assumptions, capabilities, implementation paths, or verification surface.
 - `feature_decomposition_gap` - broad requirements were collapsed into one over-bundled feature instead of independently verifiable feature entries.
 - `implementation_gap` - the product code did not satisfy a clear requirement.
 - `test_gap` - existing tests missed behavior that should have been caught earlier.
@@ -15,7 +15,7 @@ The harness improves when failures are classified and converted into durable cha
 - `capability_gap` - a required tool, permission, generator, dependency, service, credential, runtime setting, CI resource, or verification fixture was missing or implicit and was not turned into a durable project capability.
 - `example_scope_gap` - product work was implemented in default examples instead of project-owned source, contracts, documentation, and tests.
 - `state_recovery_gap` - progress, run records, feature state, or docs were insufficient for resuming work.
-- `agent_workflow_gap` - role boundaries, orchestration, evaluator behavior, or continuation flow were unclear.
+- `agent_workflow_gap` - role boundaries, orchestration, evaluator behavior, continuation flow, or evaluator-evidence gating were unclear or bypassed.
 - `environment_gap` - local dependencies, permissions, network, OS behavior, or CI/runtime setup blocked verification.
 
 ## Improvement Loop

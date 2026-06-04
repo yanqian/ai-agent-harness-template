@@ -23,20 +23,26 @@ Installed projects record `.agent-harness/manifest.json`. The template records `
 
 A project is an installed harness when `./init.sh` succeeds, the installed layout's `feature_list.json` is valid, `progress.md` contains recovery sections, `AGENTS.md` contains the startup and safety rules, prompts and scripts are present, run templates are available, and `check` reports `runnable_harness=true`.
 
+In hidden layout, root `./init.sh` starts as harness verification only. Before a project minspec exists, that is enough to prove a recoverable planning environment. After minspec acceptance, use `docs/project-recovery-init.md` to plan a runnable-skeleton feature that makes root `./init.sh` install dependencies, start required services, run a real endpoint or core-function smoke test, print clear logs, avoid manual steps and TODO placeholders, and exit non-zero on failure.
+
+From the evaluator-evidence baseline onward, `./init.sh` also verifies that completed features have matching `EVAL_PASS: Fxxx` run evidence.
+
 ## Plan Requirement
 
 Use when the user describes new work before implementation.
 
 1. Follow the repository startup protocol.
 2. Read `AGENTS.md`, `SPEC.md`, `feature_list.json`, and `progress.md`.
-3. Append the requirement to `SPEC.md`.
-4. Use `docs/feature-decomposition.md` to split broad requirements into independently verifiable feature entries.
-5. Identify required capabilities, including tools, permissions, generators, dependencies, services, credentials, runtime settings, CI resources, and verification fixtures.
-6. Identify project-owned implementation and verification paths; use `examples/` only when the requirement explicitly targets example maintenance.
-7. Append new feature entries to `feature_list.json`, including explicit capability features when needed.
-8. Preserve feature IDs, ordering, status, attempts, errors, and unknown fields.
-9. Do not implement business logic during planning.
-10. Run `./init.sh`.
+3. Use `docs/spec-normalization.md` to append a normalized SPEC entry with goal, included scope, excluded scope, core flows, constraints, ambiguities or assumptions, required capabilities, implementation paths, and verification surface.
+4. Reject vague requirements instead of turning them directly into feature entries; ask for clarification, record assumptions, or create capability, blocker, or follow-up work when needed.
+5. Use `docs/feature-decomposition.md` to split broad requirements into independently verifiable feature entries.
+6. Use `docs/project-recovery-init.md` when planning a fresh project, accepted minspec, runnable skeleton, or root `./init.sh` change.
+7. Identify required capabilities, including tools, permissions, generators, dependencies, services, credentials, runtime settings, CI resources, and verification fixtures.
+8. Identify project-owned implementation and verification paths; use `examples/` only when the requirement explicitly targets example maintenance.
+9. Append new feature entries to `feature_list.json`, including explicit capability features when needed.
+10. Preserve feature IDs, ordering, status, attempts, errors, and unknown fields.
+11. Do not implement business logic during planning.
+12. Run `./init.sh`.
 
 ## Work One Feature
 
@@ -63,11 +69,12 @@ Use when the user asks whether a feature is complete or asks for evaluation.
 3. Verify acceptance criteria in `feature_list.json`.
 4. Apply `QUALITY.md`.
 5. Check relevant run evidence in `runs/`.
-6. Check `docs/feature-decomposition.md` and reject over-bundled features that should have been split into independently verifiable entries.
-7. Check `docs/capability-gaps.md` and reject missing required capabilities that were bypassed instead of made durable or tracked.
-8. Check `docs/example-boundaries.md` and reject project-level work implemented by repurposing default examples.
-9. Do not implement new features.
-10. Output exactly `EVAL_PASS: Fxxx` or `EVAL_FAIL: Fxxx: <reason>` when acting as an Evaluator Agent.
+6. Check `docs/evaluator-evidence.md` and record `EVAL_PASS: Fxxx` in `runs/` before completion.
+7. Check `docs/feature-decomposition.md` and reject over-bundled features that should have been split into independently verifiable entries.
+8. Check `docs/capability-gaps.md` and reject missing required capabilities that were bypassed instead of made durable or tracked.
+9. Check `docs/example-boundaries.md` and reject project-level work implemented by repurposing default examples.
+10. Do not implement new features.
+11. Output exactly `EVAL_PASS: Fxxx` or `EVAL_FAIL: Fxxx: <reason>` when acting as an Evaluator Agent.
 
 ## Continue Harness Work
 
