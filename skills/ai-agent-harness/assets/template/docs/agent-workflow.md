@@ -14,6 +14,8 @@ The Coding Agent runs `./init.sh` before and after changes, updates only the sel
 
 When a required tool, dependency, generator, permission, service, credential, runtime setting, CI resource, or verification fixture is missing, follow `docs/capability-gaps.md`. Do not convert the missing capability into an untracked local workaround.
 
+When implementing project requirements, follow `docs/example-boundaries.md`. Use default examples as references only unless the selected feature explicitly targets example maintenance.
+
 ## Evaluation
 
 Use `prompts/evaluate.md`.
@@ -21,6 +23,8 @@ Use `prompts/evaluate.md`.
 The Evaluator Agent checks the feature against acceptance criteria and `QUALITY.md`. It must output exactly one pass or fail line.
 
 Evaluation rejects features that bypass required capability gaps instead of making them durable or tracking them as blocked or follow-up work.
+
+Evaluation rejects project-level features that pass only by repurposing default examples.
 
 ## Continuation
 

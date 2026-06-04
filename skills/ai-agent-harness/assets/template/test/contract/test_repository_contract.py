@@ -129,7 +129,55 @@ class RepositoryContractTests(unittest.TestCase):
             init: ["docs/capability-gaps.md"],
             skill: ["docs/capability-gaps.md", "local-only workarounds"],
             workflows: ["Identify required capabilities", "Check `docs/capability-gaps.md`"],
-            initializer: ["docs/capability-gaps.md", "Capability Gap Handling", "TEMPLATE_VERSION = \"0.2.1\""],
+            initializer: ["docs/capability-gaps.md", "Capability Gap Handling", "TEMPLATE_VERSION = \"0.2.2\""],
+        }
+        for text, phrases in checks.items():
+            for phrase in phrases:
+                self.assertIn(phrase, text)
+
+    def test_example_boundaries_are_documented_and_enforced(self):
+        agents = (ROOT / "AGENTS.md").read_text()
+        docs_index = (ROOT / "docs" / "README.md").read_text()
+        architecture = (ROOT / "docs" / "architecture.md").read_text()
+        workflow = (ROOT / "docs" / "agent-workflow.md").read_text()
+        examples = (ROOT / "docs" / "example-boundaries.md").read_text()
+        quality = (ROOT / "QUALITY.md").read_text()
+        failure_domains = (ROOT / "docs" / "failure-domains.md").read_text()
+        readme = (ROOT / "README.md").read_text()
+        init = (ROOT / "scripts" / "init.sh").read_text()
+        skill = (ROOT / "skills" / "ai-agent-harness" / "SKILL.md").read_text()
+        workflows = (ROOT / "skills" / "ai-agent-harness" / "references" / "workflows.md").read_text()
+        initializer = (ROOT / "skills" / "ai-agent-harness" / "scripts" / "init_harness.py").read_text()
+
+        for phrase in [
+            "## Example Boundaries",
+            "Default examples are harness fixtures and teaching references.",
+            "Do not satisfy a project feature by modifying `examples/tiny-cli`, `examples/go-server`, or another default example",
+            "Put project requirements in project-owned source, contract, documentation, and test paths",
+            "Evaluators must reject project-level work that passes only because an example was repurposed.",
+        ]:
+            self.assertIn(phrase, agents)
+
+        for phrase in [
+            "# Example Boundaries",
+            "`examples/` directory exists to prove and explain the harness",
+            "Do not implement a project-level feature by repurposing `examples/tiny-cli/`, `examples/go-server/`, or another default example.",
+            "project-level protobuf or gRPC behavior",
+            "Use `example_scope_gap` as the primary failure domain",
+        ]:
+            self.assertIn(phrase, examples)
+
+        checks = {
+            docs_index: ["example-boundaries.md", "project implementation shortcuts"],
+            architecture: ["Default examples under `examples/` are demonstration fixtures"],
+            workflow: ["follow `docs/example-boundaries.md`", "Evaluation rejects project-level features that pass only by repurposing default examples."],
+            quality: ["Project-level requirements are implemented in project-owned paths", "does not repurpose default examples as project product code"],
+            failure_domains: ["example_scope_gap", "product work was implemented in default examples"],
+            readme: ["Default examples under `examples/` are harness demonstrations", "do not implement project-level requirements by repurposing them"],
+            init: ["docs/example-boundaries.md"],
+            skill: ["docs/example-boundaries.md", "Default examples are references"],
+            workflows: ["Identify project-owned implementation and verification paths", "do not use default examples as the product implementation surface"],
+            initializer: ["docs/example-boundaries.md", "TEMPLATE_VERSION = \"0.2.2\""],
         }
         for text, phrases in checks.items():
             for phrase in phrases:
@@ -162,7 +210,7 @@ class RepositoryContractTests(unittest.TestCase):
 
     def test_repository_knowledge_and_quality_contracts_are_indexed(self):
         docs = (ROOT / "docs" / "README.md").read_text()
-        for phrase in ["architecture.md", "testing.md", "external-behavior.md", "capability-gaps.md", "agent-workflow.md", "failure-domains.md", "real-world-usage.md", "decisions/"]:
+        for phrase in ["architecture.md", "testing.md", "external-behavior.md", "capability-gaps.md", "example-boundaries.md", "agent-workflow.md", "failure-domains.md", "real-world-usage.md", "decisions/"]:
             self.assertIn(phrase, docs)
 
         quality = (ROOT / "QUALITY.md").read_text()
@@ -174,7 +222,7 @@ class RepositoryContractTests(unittest.TestCase):
             self.assertIn(phrase, run_template)
 
         failure_domains = (ROOT / "docs" / "failure-domains.md").read_text()
-        for phrase in ["requirement_gap", "implementation_gap", "test_gap", "contract_gap", "external_behavior_gap", "capability_gap", "state_recovery_gap", "agent_workflow_gap", "environment_gap", "Improvement Loop"]:
+        for phrase in ["requirement_gap", "implementation_gap", "test_gap", "contract_gap", "external_behavior_gap", "capability_gap", "example_scope_gap", "state_recovery_gap", "agent_workflow_gap", "environment_gap", "Improvement Loop"]:
             self.assertIn(phrase, failure_domains)
 
     def test_go_server_example_contract_is_documented_and_verified(self):
@@ -301,7 +349,7 @@ class RepositoryContractTests(unittest.TestCase):
             "next_action",
         ]:
             self.assertIn(phrase, initializer)
-        self.assertEqual(template_manifest["template_version"], "0.2.1")
+        self.assertEqual(template_manifest["template_version"], "0.2.2")
         for category in [
             "harness-owned static",
             "project-owned state",
@@ -396,6 +444,7 @@ class RepositoryContractTests(unittest.TestCase):
             "plan.md": [
                 "Act as Planning Agent",
                 "Identify required capabilities",
+                "Identify project-owned implementation and verification paths",
                 "Preserve existing feature IDs, ordering, `passes`, `status`, `attempts`, `last_error`, and unknown fields.",
                 "Do not implement business logic during planning",
             ],
@@ -408,8 +457,10 @@ class RepositoryContractTests(unittest.TestCase):
                 "Do not stage or commit during orchestrated runs.",
                 "verify it with a primary source or real-shaped fixture before depending on it.",
                 "follow `docs/capability-gaps.md` before using any workaround",
+                "follow `docs/example-boundaries.md`",
                 "Do not bypass missing tools, permissions, generators, dependencies",
                 "local-only environment changes",
+                "Do not implement project-level requirements by repurposing default examples",
                 "Record run evidence in `runs/` for non-trivial work",
                 "classify the failure using `docs/failure-domains.md`",
                 "convert harness weaknesses into docs, prompts, scripts, schemas, tests, or a new feature entry",
@@ -423,6 +474,7 @@ class RepositoryContractTests(unittest.TestCase):
                 "Use `orchestrator.py` according to `AGENTS.md` when implementation or evaluation is required.",
                 "Do not continue repeated failures without either implementing a harness improvement or adding an explicit follow-up feature.",
                 "inspect `docs/capability-gaps.md` before continuing",
+                "inspect `docs/example-boundaries.md` before continuing",
             ],
             "evaluate.md": [
                 "Act as Evaluator Agent",
@@ -433,7 +485,9 @@ class RepositoryContractTests(unittest.TestCase):
                 "record or update run evidence using `runs/RUN_TEMPLATE.md`.",
                 "classify the failure using `docs/failure-domains.md`",
                 "Check `docs/capability-gaps.md`",
+                "Check `docs/example-boundaries.md`",
                 "Use `capability_gap`",
+                "Use `example_scope_gap`",
                 "require a durable harness improvement or a follow-up feature",
                 "EVAL_PASS: Fxxx",
                 "EVAL_FAIL: Fxxx: <reason>",

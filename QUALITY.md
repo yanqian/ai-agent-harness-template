@@ -18,6 +18,7 @@ The feature must satisfy its `feature_list.json` acceptance criteria and preserv
 - Documentation, prompts, scripts, examples, and tests are updated when affected.
 - No required follow-up is hidden as "future work" unless explicitly accepted.
 - Required capabilities are provided, documented, automated, or explicitly tracked as blocked or follow-up work.
+- Project-level requirements are implemented in project-owned paths, not default examples, unless the feature explicitly targets example maintenance.
 
 ### Maintainability
 
@@ -44,6 +45,7 @@ The feature must satisfy its `feature_list.json` acceptance criteria and preserv
 - The change does not broaden execution authority accidentally.
 - The evaluator rejects premature completion.
 - The implementation does not hide missing tools, permissions, generators, dependencies, or environment setup behind local-only workarounds.
+- The implementation does not repurpose default examples as project product code.
 
 ## Pass Guidance
 
@@ -60,4 +62,5 @@ Return `EVAL_FAIL: Fxxx: <reason>` when:
 - Verification was skipped or inconclusive.
 - External behavior was assumed without evidence.
 - A required capability gap was bypassed instead of made durable or tracked.
+- A project-level requirement was implemented inside default examples instead of project-owned source and tests.
 - A failed run lacks failure-domain classification or harness improvement assessment.

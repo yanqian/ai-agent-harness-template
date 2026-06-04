@@ -146,6 +146,7 @@ Use these durable knowledge files:
 - `docs/testing.md` for verification layers.
 - `docs/external-behavior.md` for CLI, API, runtime, and tool-output verification rules.
 - `docs/capability-gaps.md` for missing tools, permissions, dependencies, generators, environment setup, and required project capabilities.
+- `docs/example-boundaries.md` for rules that keep default examples from becoming project implementation shortcuts.
 - `docs/agent-workflow.md` for planning, coding, evaluation, continuation, and run artifacts.
 - `docs/failure-domains.md` for failure classification and harness improvement rules.
 - `QUALITY.md` for evaluator criteria.
@@ -224,6 +225,17 @@ Rules:
 - If the durable capability is out of scope for the selected feature, mark the feature blocked or append a follow-up feature instead of treating the workaround as completion.
 - Temporary workarounds must be recorded in `runs/`, `progress.md`, or `last_error`, and the feature must not be marked complete until the capability is provided or explicitly scoped out.
 
+## Example Boundaries
+
+Default examples are harness fixtures and teaching references. They are not the default implementation surface for project-level requirements.
+
+Rules:
+
+- Do not satisfy a project feature by modifying `examples/tiny-cli`, `examples/go-server`, or another default example unless the selected feature explicitly targets that example.
+- Put project requirements in project-owned source, contract, documentation, and test paths; update `./init.sh` to verify those paths.
+- Use examples as references only. If fresh project setup removes or replaces default examples, record that as setup work and update verification accordingly.
+- Evaluators must reject project-level work that passes only because an example was repurposed.
+
 ## External Behavior Verification
 
 When implementation depends on behavior outside this repository's own code, agents must verify that behavior before relying on it.
@@ -269,6 +281,7 @@ When implementing behavior that parses output from external tools such as Codex 
 - Skipping `./init.sh`.
 - Leaving broken code.
 - Bypassing missing required capabilities with hand-written generated code, skipped verification, weakened scope, or local-only environment changes.
+- Implementing project-level requirements inside default examples instead of project-owned source and tests.
 - Coding Agent committing during orchestrated runs.
 - Evaluator Agent accepting incomplete work.
 - Marking a feature done without evaluator pass.

@@ -370,6 +370,26 @@
       "attempts": 1,
       "last_error": "",
       "priority": "P0"
+    },
+    {
+      "id": "F022",
+      "title": "Add default example boundaries",
+      "description": "Strengthen the harness and distributable skill so agents treat default examples as demonstration fixtures instead of implementing project-level requirements inside examples/tiny-cli, examples/go-server, or other example paths.",
+      "acceptance": [
+        "AGENTS.md defines example boundaries and forbids satisfying project-level requirements by repurposing default examples unless the selected feature explicitly targets examples",
+        "docs/example-boundaries.md documents that examples are harness demonstrations, gives project-owned path guidance, and includes protobuf/gRPC-style project work as a non-example implementation case",
+        "Planning, coding, continuation, and evaluation prompts require agents to identify project-owned implementation paths and reject project work implemented only in examples",
+        "QUALITY.md and docs/failure-domains.md include example-boundary evaluation and failure classification",
+        "README.md clarifies that default examples may be removed or replaced during setup but should not become the product implementation surface",
+        "The skill initializer and bundled template include the example-boundary documentation so newly initialized projects receive the rule",
+        "Contract tests verify the example-boundary governance remains present",
+        "./init.sh passes after the update"
+      ],
+      "passes": true,
+      "status": "done",
+      "attempts": 1,
+      "last_error": "",
+      "priority": "P0"
     }
   ]
 }

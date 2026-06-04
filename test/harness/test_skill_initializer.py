@@ -54,7 +54,7 @@ class SkillInitializerHarnessTests(unittest.TestCase):
             data = json.loads((project / "feature_list.json").read_text())
             self.assertEqual(data, {"features": []})
             manifest = json.loads((project / ".agent-harness" / "manifest.json").read_text())
-            self.assertEqual(manifest["template_version"], "0.2.1")
+            self.assertEqual(manifest["template_version"], "0.2.2")
             self.assertIn("category", manifest["files"]["scripts/validate-state.py"])
 
             init = run_project_init(project)
@@ -62,8 +62,8 @@ class SkillInitializerHarnessTests(unittest.TestCase):
 
             check = run_initializer(project, "check")
             self.assertEqual(check.returncode, 0, check.stdout + check.stderr)
-            self.assertIn("template_version=0.2.1", check.stdout)
-            self.assertIn("installed_version=0.2.1", check.stdout)
+            self.assertIn("template_version=0.2.2", check.stdout)
+            self.assertIn("installed_version=0.2.2", check.stdout)
             self.assertIn("state_valid=true", check.stdout)
             self.assertIn("runnable_harness=true", check.stdout)
             self.assertIn("project_state_changed=", check.stdout)
@@ -147,7 +147,7 @@ class SkillInitializerHarnessTests(unittest.TestCase):
             self.assertEqual(check.returncode, 1)
             for phrase in [
                 "mode=check",
-                "template_version=0.2.1",
+                "template_version=0.2.2",
                 "installed_version=0.0.0",
                 "state_valid=false",
                 "runnable_harness=false",

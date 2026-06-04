@@ -12,6 +12,7 @@ The harness improves when failures are classified and converted into durable cha
 - `contract_gap` - harness rules, prompts, schema, or state contracts allowed unsafe or ambiguous behavior.
 - `external_behavior_gap` - CLI, API, runtime, or structured tool output behavior was assumed without evidence.
 - `capability_gap` - a required tool, permission, generator, dependency, service, credential, runtime setting, CI resource, or verification fixture was missing or implicit and was not turned into a durable project capability.
+- `example_scope_gap` - product work was implemented in default examples instead of project-owned source, contracts, documentation, and tests.
 - `state_recovery_gap` - progress, run records, feature state, or docs were insufficient for resuming work.
 - `agent_workflow_gap` - role boundaries, orchestration, evaluator behavior, or continuation flow were unclear.
 - `environment_gap` - local dependencies, permissions, network, OS behavior, or CI/runtime setup blocked verification.

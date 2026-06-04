@@ -267,7 +267,7 @@ scripts/summarize-runs.sh
 
 ## Copying The Template
 
-For a new project, copy the template files into the project root, then replace the tiny example with project-specific code and tests. Keep `./init.sh` as the single verification entry point.
+For a new project, copy the template files into the project root, then create project-specific code and tests in project-owned paths. Keep `./init.sh` as the single verification entry point. Default examples under `examples/` are harness demonstrations; remove or replace them only as explicit setup work, and do not implement project-level requirements by repurposing them.
 
 ## Tiny Example
 

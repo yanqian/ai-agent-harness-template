@@ -11,9 +11,10 @@ You must:
 5. Run `./init.sh`.
 6. Convert the new requirement into clear additions to `SPEC.md`.
 7. Identify required capabilities such as tools, permissions, generators, dependencies, services, credentials, runtime settings, CI resources, and verification fixtures.
-8. Append one or more new features to `feature_list.json`, including explicit capability features when the requirement depends on missing or unclear capabilities.
-9. Preserve existing feature IDs, ordering, `passes`, `status`, `attempts`, `last_error`, and unknown fields.
-10. Validate JSON and uniqueness with `./init.sh`.
+8. Identify project-owned implementation and verification paths; use `examples/` only when the requirement explicitly targets example maintenance.
+9. Append one or more new features to `feature_list.json`, including explicit capability features when the requirement depends on missing or unclear capabilities.
+10. Preserve existing feature IDs, ordering, `passes`, `status`, `attempts`, `last_error`, and unknown fields.
+11. Validate JSON and uniqueness with `./init.sh`.
 
 New feature defaults:
 
