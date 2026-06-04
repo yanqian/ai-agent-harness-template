@@ -148,6 +148,7 @@ Use these durable knowledge files:
 - `docs/architecture.md` for structure and boundaries.
 - `docs/testing.md` for verification layers.
 - `docs/feature-decomposition.md` for requirement-to-feature splitting rules.
+- `docs/commit-messages.md` for linking commits to feature IDs.
 - `docs/external-behavior.md` for CLI, API, runtime, and tool-output verification rules.
 - `docs/capability-gaps.md` for missing tools, permissions, dependencies, generators, environment setup, and required project capabilities.
 - `docs/example-boundaries.md` for rules that keep default examples from becoming project implementation shortcuts.
@@ -280,6 +281,16 @@ When implementing behavior that parses output from external tools such as Codex 
 - The Evaluator Agent verifies without implementation changes.
 - The orchestrator owns unattended feature state transitions.
 
+## Commit Message Rules
+
+When the user explicitly asks to commit approved feature work:
+
+- Follow `docs/commit-messages.md`.
+- Include the selected feature ID first in the commit subject using the format `Fxxx <Action> <concise summary>`.
+- Verify every referenced feature ID exists in `feature_list.json`.
+- Use batch feature IDs only when the user explicitly approved a batch commit.
+- Use `No-feature: <summary>` only for explicitly non-feature work.
+
 ## Anti-Patterns
 
 - Doing multiple features in one Coding Agent run.
@@ -290,6 +301,7 @@ When implementing behavior that parses output from external tools such as Codex 
 - Bypassing missing required capabilities with hand-written generated code, skipped verification, weakened scope, or local-only environment changes.
 - Implementing project-level requirements inside default examples instead of project-owned source and tests.
 - Coding Agent committing during orchestrated runs.
+- Committing approved feature work without the feature ID in the commit subject.
 - Evaluator Agent accepting incomplete work.
 - Marking a feature done without evaluator pass.
 

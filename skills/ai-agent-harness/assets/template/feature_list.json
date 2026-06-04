@@ -430,6 +430,24 @@
       "attempts": 1,
       "last_error": "",
       "priority": "P0"
+    },
+    {
+      "id": "F025",
+      "title": "Add feature-linked commit message rules",
+      "description": "Require approved feature commits to include their feature ID in a predictable commit subject format so git history can be correlated with feature_list.json for analysis and harness improvement.",
+      "acceptance": [
+        "docs/commit-messages.md defines the feature commit subject format, batch feature handling, non-feature commit handling, and finalize checklist",
+        "AGENTS.md and the skill finalize-and-commit workflow require commit subjects to include approved feature IDs",
+        "README.md, SPEC.md, QUALITY.md, and docs/agent-workflow.md document feature-linked commit traceability",
+        "The skill initializer and bundled template include docs/commit-messages.md so newly initialized projects receive the rule",
+        "Contract tests verify commit-message governance remains present",
+        "./init.sh passes after the update"
+      ],
+      "passes": true,
+      "status": "done",
+      "attempts": 1,
+      "last_error": "",
+      "priority": "P0"
     }
   ]
 }

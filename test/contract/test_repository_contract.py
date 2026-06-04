@@ -129,7 +129,7 @@ class RepositoryContractTests(unittest.TestCase):
             init: ["docs/capability-gaps.md"],
             skill: ["docs/capability-gaps.md", "local-only workarounds"],
             workflows: ["Identify required capabilities", "Check `docs/capability-gaps.md`"],
-            initializer: ["docs/capability-gaps.md", "Capability Gap Handling", "TEMPLATE_VERSION = \"0.3.1\""],
+            initializer: ["docs/capability-gaps.md", "Capability Gap Handling", "TEMPLATE_VERSION = \"0.3.2\""],
         }
         for text, phrases in checks.items():
             for phrase in phrases:
@@ -179,7 +179,55 @@ class RepositoryContractTests(unittest.TestCase):
             init: ["docs/feature-decomposition.md"],
             skill: ["docs/feature-decomposition.md", "Split independently verifiable behavior"],
             workflows: ["Use `docs/feature-decomposition.md`", "reject over-bundled features"],
-            initializer: ["docs/feature-decomposition.md", "TEMPLATE_VERSION = \"0.3.1\""],
+            initializer: ["docs/feature-decomposition.md", "TEMPLATE_VERSION = \"0.3.2\""],
+        }
+        for text, phrases in checks.items():
+            for phrase in phrases:
+                self.assertIn(phrase, text)
+
+    def test_commit_message_governance_is_documented_and_enforced(self):
+        agents = (ROOT / "AGENTS.md").read_text()
+        spec = (ROOT / "SPEC.md").read_text()
+        docs_index = (ROOT / "docs" / "README.md").read_text()
+        commit_messages = (ROOT / "docs" / "commit-messages.md").read_text()
+        workflow = (ROOT / "docs" / "agent-workflow.md").read_text()
+        quality = (ROOT / "QUALITY.md").read_text()
+        readme = (ROOT / "README.md").read_text()
+        init = (ROOT / "scripts" / "init.sh").read_text()
+        skill = (ROOT / "skills" / "ai-agent-harness" / "SKILL.md").read_text()
+        workflows = (ROOT / "skills" / "ai-agent-harness" / "references" / "workflows.md").read_text()
+        initializer = (ROOT / "skills" / "ai-agent-harness" / "scripts" / "init_harness.py").read_text()
+
+        for phrase in [
+            "## Commit Message Rules",
+            "Follow `docs/commit-messages.md`.",
+            "Include the selected feature ID first in the commit subject",
+            "Use `No-feature: <summary>` only for explicitly non-feature work.",
+            "Committing approved feature work without the feature ID in the commit subject.",
+        ]:
+            self.assertIn(phrase, agents)
+
+        for phrase in [
+            "# Commit Messages",
+            "Fxxx <Action> <concise summary>",
+            "Put the feature ID first",
+            "F025 Add feature-linked commit messages",
+            "Multiple Features",
+            "No-feature:",
+            "Verify each referenced ID exists",
+        ]:
+            self.assertIn(phrase, commit_messages)
+
+        checks = {
+            spec: ["Feature-Linked Commits", "Fxxx <Action> <concise summary>", "No-feature:"],
+            docs_index: ["commit-messages.md", "linking commits back to feature IDs"],
+            workflow: ["Use `docs/commit-messages.md`", "include the feature ID in the commit subject"],
+            quality: ["Feature commits can be traced back to `feature_list.json`"],
+            readme: ["F025 Add feature-linked commit messages", "docs/commit-messages.md"],
+            init: ["docs/commit-messages.md"],
+            skill: ["docs/commit-messages.md", "Fxxx <Action> <concise summary>"],
+            workflows: ["Read `docs/commit-messages.md`", "starts with the feature ID", "Verify every feature ID referenced"],
+            initializer: ["docs/commit-messages.md", "TEMPLATE_VERSION = \"0.3.2\""],
         }
         for text, phrases in checks.items():
             for phrase in phrases:
@@ -227,7 +275,7 @@ class RepositoryContractTests(unittest.TestCase):
             init: ["docs/example-boundaries.md"],
             skill: ["docs/example-boundaries.md", "Default examples are references"],
             workflows: ["Identify project-owned implementation and verification paths", "do not use default examples as the product implementation surface"],
-            initializer: ["docs/example-boundaries.md", "TEMPLATE_VERSION = \"0.3.1\""],
+            initializer: ["docs/example-boundaries.md", "TEMPLATE_VERSION = \"0.3.2\""],
         }
         for text, phrases in checks.items():
             for phrase in phrases:
@@ -260,7 +308,7 @@ class RepositoryContractTests(unittest.TestCase):
 
     def test_repository_knowledge_and_quality_contracts_are_indexed(self):
         docs = (ROOT / "docs" / "README.md").read_text()
-        for phrase in ["architecture.md", "testing.md", "external-behavior.md", "feature-decomposition.md", "capability-gaps.md", "example-boundaries.md", "agent-workflow.md", "failure-domains.md", "real-world-usage.md", "decisions/"]:
+        for phrase in ["architecture.md", "testing.md", "external-behavior.md", "feature-decomposition.md", "commit-messages.md", "capability-gaps.md", "example-boundaries.md", "agent-workflow.md", "failure-domains.md", "real-world-usage.md", "decisions/"]:
             self.assertIn(phrase, docs)
 
         quality = (ROOT / "QUALITY.md").read_text()
@@ -406,7 +454,7 @@ class RepositoryContractTests(unittest.TestCase):
             "next_action",
         ]:
             self.assertIn(phrase, initializer)
-        self.assertEqual(template_manifest["template_version"], "0.3.1")
+        self.assertEqual(template_manifest["template_version"], "0.3.2")
         self.assertEqual(template_manifest["default_layout"], "hidden")
         self.assertIn("hidden", template_manifest["layouts"])
         self.assertIn("visible", template_manifest["layouts"])

@@ -36,12 +36,13 @@ Implemented components:
 - Example-boundary governance that keeps default examples as harness demonstrations instead of project implementation shortcuts.
 - Installation layout profiles, with hidden layout as the default for user projects and visible layout retained for template maintenance.
 - Feature-decomposition governance that requires broad requirements to become independently verifiable feature entries instead of over-bundled features.
+- Feature-linked commit message governance that ties approved feature commits back to `feature_list.json`.
 - Tiny dependency-free Python CLI example in `examples/tiny-cli/`.
 - Dependency-free Go server example in `examples/go-server/`.
 
 ## Last Completed Feature
 
-`F024` - Add feature decomposition governance.
+`F025` - Add feature-linked commit message rules.
 
 ## Next Feature
 

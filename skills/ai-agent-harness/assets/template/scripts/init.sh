@@ -29,6 +29,7 @@ for path in \
   docs/testing.md \
   docs/external-behavior.md \
   docs/feature-decomposition.md \
+  docs/commit-messages.md \
   docs/capability-gaps.md \
   docs/example-boundaries.md \
   docs/agent-workflow.md \

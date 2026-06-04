@@ -87,6 +87,6 @@ Before committing:
 3. Inspect `git status --short`.
 4. Stage only files related to the approved work.
 5. Stop and ask if unrelated changes are present.
-6. Commit with a message derived from the feature ID and title when available.
+6. Commit with a subject that follows `docs/commit-messages.md`, normally `Fxxx <Action> <concise summary>`.
 
 Default to commit only. Push or pull request creation requires a separate explicit request.

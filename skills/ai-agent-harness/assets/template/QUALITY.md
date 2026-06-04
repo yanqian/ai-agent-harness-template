@@ -37,6 +37,7 @@ The feature must satisfy its `feature_list.json` acceptance criteria and preserv
 
 - A future agent can resume from `AGENTS.md`, `SPEC.md`, `feature_list.json`, `progress.md`, `docs/`, `QUALITY.md`, `runs/`, and git history.
 - State files remain valid and internally consistent.
+- Feature commits can be traced back to `feature_list.json` through their commit subject.
 - Run evidence is recorded when the work involves non-trivial verification or failure analysis.
 - Failed or blocked work is classified with a failure domain and assessed for harness improvement.
 

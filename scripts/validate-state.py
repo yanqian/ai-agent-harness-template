@@ -13,6 +13,7 @@ DOCS_INDEX_PATH = ROOT / "docs" / "README.md"
 RUN_TEMPLATE_PATH = ROOT / "runs" / "RUN_TEMPLATE.md"
 FAILURE_DOMAINS_PATH = ROOT / "docs" / "failure-domains.md"
 FEATURE_DECOMPOSITION_PATH = ROOT / "docs" / "feature-decomposition.md"
+COMMIT_MESSAGES_PATH = ROOT / "docs" / "commit-messages.md"
 VALID_STATUSES = {"todo", "in_progress", "done", "blocked"}
 FEATURE_ID_RE = re.compile(r"^F[0-9]{3,}$")
 
@@ -105,7 +106,7 @@ def validate_agents_guardrails() -> None:
 
 
 def validate_knowledge_files() -> None:
-    for path in [QUALITY_PATH, DOCS_INDEX_PATH, RUN_TEMPLATE_PATH, FAILURE_DOMAINS_PATH, FEATURE_DECOMPOSITION_PATH]:
+    for path in [QUALITY_PATH, DOCS_INDEX_PATH, RUN_TEMPLATE_PATH, FAILURE_DOMAINS_PATH, FEATURE_DECOMPOSITION_PATH, COMMIT_MESSAGES_PATH]:
         if not path.exists():
             fail(f"{path.relative_to(ROOT)} is missing")
 
@@ -115,7 +116,7 @@ def validate_knowledge_files() -> None:
             fail(f"QUALITY.md is missing rubric criterion: {phrase}")
 
     docs_index = DOCS_INDEX_PATH.read_text()
-    for phrase in ["architecture.md", "testing.md", "external-behavior.md", "feature-decomposition.md", "capability-gaps.md", "example-boundaries.md", "agent-workflow.md", "failure-domains.md", "real-world-usage.md", "decisions/"]:
+    for phrase in ["architecture.md", "testing.md", "external-behavior.md", "feature-decomposition.md", "commit-messages.md", "capability-gaps.md", "example-boundaries.md", "agent-workflow.md", "failure-domains.md", "real-world-usage.md", "decisions/"]:
         if phrase not in docs_index:
             fail(f"docs/README.md is missing index entry: {phrase}")
 
@@ -123,6 +124,11 @@ def validate_knowledge_files() -> None:
     for phrase in ["independently verifiable", "Split Triggers", "Allowed Merges", "feature_decomposition_gap"]:
         if phrase not in decomposition:
             fail(f"docs/feature-decomposition.md is missing rule: {phrase}")
+
+    commit_messages = COMMIT_MESSAGES_PATH.read_text()
+    for phrase in ["Fxxx <Action> <concise summary>", "Put the feature ID first", "Multiple Features", "No-feature:", "Verify each referenced ID exists"]:
+        if phrase not in commit_messages:
+            fail(f"docs/commit-messages.md is missing rule: {phrase}")
 
     run_template = RUN_TEMPLATE_PATH.read_text()
     for phrase in ["Commands Run", "Evidence", "Failure Analysis", "Failure domain", "Harness improvement", "Evaluator Result", "Follow-Up"]:

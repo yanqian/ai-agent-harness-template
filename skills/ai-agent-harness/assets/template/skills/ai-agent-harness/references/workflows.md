@@ -91,7 +91,10 @@ Use only when the user explicitly says they are satisfied or asks to commit.
 4. Identify files changed by the approved work.
 5. If unrelated changes are present, ask the user before staging.
 6. Stage only approved files.
-7. Commit with a concise message. Prefer `Implement Fxxx <feature title>` or `Add Fxxx <feature title>`.
-8. Default to no push. Push or pull request creation requires a separate explicit request.
+7. Read `docs/commit-messages.md`.
+8. Commit feature work with a subject that starts with the feature ID, normally `Fxxx <Action> <concise summary>`.
+9. Verify every feature ID referenced in the commit subject exists in `feature_list.json`.
+10. Use `No-feature: <summary>` only for explicitly non-feature work.
+11. Default to no push. Push or pull request creation requires a separate explicit request.
 
 Never commit merely because implementation finished. The commit boundary is user satisfaction.

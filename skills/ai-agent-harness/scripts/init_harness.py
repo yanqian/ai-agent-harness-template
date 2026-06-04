@@ -14,7 +14,7 @@ SKILL_DIR = Path(__file__).resolve().parents[1]
 BUNDLED_TEMPLATE = SKILL_DIR / "assets" / "template"
 TEMPLATE_MANIFEST = ".agent-harness-template.json"
 INSTALL_MANIFEST = ".agent-harness/manifest.json"
-TEMPLATE_VERSION = "0.3.1"
+TEMPLATE_VERSION = "0.3.2"
 MODE_CHOICES = {"new", "adopt", "repair", "check"}
 LAYOUT_CHOICES = {"hidden", "visible"}
 DEFAULT_LAYOUT = "hidden"
@@ -36,6 +36,7 @@ REQUIRED_TEMPLATE_FILES = [
     "prompts/evaluate.md",
     "docs/README.md",
     "docs/feature-decomposition.md",
+    "docs/commit-messages.md",
     "docs/capability-gaps.md",
     "docs/example-boundaries.md",
     "runs/RUN_TEMPLATE.md",
@@ -347,6 +348,7 @@ def semantic_validation(root: Path, layout: str) -> dict:
         "prompts/evaluate.md",
         "docs/README.md",
         "docs/feature-decomposition.md",
+        "docs/commit-messages.md",
         "docs/capability-gaps.md",
         "docs/example-boundaries.md",
         "runs/RUN_TEMPLATE.md",

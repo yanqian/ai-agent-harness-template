@@ -167,6 +167,8 @@ For version drift handling, run skill `check` first. Use `repair` to restore mis
 
 The skill also defines a finalize-and-commit workflow. It stages and commits only after the user explicitly says they are satisfied or asks to commit.
 
+Feature commits use feature-linked subjects such as `F025 Add feature-linked commit messages`. Batch commits include every approved feature ID, and explicitly non-feature commits use `No-feature: <summary>`. See `docs/commit-messages.md`.
+
 ### Verify This Repository
 
 Run the same command used by CI:

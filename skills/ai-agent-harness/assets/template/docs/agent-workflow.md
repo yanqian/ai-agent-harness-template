@@ -36,6 +36,10 @@ Use `prompts/continue.md` after interruptions.
 
 Continuation reconstructs context from repository files and git history only.
 
+## Finalize And Commit
+
+Use `docs/commit-messages.md` for approved commits. Feature work must include the feature ID in the commit subject so git history can be analyzed against `feature_list.json`.
+
 ## Run Artifacts
 
 For non-trivial work, create a run note from `runs/RUN_TEMPLATE.md`.
