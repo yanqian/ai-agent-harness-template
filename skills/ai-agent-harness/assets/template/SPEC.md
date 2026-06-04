@@ -16,6 +16,7 @@ The harness makes project state recoverable by storing requirements, feature sta
 - Evaluator quality criteria in `QUALITY.md`.
 - Per-run evidence and handoff records in `runs/`.
 - Failure-domain classification and harness improvement checks.
+- Capability-gap handling rules that prevent agents from hiding missing tools, permissions, generators, dependencies, or environment setup behind local-only workarounds.
 - Proven agent guardrails for state safety, external behavior verification, and anti-patterns in `AGENTS.md`.
 - Human-readable requirements in `SPEC.md`.
 - Machine-readable feature state in `feature_list.json`.
@@ -58,6 +59,12 @@ New work is first written into `SPEC.md` so agents share a stable requirement so
 Failures are classified by domain and assessed for harness improvement. Failed or blocked run records must state the failure domain and whether the harness should be improved through docs, prompts, scripts, schemas, tests, or a follow-up feature.
 
 The orchestrator writes a failed run record when unattended coding or evaluation fails. Unknown failure-domain fields intentionally fail validation until the failure is classified and the harness improvement assessment is recorded.
+
+### Capability Gaps
+
+When a required capability is missing, agents must make that gap explicit and durable instead of bypassing it. Required capabilities include tools, permissions, generators, dependencies, services, credentials, runtime settings, CI resources, and verification fixtures needed to implement or verify a feature.
+
+Agents must verify the missing capability with real evidence, then either add a durable project capability such as setup documentation, scripts, adapters, fixtures, CI configuration, or tests; mark the feature blocked; or append a follow-up feature. Temporary workarounds are acceptable only when recorded as temporary and cannot justify marking a feature complete unless the missing capability is provided or explicitly scoped out.
 
 ### Feature Tracked
 
@@ -114,6 +121,7 @@ The template keeps automated checks in explicit layers:
 - The tiny example can be tested without installing third-party dependencies.
 - The Go server example can be tested with `go test ./...` when Go is installed.
 - `AGENTS.md` includes external behavior verification and external tool schema guardrails.
+- `docs/capability-gaps.md`, prompts, and contract tests require missing capabilities to become durable setup, tests, docs, adapters, CI configuration, blocked state, or follow-up features instead of local-only bypasses.
 - `./init.sh` runs unit, contract, smoke, and optional harness tests.
 - `docs/README.md`, `QUALITY.md`, and `runs/RUN_TEMPLATE.md` are present and validated.
 - `scripts/check-failure-domains.sh` verifies failed run records include failure-domain and harness-improvement fields.

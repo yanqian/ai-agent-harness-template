@@ -9,6 +9,7 @@ This directory is the expandable knowledge base for agents.
 - `architecture.md` - repository structure, boundaries, and extension points.
 - `testing.md` - verification layers and how to add project-specific tests.
 - `external-behavior.md` - rules for validating CLIs, APIs, runtimes, and structured tool output.
+- `capability-gaps.md` - rules for turning missing tools, permissions, generators, dependencies, and environment setup into durable project capabilities.
 - `agent-workflow.md` - planning, coding, evaluation, orchestration, and recovery loop.
 - `failure-domains.md` - failure classification and rules for turning failures into harness improvements.
 - `real-world-usage.md` - real projects that informed the harness design.

@@ -12,11 +12,15 @@ Use `prompts/work.md` for one selected feature.
 
 The Coding Agent runs `./init.sh` before and after changes, updates only the selected feature state, and records progress.
 
+When a required tool, dependency, generator, permission, service, credential, runtime setting, CI resource, or verification fixture is missing, follow `docs/capability-gaps.md`. Do not convert the missing capability into an untracked local workaround.
+
 ## Evaluation
 
 Use `prompts/evaluate.md`.
 
 The Evaluator Agent checks the feature against acceptance criteria and `QUALITY.md`. It must output exactly one pass or fail line.
+
+Evaluation rejects features that bypass required capability gaps instead of making them durable or tracking them as blocked or follow-up work.
 
 ## Continuation
 

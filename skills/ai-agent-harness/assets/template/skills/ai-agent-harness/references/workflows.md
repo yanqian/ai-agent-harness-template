@@ -28,10 +28,11 @@ Use when the user describes new work before implementation.
 1. Follow the repository startup protocol.
 2. Read `AGENTS.md`, `SPEC.md`, `feature_list.json`, and `progress.md`.
 3. Append the requirement to `SPEC.md`.
-4. Append new feature entries to `feature_list.json`.
-5. Preserve feature IDs, ordering, status, attempts, errors, and unknown fields.
-6. Do not implement business logic during planning.
-7. Run `./init.sh`.
+4. Identify required capabilities, including tools, permissions, generators, dependencies, services, credentials, runtime settings, CI resources, and verification fixtures.
+5. Append new feature entries to `feature_list.json`, including explicit capability features when needed.
+6. Preserve feature IDs, ordering, status, attempts, errors, and unknown fields.
+7. Do not implement business logic during planning.
+8. Run `./init.sh`.
 
 ## Work One Feature
 
@@ -44,8 +45,9 @@ Use when the user asks to implement, continue, or work on a harness feature.
 5. Update `progress.md`.
 6. Update only the selected feature in `feature_list.json`.
 7. Record a run note in `runs/` for non-trivial work, external behavior verification, failures, or evaluator handoff.
-8. Run `./init.sh` after changes.
-9. Do not stage or commit during orchestrated Coding Agent work.
+8. When a required capability is missing, follow `docs/capability-gaps.md`; make the capability durable, block the feature, or create follow-up work instead of relying on local-only workarounds.
+9. Run `./init.sh` after changes.
+10. Do not stage or commit during orchestrated Coding Agent work.
 
 ## Evaluate Feature
 
@@ -56,8 +58,9 @@ Use when the user asks whether a feature is complete or asks for evaluation.
 3. Verify acceptance criteria in `feature_list.json`.
 4. Apply `QUALITY.md`.
 5. Check relevant run evidence in `runs/`.
-6. Do not implement new features.
-7. Output exactly `EVAL_PASS: Fxxx` or `EVAL_FAIL: Fxxx: <reason>` when acting as an Evaluator Agent.
+6. Check `docs/capability-gaps.md` and reject missing required capabilities that were bypassed instead of made durable or tracked.
+7. Do not implement new features.
+8. Output exactly `EVAL_PASS: Fxxx` or `EVAL_FAIL: Fxxx: <reason>` when acting as an Evaluator Agent.
 
 ## Continue Harness Work
 
@@ -67,7 +70,8 @@ Use after interruption or when the user asks to resume.
 2. Read `progress.md`, `feature_list.json`, `AGENTS.md`, and recent commits.
 3. Run `./init.sh`.
 4. Identify the next safe action from repository state.
-5. Stop and report exact conflicts if state is unsafe.
+5. Inspect `docs/capability-gaps.md` when prior work used local-only workarounds for missing capabilities.
+6. Stop and report exact conflicts if state is unsafe.
 
 ## Finalize And Commit
 

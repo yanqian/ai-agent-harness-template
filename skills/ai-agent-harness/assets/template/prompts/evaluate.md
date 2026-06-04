@@ -16,6 +16,7 @@ You must:
 8. Apply the rubric in `QUALITY.md`.
 9. Check relevant run evidence in `runs/` when present.
 10. For failed or blocked work, classify the failure using `docs/failure-domains.md`.
+11. Check `docs/capability-gaps.md` and reject missing required capabilities that were bypassed instead of made durable or tracked.
 
 Strict rules:
 
@@ -26,6 +27,7 @@ Strict rules:
 - If verification fails, explain the exact failure.
 - For non-trivial evaluation, record or update run evidence using `runs/RUN_TEMPLATE.md`.
 - If a failure reveals a harness weakness, require a durable harness improvement or a follow-up feature.
+- If a required capability is missing, do not accept hand-written generated artifacts, weakened scope, skipped verification, or local-only environment changes as durable completion.
 
 Output exactly one of:
 
@@ -35,3 +37,4 @@ EVAL_FAIL: Fxxx: <reason>
 ```
 
 When returning `EVAL_FAIL`, include the failure domain and harness improvement assessment in the reason when known.
+Use `capability_gap` when a missing required capability is the primary reason the feature cannot be accepted.

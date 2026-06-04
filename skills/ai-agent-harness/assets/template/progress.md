@@ -32,12 +32,13 @@ Implemented components:
 - Manifest-aware skill initializer checks for new, adopt, repair, and check modes, including drift diagnostics and runnable installed-harness validation.
 - README guidance that separates installing the AI Agent Harness skill, invoking the installed skill, and manually running the fallback initializer script.
 - Portable Codex, Claude Code, and Cursor installation guidance for the AI Agent Harness skill without machine-specific absolute paths.
+- Capability-gap governance that requires missing tools, permissions, generators, dependencies, services, credentials, runtime settings, CI resources, and verification fixtures to become durable project capabilities or tracked blocked/follow-up work.
 - Tiny dependency-free Python CLI example in `examples/tiny-cli/`.
 - Dependency-free Go server example in `examples/go-server/`.
 
 ## Last Completed Feature
 
-`F020` - Document portable cross-agent skill installation.
+`F021` - Add capability gap governance.
 
 ## Next Feature
 

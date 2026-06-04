@@ -28,6 +28,7 @@ for path in \
   docs/architecture.md \
   docs/testing.md \
   docs/external-behavior.md \
+  docs/capability-gaps.md \
   docs/agent-workflow.md \
   docs/failure-domains.md \
   docs/real-world-usage.md \

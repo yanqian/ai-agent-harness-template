@@ -11,6 +11,7 @@ The harness improves when failures are classified and converted into durable cha
 - `test_gap` - existing tests missed behavior that should have been caught earlier.
 - `contract_gap` - harness rules, prompts, schema, or state contracts allowed unsafe or ambiguous behavior.
 - `external_behavior_gap` - CLI, API, runtime, or structured tool output behavior was assumed without evidence.
+- `capability_gap` - a required tool, permission, generator, dependency, service, credential, runtime setting, CI resource, or verification fixture was missing or implicit and was not turned into a durable project capability.
 - `state_recovery_gap` - progress, run records, feature state, or docs were insufficient for resuming work.
 - `agent_workflow_gap` - role boundaries, orchestration, evaluator behavior, or continuation flow were unclear.
 - `environment_gap` - local dependencies, permissions, network, OS behavior, or CI/runtime setup blocked verification.
@@ -36,4 +37,3 @@ Use `runs/RUN_TEMPLATE.md` to record:
 - Failure summary.
 - Harness improvement assessment.
 - Follow-up feature ID when an improvement is deferred.
-

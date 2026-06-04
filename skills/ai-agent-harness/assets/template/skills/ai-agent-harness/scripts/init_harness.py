@@ -14,7 +14,7 @@ SKILL_DIR = Path(__file__).resolve().parents[1]
 BUNDLED_TEMPLATE = SKILL_DIR / "assets" / "template"
 TEMPLATE_MANIFEST = ".agent-harness-template.json"
 INSTALL_MANIFEST = ".agent-harness/manifest.json"
-TEMPLATE_VERSION = "0.2.0"
+TEMPLATE_VERSION = "0.2.1"
 MODE_CHOICES = {"new", "adopt", "repair", "check"}
 
 REQUIRED_TEMPLATE_FILES = [
@@ -33,6 +33,7 @@ REQUIRED_TEMPLATE_FILES = [
     "prompts/work.md",
     "prompts/evaluate.md",
     "docs/README.md",
+    "docs/capability-gaps.md",
     "runs/RUN_TEMPLATE.md",
 ]
 
@@ -231,6 +232,7 @@ def semantic_validation(root: Path) -> dict:
         "prompts/work.md",
         "prompts/evaluate.md",
         "docs/README.md",
+        "docs/capability-gaps.md",
         "runs/RUN_TEMPLATE.md",
     ]
     missing = [path for path in required if not (root / path).exists()]
@@ -241,7 +243,7 @@ def semantic_validation(root: Path) -> dict:
     agents = root / "AGENTS.md"
     if agents.exists():
         text = agents.read_text(errors="replace")
-        for phrase in ["Required Startup Protocol", "State Safety Rules", "External Behavior Verification"]:
+        for phrase in ["Required Startup Protocol", "State Safety Rules", "External Behavior Verification", "Capability Gap Handling"]:
             if phrase not in text:
                 checks.append(f"AGENTS.md missing {phrase}")
 

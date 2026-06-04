@@ -17,6 +17,7 @@ The feature must satisfy its `feature_list.json` acceptance criteria and preserv
 - The implemented surface matches the requested scope.
 - Documentation, prompts, scripts, examples, and tests are updated when affected.
 - No required follow-up is hidden as "future work" unless explicitly accepted.
+- Required capabilities are provided, documented, automated, or explicitly tracked as blocked or follow-up work.
 
 ### Maintainability
 
@@ -42,6 +43,7 @@ The feature must satisfy its `feature_list.json` acceptance criteria and preserv
 - The change preserves unrelated user work.
 - The change does not broaden execution authority accidentally.
 - The evaluator rejects premature completion.
+- The implementation does not hide missing tools, permissions, generators, dependencies, or environment setup behind local-only workarounds.
 
 ## Pass Guidance
 
@@ -57,4 +59,5 @@ Return `EVAL_FAIL: Fxxx: <reason>` when:
 - State is inconsistent.
 - Verification was skipped or inconclusive.
 - External behavior was assumed without evidence.
+- A required capability gap was bypassed instead of made durable or tracked.
 - A failed run lacks failure-domain classification or harness improvement assessment.

@@ -351,6 +351,25 @@
       "attempts": 1,
       "last_error": "",
       "priority": "P0"
+    },
+    {
+      "id": "F021",
+      "title": "Add capability gap governance",
+      "description": "Strengthen the harness and distributable skill so agents must turn missing tools, permissions, generators, dependencies, services, credentials, runtime settings, CI resources, and verification fixtures into durable project capabilities or tracked blocked/follow-up work instead of bypassing them with local-only workarounds.",
+      "acceptance": [
+        "AGENTS.md defines capability gap handling and forbids bypassing required missing capabilities with hand-written generated artifacts, weakened scope, skipped verification, or local-only environment changes",
+        "docs/capability-gaps.md documents the required response, workaround rules, examples, and evaluator expectations for missing capabilities",
+        "Planning, coding, continuation, and evaluation prompts require agents to identify, record, and resolve capability gaps durably or track them as blocked/follow-up work",
+        "QUALITY.md and docs/failure-domains.md include capability-gap evaluation and failure classification",
+        "The skill initializer and template manifest include the capability-gap documentation so newly initialized projects receive the rule",
+        "Contract tests verify the capability-gap governance remains present",
+        "./init.sh passes after the update"
+      ],
+      "passes": true,
+      "status": "done",
+      "attempts": 1,
+      "last_error": "",
+      "priority": "P0"
     }
   ]
 }

@@ -10,9 +10,10 @@ You must:
 4. Check recent work with `git log --oneline -20`.
 5. Run `./init.sh`.
 6. Convert the new requirement into clear additions to `SPEC.md`.
-7. Append one or more new features to `feature_list.json`.
-8. Preserve existing feature IDs, ordering, `passes`, `status`, `attempts`, `last_error`, and unknown fields.
-9. Validate JSON and uniqueness with `./init.sh`.
+7. Identify required capabilities such as tools, permissions, generators, dependencies, services, credentials, runtime settings, CI resources, and verification fixtures.
+8. Append one or more new features to `feature_list.json`, including explicit capability features when the requirement depends on missing or unclear capabilities.
+9. Preserve existing feature IDs, ordering, `passes`, `status`, `attempts`, `last_error`, and unknown fields.
+10. Validate JSON and uniqueness with `./init.sh`.
 
 New feature defaults:
 
@@ -29,4 +30,3 @@ Return:
 - Feature IDs appended.
 - Validation commands run.
 - Remaining planning risks.
-

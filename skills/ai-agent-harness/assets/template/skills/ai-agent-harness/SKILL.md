@@ -65,6 +65,8 @@ Use the workflow names as intent detectors:
 - Continue Harness Work
 - Finalize And Commit
 
+When an installed harness reports a missing tool, permission, generator, dependency, service, credential, runtime setting, CI resource, or verification fixture, follow the target repository's `docs/capability-gaps.md`. Do not treat local-only workarounds as durable completion.
+
 ## Commit Boundary
 
 Only commit after the user explicitly says they are satisfied or asks to commit.

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "template_version": "0.2.0",
+  "template_version": "0.2.1",
   "file_categories": {
     "harness-owned static": "Copied and drift-checked by content hash.",
     "project-owned state": "Copied or reset during initialization, then validated semantically instead of byte-compared.",

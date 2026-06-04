@@ -145,6 +145,7 @@ Use these durable knowledge files:
 - `docs/architecture.md` for structure and boundaries.
 - `docs/testing.md` for verification layers.
 - `docs/external-behavior.md` for CLI, API, runtime, and tool-output verification rules.
+- `docs/capability-gaps.md` for missing tools, permissions, dependencies, generators, environment setup, and required project capabilities.
 - `docs/agent-workflow.md` for planning, coding, evaluation, continuation, and run artifacts.
 - `docs/failure-domains.md` for failure classification and harness improvement rules.
 - `QUALITY.md` for evaluator criteria.
@@ -211,6 +212,18 @@ When a feature fails, is blocked, or exposes repeated evaluator feedback:
 
 Repeated failures in the same domain must not remain only retries. They should become an explicit harness improvement feature or a committed harness rule/test change.
 
+## Capability Gap Handling
+
+A missing tool, permission, generator, dependency, service, credential, runtime setting, CI resource, or verification fixture is a capability gap when it is required to implement or verify the selected feature durably.
+
+Rules:
+
+- Verify the gap with a primary source, real command output, official documentation, or captured logs before relying on it.
+- Do not bypass a capability gap by hand-writing generated artifacts, weakening acceptance criteria, skipping verification, or making local-only environment changes that future agents and CI cannot reproduce.
+- Resolve the gap with a durable project capability such as setup documentation, scripts, adapters, fixtures, CI configuration, dependency declarations, or tests.
+- If the durable capability is out of scope for the selected feature, mark the feature blocked or append a follow-up feature instead of treating the workaround as completion.
+- Temporary workarounds must be recorded in `runs/`, `progress.md`, or `last_error`, and the feature must not be marked complete until the capability is provided or explicitly scoped out.
+
 ## External Behavior Verification
 
 When implementation depends on behavior outside this repository's own code, agents must verify that behavior before relying on it.
@@ -255,6 +268,7 @@ When implementing behavior that parses output from external tools such as Codex 
 - Relying on previous chat instead of repository files.
 - Skipping `./init.sh`.
 - Leaving broken code.
+- Bypassing missing required capabilities with hand-written generated code, skipped verification, weakened scope, or local-only environment changes.
 - Coding Agent committing during orchestrated runs.
 - Evaluator Agent accepting incomplete work.
 - Marking a feature done without evaluator pass.

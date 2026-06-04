@@ -25,6 +25,7 @@
 - Logs:
 - Screenshots or traces:
 - External behavior verification:
+- Capability gaps:
 
 ## Failure Analysis
 
