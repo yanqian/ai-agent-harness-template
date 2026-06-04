@@ -15,6 +15,7 @@ The feature must satisfy its `feature_list.json` acceptance criteria and preserv
 ### Completeness
 
 - The implemented surface matches the requested scope.
+- The selected feature is not over-bundled with unrelated or independently verifiable work.
 - Documentation, prompts, scripts, examples, and tests are updated when affected.
 - No required follow-up is hidden as "future work" unless explicitly accepted.
 - Required capabilities are provided, documented, automated, or explicitly tracked as blocked or follow-up work.
@@ -58,6 +59,7 @@ Return `EVAL_PASS: Fxxx` only when:
 Return `EVAL_FAIL: Fxxx: <reason>` when:
 
 - A required behavior is missing.
+- The feature is over-bundled and should have been decomposed before implementation.
 - State is inconsistent.
 - Verification was skipped or inconclusive.
 - External behavior was assumed without evidence.

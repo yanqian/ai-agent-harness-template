@@ -410,6 +410,26 @@
       "attempts": 1,
       "last_error": "",
       "priority": "P0"
+    },
+    {
+      "id": "F024",
+      "title": "Add feature decomposition governance",
+      "description": "Strengthen Planning Agent, Evaluator Agent, and skill guidance so broad user requirements are decomposed into independently verifiable feature entries instead of being collapsed into one over-bundled feature.",
+      "acceptance": [
+        "AGENTS.md requires Planning Agents to decompose broad requirements and forbids collapsing unrelated or independently verifiable work into one feature",
+        "docs/feature-decomposition.md defines split triggers, allowed merges, required planning output, and evaluator expectations",
+        "Planning and evaluation prompts require use of docs/feature-decomposition.md and reject generic all-requirements or over-bundled features",
+        "QUALITY.md and docs/failure-domains.md include feature-decomposition evaluation and failure classification",
+        "README.md, SPEC.md, docs/agent-workflow.md, SKILL.md, and workflow references document the decomposition rule",
+        "The skill initializer and bundled template include the feature-decomposition documentation so newly initialized projects receive the rule",
+        "Contract tests verify the feature-decomposition governance remains present",
+        "./init.sh passes after the update"
+      ],
+      "passes": true,
+      "status": "done",
+      "attempts": 1,
+      "last_error": "",
+      "priority": "P0"
     }
   ]
 }

@@ -189,12 +189,13 @@ Expected result:
 ## Development Flow
 
 1. Add new requirements to `SPEC.md`.
-2. Append new features to `feature_list.json`.
-3. Implement one feature at a time.
-4. Run `make init`.
-5. Run `make validate FEATURE=Fxxx`.
-6. Update `progress.md`.
-7. Commit only after verification passes.
+2. Decompose broad requirements into independently verifiable features using `docs/feature-decomposition.md`.
+3. Append new features to `feature_list.json`.
+4. Implement one feature at a time.
+5. Run `make init`.
+6. Run `make validate FEATURE=Fxxx`.
+7. Update `progress.md`.
+8. Commit only after verification passes.
 
 ## Make Targets
 

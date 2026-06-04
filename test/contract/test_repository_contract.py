@@ -129,7 +129,57 @@ class RepositoryContractTests(unittest.TestCase):
             init: ["docs/capability-gaps.md"],
             skill: ["docs/capability-gaps.md", "local-only workarounds"],
             workflows: ["Identify required capabilities", "Check `docs/capability-gaps.md`"],
-            initializer: ["docs/capability-gaps.md", "Capability Gap Handling", "TEMPLATE_VERSION = \"0.3.0\""],
+            initializer: ["docs/capability-gaps.md", "Capability Gap Handling", "TEMPLATE_VERSION = \"0.3.1\""],
+        }
+        for text, phrases in checks.items():
+            for phrase in phrases:
+                self.assertIn(phrase, text)
+
+    def test_feature_decomposition_governance_is_documented_and_enforced(self):
+        agents = (ROOT / "AGENTS.md").read_text()
+        spec = (ROOT / "SPEC.md").read_text()
+        docs_index = (ROOT / "docs" / "README.md").read_text()
+        decomposition = (ROOT / "docs" / "feature-decomposition.md").read_text()
+        workflow = (ROOT / "docs" / "agent-workflow.md").read_text()
+        quality = (ROOT / "QUALITY.md").read_text()
+        failure_domains = (ROOT / "docs" / "failure-domains.md").read_text()
+        plan = (ROOT / "prompts" / "plan.md").read_text()
+        evaluate = (ROOT / "prompts" / "evaluate.md").read_text()
+        init = (ROOT / "scripts" / "init.sh").read_text()
+        skill = (ROOT / "skills" / "ai-agent-harness" / "SKILL.md").read_text()
+        workflows = (ROOT / "skills" / "ai-agent-harness" / "references" / "workflows.md").read_text()
+        initializer = (ROOT / "skills" / "ai-agent-harness" / "scripts" / "init_harness.py").read_text()
+
+        for phrase in [
+            "Decompose broad requirements into independently verifiable feature entries.",
+            "Do not collapse unrelated or independently verifiable work into one feature.",
+            "Use `docs/feature-decomposition.md`",
+            "Feature entries must be independently verifiable units of work.",
+        ]:
+            self.assertIn(phrase, agents)
+
+        for phrase in [
+            "# Feature Decomposition",
+            "A feature is the smallest valuable behavior or capability",
+            "Split Triggers",
+            "Allowed Merges",
+            "more than five acceptance criteria",
+            "Use `feature_decomposition_gap`",
+        ]:
+            self.assertIn(phrase, decomposition)
+
+        checks = {
+            spec: ["Feature count is determined by independently verifiable behavior"],
+            docs_index: ["feature-decomposition.md", "independently verifiable feature entries"],
+            workflow: ["Planning follows `docs/feature-decomposition.md`", "Evaluation rejects over-bundled features"],
+            quality: ["not over-bundled", "should have been decomposed"],
+            failure_domains: ["feature_decomposition_gap", "over-bundled feature"],
+            plan: ["Use `docs/feature-decomposition.md`", "Do not append a generic \"implement all requirements\" feature"],
+            evaluate: ["Check `docs/feature-decomposition.md`", "Use `feature_decomposition_gap`"],
+            init: ["docs/feature-decomposition.md"],
+            skill: ["docs/feature-decomposition.md", "Split independently verifiable behavior"],
+            workflows: ["Use `docs/feature-decomposition.md`", "reject over-bundled features"],
+            initializer: ["docs/feature-decomposition.md", "TEMPLATE_VERSION = \"0.3.1\""],
         }
         for text, phrases in checks.items():
             for phrase in phrases:
@@ -177,7 +227,7 @@ class RepositoryContractTests(unittest.TestCase):
             init: ["docs/example-boundaries.md"],
             skill: ["docs/example-boundaries.md", "Default examples are references"],
             workflows: ["Identify project-owned implementation and verification paths", "do not use default examples as the product implementation surface"],
-            initializer: ["docs/example-boundaries.md", "TEMPLATE_VERSION = \"0.3.0\""],
+            initializer: ["docs/example-boundaries.md", "TEMPLATE_VERSION = \"0.3.1\""],
         }
         for text, phrases in checks.items():
             for phrase in phrases:
@@ -210,7 +260,7 @@ class RepositoryContractTests(unittest.TestCase):
 
     def test_repository_knowledge_and_quality_contracts_are_indexed(self):
         docs = (ROOT / "docs" / "README.md").read_text()
-        for phrase in ["architecture.md", "testing.md", "external-behavior.md", "capability-gaps.md", "example-boundaries.md", "agent-workflow.md", "failure-domains.md", "real-world-usage.md", "decisions/"]:
+        for phrase in ["architecture.md", "testing.md", "external-behavior.md", "feature-decomposition.md", "capability-gaps.md", "example-boundaries.md", "agent-workflow.md", "failure-domains.md", "real-world-usage.md", "decisions/"]:
             self.assertIn(phrase, docs)
 
         quality = (ROOT / "QUALITY.md").read_text()
@@ -222,7 +272,7 @@ class RepositoryContractTests(unittest.TestCase):
             self.assertIn(phrase, run_template)
 
         failure_domains = (ROOT / "docs" / "failure-domains.md").read_text()
-        for phrase in ["requirement_gap", "implementation_gap", "test_gap", "contract_gap", "external_behavior_gap", "capability_gap", "example_scope_gap", "state_recovery_gap", "agent_workflow_gap", "environment_gap", "Improvement Loop"]:
+        for phrase in ["requirement_gap", "feature_decomposition_gap", "implementation_gap", "test_gap", "contract_gap", "external_behavior_gap", "capability_gap", "example_scope_gap", "state_recovery_gap", "agent_workflow_gap", "environment_gap", "Improvement Loop"]:
             self.assertIn(phrase, failure_domains)
 
     def test_go_server_example_contract_is_documented_and_verified(self):
@@ -356,7 +406,7 @@ class RepositoryContractTests(unittest.TestCase):
             "next_action",
         ]:
             self.assertIn(phrase, initializer)
-        self.assertEqual(template_manifest["template_version"], "0.3.0")
+        self.assertEqual(template_manifest["template_version"], "0.3.1")
         self.assertEqual(template_manifest["default_layout"], "hidden")
         self.assertIn("hidden", template_manifest["layouts"])
         self.assertIn("visible", template_manifest["layouts"])
@@ -460,6 +510,8 @@ class RepositoryContractTests(unittest.TestCase):
         expectations = {
             "plan.md": [
                 "Act as Planning Agent",
+                "Use `docs/feature-decomposition.md`",
+                "Do not append a generic \"implement all requirements\" feature",
                 "Identify required capabilities",
                 "Identify project-owned implementation and verification paths",
                 "Preserve existing feature IDs, ordering, `passes`, `status`, `attempts`, `last_error`, and unknown fields.",
@@ -495,6 +547,7 @@ class RepositoryContractTests(unittest.TestCase):
             ],
             "evaluate.md": [
                 "Act as Evaluator Agent",
+                "Check `docs/feature-decomposition.md`",
                 "Do not implement new features.",
                 "Do not accept incomplete work.",
                 "Prevent premature completion.",
@@ -505,6 +558,7 @@ class RepositoryContractTests(unittest.TestCase):
                 "Check `docs/example-boundaries.md`",
                 "Use `capability_gap`",
                 "Use `example_scope_gap`",
+                "Use `feature_decomposition_gap`",
                 "require a durable harness improvement or a follow-up feature",
                 "EVAL_PASS: Fxxx",
                 "EVAL_FAIL: Fxxx: <reason>",

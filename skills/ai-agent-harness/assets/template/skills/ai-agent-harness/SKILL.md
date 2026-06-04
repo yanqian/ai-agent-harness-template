@@ -72,6 +72,8 @@ Use the workflow names as intent detectors:
 
 When an installed harness reports a missing tool, permission, generator, dependency, service, credential, runtime setting, CI resource, or verification fixture, follow the target repository's `docs/capability-gaps.md`. Do not treat local-only workarounds as durable completion.
 
+When planning broad requirements, follow the target repository's `docs/feature-decomposition.md`. Split independently verifiable behavior, capability, implementation-boundary, risk-domain, and verification-surface work into separate features.
+
 When project work touches `examples/`, follow the target repository's `docs/example-boundaries.md`. Default examples are references, not the default place for product requirements.
 
 ## Commit Boundary

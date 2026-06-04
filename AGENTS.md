@@ -55,6 +55,7 @@ Responsibilities:
 - Read `SPEC.md`.
 - Read `feature_list.json`.
 - Append the new requirement to `SPEC.md`.
+- Decompose broad requirements into independently verifiable feature entries.
 - Append new feature entries to `feature_list.json`.
 - Preserve all existing feature IDs, order, status fields, attempts, errors, and unknown fields.
 
@@ -64,6 +65,8 @@ Strict rules:
 - Do not reorder existing features.
 - Do not reset existing feature state.
 - Only append new feature entries unless explicitly instructed otherwise.
+- Do not collapse unrelated or independently verifiable work into one feature.
+- Use `docs/feature-decomposition.md` to decide whether to split or intentionally merge work.
 - Ensure `feature_list.json` remains valid JSON.
 - Ensure feature IDs remain unique.
 
@@ -144,6 +147,7 @@ Use these durable knowledge files:
 - `docs/README.md` for the repository knowledge index.
 - `docs/architecture.md` for structure and boundaries.
 - `docs/testing.md` for verification layers.
+- `docs/feature-decomposition.md` for requirement-to-feature splitting rules.
 - `docs/external-behavior.md` for CLI, API, runtime, and tool-output verification rules.
 - `docs/capability-gaps.md` for missing tools, permissions, dependencies, generators, environment setup, and required project capabilities.
 - `docs/example-boundaries.md` for rules that keep default examples from becoming project implementation shortcuts.
@@ -155,6 +159,8 @@ Use these durable knowledge files:
 ### `feature_list.json`
 
 `feature_list.json` is the machine-readable feature scope and state.
+
+Feature entries must be independently verifiable units of work. Planning Agents must split broad requirements when multiple user-visible behaviors, capability dependencies, implementation boundaries, risk domains, or verification surfaces are present. If a broad requirement is intentionally represented by one feature, the planning output must explain why it remains independently verifiable.
 
 Each feature must include:
 
@@ -277,6 +283,7 @@ When implementing behavior that parses output from external tools such as Codex 
 ## Anti-Patterns
 
 - Doing multiple features in one Coding Agent run.
+- Collapsing unrelated or independently verifiable requirements into one over-bundled feature.
 - Relying on previous chat instead of repository files.
 - Skipping `./init.sh`.
 - Leaving broken code.

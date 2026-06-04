@@ -12,6 +12,7 @@ QUALITY_PATH = ROOT / "QUALITY.md"
 DOCS_INDEX_PATH = ROOT / "docs" / "README.md"
 RUN_TEMPLATE_PATH = ROOT / "runs" / "RUN_TEMPLATE.md"
 FAILURE_DOMAINS_PATH = ROOT / "docs" / "failure-domains.md"
+FEATURE_DECOMPOSITION_PATH = ROOT / "docs" / "feature-decomposition.md"
 VALID_STATUSES = {"todo", "in_progress", "done", "blocked"}
 FEATURE_ID_RE = re.compile(r"^F[0-9]{3,}$")
 
@@ -104,7 +105,7 @@ def validate_agents_guardrails() -> None:
 
 
 def validate_knowledge_files() -> None:
-    for path in [QUALITY_PATH, DOCS_INDEX_PATH, RUN_TEMPLATE_PATH, FAILURE_DOMAINS_PATH]:
+    for path in [QUALITY_PATH, DOCS_INDEX_PATH, RUN_TEMPLATE_PATH, FAILURE_DOMAINS_PATH, FEATURE_DECOMPOSITION_PATH]:
         if not path.exists():
             fail(f"{path.relative_to(ROOT)} is missing")
 
@@ -114,9 +115,14 @@ def validate_knowledge_files() -> None:
             fail(f"QUALITY.md is missing rubric criterion: {phrase}")
 
     docs_index = DOCS_INDEX_PATH.read_text()
-    for phrase in ["architecture.md", "testing.md", "external-behavior.md", "capability-gaps.md", "example-boundaries.md", "agent-workflow.md", "failure-domains.md", "real-world-usage.md", "decisions/"]:
+    for phrase in ["architecture.md", "testing.md", "external-behavior.md", "feature-decomposition.md", "capability-gaps.md", "example-boundaries.md", "agent-workflow.md", "failure-domains.md", "real-world-usage.md", "decisions/"]:
         if phrase not in docs_index:
             fail(f"docs/README.md is missing index entry: {phrase}")
+
+    decomposition = FEATURE_DECOMPOSITION_PATH.read_text()
+    for phrase in ["independently verifiable", "Split Triggers", "Allowed Merges", "feature_decomposition_gap"]:
+        if phrase not in decomposition:
+            fail(f"docs/feature-decomposition.md is missing rule: {phrase}")
 
     run_template = RUN_TEMPLATE_PATH.read_text()
     for phrase in ["Commands Run", "Evidence", "Failure Analysis", "Failure domain", "Harness improvement", "Evaluator Result", "Follow-Up"]:
@@ -124,7 +130,7 @@ def validate_knowledge_files() -> None:
             fail(f"runs/RUN_TEMPLATE.md is missing section: {phrase}")
 
     failure_domains = FAILURE_DOMAINS_PATH.read_text()
-    for phrase in ["requirement_gap", "implementation_gap", "test_gap", "contract_gap", "external_behavior_gap", "capability_gap", "example_scope_gap", "state_recovery_gap", "agent_workflow_gap", "environment_gap", "Improvement Loop"]:
+    for phrase in ["requirement_gap", "feature_decomposition_gap", "implementation_gap", "test_gap", "contract_gap", "external_behavior_gap", "capability_gap", "example_scope_gap", "state_recovery_gap", "agent_workflow_gap", "environment_gap", "Improvement Loop"]:
         if phrase not in failure_domains:
             fail(f"docs/failure-domains.md is missing domain or rule: {phrase}")
 

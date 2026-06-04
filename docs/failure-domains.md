@@ -7,6 +7,7 @@ The harness improves when failures are classified and converted into durable cha
 ## Domains
 
 - `requirement_gap` - the spec, feature description, or acceptance criteria were ambiguous or incomplete.
+- `feature_decomposition_gap` - broad requirements were collapsed into one over-bundled feature instead of independently verifiable feature entries.
 - `implementation_gap` - the product code did not satisfy a clear requirement.
 - `test_gap` - existing tests missed behavior that should have been caught earlier.
 - `contract_gap` - harness rules, prompts, schema, or state contracts allowed unsafe or ambiguous behavior.

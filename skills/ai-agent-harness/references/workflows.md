@@ -30,12 +30,13 @@ Use when the user describes new work before implementation.
 1. Follow the repository startup protocol.
 2. Read `AGENTS.md`, `SPEC.md`, `feature_list.json`, and `progress.md`.
 3. Append the requirement to `SPEC.md`.
-4. Identify required capabilities, including tools, permissions, generators, dependencies, services, credentials, runtime settings, CI resources, and verification fixtures.
-5. Identify project-owned implementation and verification paths; use `examples/` only when the requirement explicitly targets example maintenance.
-6. Append new feature entries to `feature_list.json`, including explicit capability features when needed.
-7. Preserve feature IDs, ordering, status, attempts, errors, and unknown fields.
-8. Do not implement business logic during planning.
-9. Run `./init.sh`.
+4. Use `docs/feature-decomposition.md` to split broad requirements into independently verifiable feature entries.
+5. Identify required capabilities, including tools, permissions, generators, dependencies, services, credentials, runtime settings, CI resources, and verification fixtures.
+6. Identify project-owned implementation and verification paths; use `examples/` only when the requirement explicitly targets example maintenance.
+7. Append new feature entries to `feature_list.json`, including explicit capability features when needed.
+8. Preserve feature IDs, ordering, status, attempts, errors, and unknown fields.
+9. Do not implement business logic during planning.
+10. Run `./init.sh`.
 
 ## Work One Feature
 
@@ -62,10 +63,11 @@ Use when the user asks whether a feature is complete or asks for evaluation.
 3. Verify acceptance criteria in `feature_list.json`.
 4. Apply `QUALITY.md`.
 5. Check relevant run evidence in `runs/`.
-6. Check `docs/capability-gaps.md` and reject missing required capabilities that were bypassed instead of made durable or tracked.
-7. Check `docs/example-boundaries.md` and reject project-level work implemented by repurposing default examples.
-8. Do not implement new features.
-9. Output exactly `EVAL_PASS: Fxxx` or `EVAL_FAIL: Fxxx: <reason>` when acting as an Evaluator Agent.
+6. Check `docs/feature-decomposition.md` and reject over-bundled features that should have been split into independently verifiable entries.
+7. Check `docs/capability-gaps.md` and reject missing required capabilities that were bypassed instead of made durable or tracked.
+8. Check `docs/example-boundaries.md` and reject project-level work implemented by repurposing default examples.
+9. Do not implement new features.
+10. Output exactly `EVAL_PASS: Fxxx` or `EVAL_FAIL: Fxxx: <reason>` when acting as an Evaluator Agent.
 
 ## Continue Harness Work
 

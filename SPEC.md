@@ -77,6 +77,8 @@ Agents must not satisfy a project-level feature by modifying `examples/tiny-cli`
 
 Every executable unit of work is represented in `feature_list.json` with explicit state and acceptance criteria.
 
+Feature count is determined by independently verifiable behavior and capability boundaries, not by how much text the user wrote. Planning must split broad requirements into multiple features when there are separate user-visible behaviors, required capabilities, implementation boundaries, risk domains, or verification surfaces. If a broad requirement stays as one feature, the planning output must explain why the work remains coherent and independently evaluable.
+
 ### Evaluator Gated
 
 A feature is complete only when validation passes and an evaluator can justify the result against the acceptance criteria.

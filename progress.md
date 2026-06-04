@@ -35,12 +35,13 @@ Implemented components:
 - Capability-gap governance that requires missing tools, permissions, generators, dependencies, services, credentials, runtime settings, CI resources, and verification fixtures to become durable project capabilities or tracked blocked/follow-up work.
 - Example-boundary governance that keeps default examples as harness demonstrations instead of project implementation shortcuts.
 - Installation layout profiles, with hidden layout as the default for user projects and visible layout retained for template maintenance.
+- Feature-decomposition governance that requires broad requirements to become independently verifiable feature entries instead of over-bundled features.
 - Tiny dependency-free Python CLI example in `examples/tiny-cli/`.
 - Dependency-free Go server example in `examples/go-server/`.
 
 ## Last Completed Feature
 
-`F023` - Add hidden harness installation layout.
+`F024` - Add feature decomposition governance.
 
 ## Next Feature
 

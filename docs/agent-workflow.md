@@ -6,6 +6,8 @@ Use `prompts/plan.md` for new requirements.
 
 Planning appends to `SPEC.md` and `feature_list.json`. It does not implement business logic.
 
+Planning follows `docs/feature-decomposition.md` so broad requirements become independently verifiable feature entries instead of one over-bundled feature.
+
 ## Coding
 
 Use `prompts/work.md` for one selected feature.
@@ -21,6 +23,8 @@ When implementing project requirements, follow `docs/example-boundaries.md`. Use
 Use `prompts/evaluate.md`.
 
 The Evaluator Agent checks the feature against acceptance criteria and `QUALITY.md`. It must output exactly one pass or fail line.
+
+Evaluation rejects over-bundled features that should have been decomposed before implementation.
 
 Evaluation rejects features that bypass required capability gaps instead of making them durable or tracking them as blocked or follow-up work.
 
