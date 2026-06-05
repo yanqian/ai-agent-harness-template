@@ -34,16 +34,18 @@ The harness makes project state recoverable by storing requirements, feature sta
 - A test plan and dependency-free unit, contract, and smoke tests.
 - Contract tests for AI agent obligations and harness boundaries.
 - A vendor-neutral lightweight `orchestrator.py`.
+- Orchestrator-first work entrypoint guidance so implementation and evaluation normally run through the orchestrator instead of ad hoc manual state edits.
+- Configurable orchestrator agent provider selection for Codex, Claude Code, Cursor Agent, or another explicitly configured tool.
 - A tiny runnable example proving the harness loop works.
 - A dependency-free Go server example for service-style projects.
 
 ### Excluded
 
-- Vendor-specific automation for Codex, Claude Code, Cursor, or other tools.
+- Hard-coded vendor-specific automation that assumes one installed CLI for every user.
 - Cloud deployment.
 - CI provider configuration.
 - Automatic commits.
-- Vendor-specific orchestration adapters.
+- Implicit agent-provider guessing when multiple provider CLIs are available.
 
 ## 3. Core Concepts
 
@@ -88,6 +90,46 @@ Completed features must have durable evaluator evidence. From the evaluator-evid
 ### Orchestrated When Needed
 
 `orchestrator.py` can preview or run the coding/evaluation loop for one unfinished feature at a time. It is intentionally vendor-neutral: `--dry-run` prints prompts, while `scripts/run-coding-agent.sh` and `scripts/run-evaluator-agent.sh` are the explicit role adapters downstream projects replace to connect Codex, Claude Code, Cursor Agent, or another tool.
+
+### Orchestrator-First Work
+
+Goal: make the orchestrator the default work entrypoint for implementing and evaluating one feature, so feature state transitions, attempts, evaluator gating, failure records, and run evidence are owned by one durable flow.
+
+Included scope: update agent rules, skill workflows, README guidance, Makefile or script entrypoints, and contract tests so the normal "work one feature" path starts with the orchestrator. Manual Coding Agent work remains available only as an explicit fallback when adapters are not configured, unavailable, or the user asks for interactive/manual work.
+
+Excluded scope: replacing the orchestrator with a vendor-specific runner, weakening evaluator evidence, automatically committing orchestrated work, or requiring unattended execution when no provider is configured.
+
+Core flows: a user asks to work on the next feature; the documented default command runs one orchestrator round; the orchestrator selects one unfinished feature, invokes Coding Agent and Evaluator Agent adapters, and marks the feature done only after `EVAL_PASS: Fxxx`; if adapters are unavailable, the flow fails closed with clear recovery guidance instead of silently falling back to manual state edits.
+
+Constraints: the startup protocol must still run before work, one feature is handled per round, evaluator evidence remains mandatory for done features after the baseline, manual fallback must be recorded as fallback rather than the default path, and project verification still ends with `./init.sh`.
+
+Ambiguities or assumptions: "default" means default documented entrypoint and convenience target, not that every agent surface must be able to run unattended without adapter configuration.
+
+Required capabilities: deterministic orchestrator command, role adapters, clear adapter-unavailable errors, docs and prompts that route work through the orchestrator first, and tests that lock the default path.
+
+Implementation paths: `AGENTS.md`, `README.md`, `Makefile`, `docs/agent-workflow.md`, `skills/ai-agent-harness/`, bundled template files, `prompts/`, and contract tests.
+
+Verification surface: `./init.sh`, contract tests for orchestrator-first language and targets, orchestrator dry-run checks, and feature validation for the new feature.
+
+### Agent Provider Configuration
+
+Goal: let downstream projects explicitly configure which agent provider the orchestrator adapters use, so Codex users can use Codex, Claude Code users can use Claude Code, Cursor users can use Cursor Agent, and no provider is chosen by unsafe guessing.
+
+Included scope: define a durable provider configuration format, adapter behavior, provider validation, documentation, and tests for Codex, Claude Code, Cursor Agent, and custom providers. Configuration may support detection or recommendations, but execution must use an explicit configured provider.
+
+Excluded scope: inventing unverified external CLI schemas, requiring every provider CLI to be installed on all machines, parsing assistant prose as structured output, or auto-selecting one provider when multiple candidates exist.
+
+Core flows: a user configures a provider; the Coding Agent and Evaluator Agent adapters read the provider config; each adapter validates that the configured command is available and suitable; the orchestrator sends the role prompt on stdin; adapter failure exits non-zero with a capability-gap message; unconfigured provider state fails closed with setup guidance.
+
+Constraints: external CLI flags, stdin behavior, output format, and exit-code semantics must be verified from real help output, official documentation, or captured logs before being trusted. Provider-specific parsing must use real-shaped fixtures, and unknown provider schemas must fail closed.
+
+Ambiguities or assumptions: exact Claude Code and Cursor Agent command shapes are provider-specific external behavior and must be verified during implementation before being documented as executable defaults.
+
+Required capabilities: provider config file or environment contract, adapter dispatch logic, provider validation command, setup documentation, failure messages, and regression tests for configured, unconfigured, missing-command, and ambiguous-provider cases.
+
+Implementation paths: `scripts/run-coding-agent.sh`, `scripts/run-evaluator-agent.sh`, provider config docs or templates, `README.md`, `SPEC.md`, `docs/capability-gaps.md`, `docs/external-behavior.md`, `skills/ai-agent-harness/`, bundled template files, and tests.
+
+Verification surface: `./init.sh`, unit or contract tests for provider configuration semantics, adapter failure-mode tests, and captured evidence or documented uncertainty for each trusted provider command shape.
 
 ### Recoverable
 
@@ -146,6 +188,8 @@ The template keeps automated checks in explicit layers:
 - `scripts/validate-feature.sh F001` validates a feature by ID and runs the default verification entry point.
 - `scripts/summarize-progress.sh` prints a concise status summary.
 - Contract tests statically verify the orchestrator CLI and startup contract.
+- The documented default one-feature work entrypoint runs through the orchestrator before manual fallback.
+- Orchestrator agent providers are explicitly configurable and fail closed when unconfigured, missing, or ambiguous.
 - Contract tests verify AI-facing obligations for state safety, external behavior verification, prompt restrictions, and evaluator gating.
 - `feature_list.json` conforms to `schemas/feature_list.schema.json`.
 - `prompts/plan.md`, `prompts/work.md`, `prompts/continue.md`, and `prompts/evaluate.md` define the standard agent roles.

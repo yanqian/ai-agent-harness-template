@@ -14,9 +14,19 @@ Planning follows `docs/project-recovery-init.md` for fresh projects and accepted
 
 ## Coding
 
-Use `prompts/work.md` for one selected feature.
+Use the orchestrator as the default entrypoint for one selected feature:
 
-The Coding Agent runs `./init.sh` before and after changes, updates only the selected feature state, and records progress.
+```bash
+make work
+```
+
+`make work` runs one orchestrator round for the next unfinished feature. The orchestrator owns feature selection, `in_progress` state, attempt increments, Coding Agent dispatch, Evaluator Agent dispatch, pass/fail state transitions, failure records, and evaluator-gated completion.
+
+Use `prompts/work.md` manually only as an explicit fallback when role adapters are not configured, unavailable, or the user asks for interactive work.
+
+Manual fallback still follows the Coding Agent contract: run `./init.sh` before and after changes, update only the selected feature state, record progress, and note that manual work was a fallback in `progress.md` or `runs/`.
+
+Manual fallback must not bypass evaluator pass, evaluator evidence, attempts, failure records, or final `./init.sh` verification. If adapter failure blocks `make work`, treat that as a capability gap or follow-up feature instead of silently hand-editing completion state.
 
 When a required tool, dependency, generator, permission, service, credential, runtime setting, CI resource, or verification fixture is missing, follow `docs/capability-gaps.md`. Do not convert the missing capability into an untracked local workaround.
 
@@ -45,6 +55,8 @@ Evaluation rejects project-level completion when accepted minspec work only veri
 Use `prompts/continue.md` after interruptions.
 
 Continuation reconstructs context from repository files and git history only.
+
+When implementation or evaluation remains, continue through `make work` first. Use manual continuation only as an explicit fallback when adapters are unavailable or the user asks for interactive/manual work.
 
 ## Finalize And Commit
 

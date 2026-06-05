@@ -82,6 +82,8 @@ When completing or evaluating a feature, follow the target repository's `docs/ev
 
 When project work touches `examples/`, follow the target repository's `docs/example-boundaries.md`. Default examples are references, not the default place for product requirements.
 
+For one-feature implementation and evaluation, default to the repository's orchestrator-first entrypoint, normally `make work`. Manual or interactive Coding Agent work is an explicit fallback only when role adapters are unavailable or the user asks for manual work; it must not bypass evaluator gating, evaluator evidence, or final `./init.sh` verification.
+
 ## Commit Boundary
 
 Only commit after the user explicitly says they are satisfied or asks to commit.

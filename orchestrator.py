@@ -175,13 +175,39 @@ def evaluator_prompt(feature_id: str) -> str:
     return f"{prompt_template('evaluate.md')}\n\nSelected feature ID: `{feature_id}`\n"
 
 
+def ensure_adapter_configured(label: str, adapter_path: Path) -> None:
+    if not adapter_path.exists():
+        raise OrchestratorError(
+            f"{label} adapter is missing: {adapter_path}. "
+            "Configure the role adapter before running orchestrator work, or explicitly use the documented manual fallback."
+        )
+    if not adapter_path.is_file():
+        raise OrchestratorError(f"{label} adapter is not a file: {adapter_path}")
+    if (adapter_path.stat().st_mode & 0o111) == 0:
+        raise OrchestratorError(
+            f"{label} adapter is not executable: {adapter_path}. "
+            "Run chmod +x after configuring the adapter."
+        )
+    marker = "is a template adapter."
+    try:
+        adapter_text = adapter_path.read_text()
+    except UnicodeDecodeError:
+        adapter_text = ""
+    if marker in adapter_text:
+        raise OrchestratorError(
+            f"{label} adapter is still the template adapter: {adapter_path}. "
+            "The default work entrypoint is orchestrator-first, but real work requires configured Coding Agent "
+            "and Evaluator Agent adapters. Configure an agent provider, or explicitly use the manual fallback "
+            "without bypassing evaluator pass evidence or final ./init.sh verification."
+        )
+
+
 def run_agent(prompt: str, dry_run: bool, label: str, adapter_path: Path) -> subprocess.CompletedProcess[str]:
     if dry_run:
         print(f"\n== {label} prompt ==")
         print(prompt)
         return subprocess.CompletedProcess(["dry-run"], 0, stdout="", stderr="")
-    if not adapter_path.exists():
-        raise OrchestratorError(f"Missing {label} adapter: {adapter_path}")
+    ensure_adapter_configured(label, adapter_path)
     result = subprocess.run([str(adapter_path)], input=prompt, text=True, capture_output=True)
     if result.stdout:
         print(result.stdout, end="", flush=True)
@@ -259,6 +285,8 @@ def main() -> int:
             run_agent(evaluator_prompt(feature_id), dry_run=True, label="Evaluator Agent", adapter_path=EVALUATOR_AGENT_ADAPTER)
             continue
 
+        ensure_adapter_configured("Coding Agent", CODING_AGENT_ADAPTER)
+        ensure_adapter_configured("Evaluator Agent", EVALUATOR_AGENT_ADAPTER)
         mark_in_progress(feature_id)
         coding_result = run_agent(coding_prompt(feature_id), dry_run=False, label="Coding Agent", adapter_path=CODING_AGENT_ADAPTER)
         if coding_result.returncode != 0:

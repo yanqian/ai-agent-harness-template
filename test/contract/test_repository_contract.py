@@ -511,9 +511,9 @@ class RepositoryContractTests(unittest.TestCase):
         readme = (ROOT / "README.md").read_text()
         init = (ROOT / "scripts" / "init.sh").read_text()
 
-        for target in ["init:", "test:", "validate:", "unit:", "contract:", "smoke:", "go-example:", "dry-run:", "summarize:", "clean:", "ci:"]:
+        for target in ["init:", "test:", "validate:", "unit:", "contract:", "smoke:", "go-example:", "work:", "dry-run:", "summarize:", "clean:", "ci:"]:
             self.assertIn(target, makefile)
-        for phrase in ["./init.sh", "scripts/validate-feature.sh $(FEATURE)", "python3 orchestrator.py --dry-run", "python3 scripts/clean-state.py", "$(MAKE) validate FEATURE=F001"]:
+        for phrase in ["./init.sh", "scripts/validate-feature.sh $(FEATURE)", "python3 orchestrator.py --max-rounds 1", "python3 orchestrator.py --dry-run", "python3 scripts/clean-state.py", "$(MAKE) validate FEATURE=F001"]:
             self.assertIn(phrase, makefile)
         for phrase in ["push:", "pull_request:", "workflow_dispatch:", "actions/checkout@v4", "actions/setup-go@v5", "make ci"]:
             self.assertIn(phrase, workflow)
@@ -521,6 +521,51 @@ class RepositoryContractTests(unittest.TestCase):
             self.assertIn(phrase, readme)
         for phrase in ["Makefile", ".github/workflows/ci.yml"]:
             self.assertIn(phrase, init)
+
+    def test_orchestrator_first_work_entrypoint_is_documented_and_enforced(self):
+        agents = (ROOT / "AGENTS.md").read_text()
+        readme = (ROOT / "README.md").read_text()
+        workflow = (ROOT / "docs" / "agent-workflow.md").read_text()
+        work_prompt = (ROOT / "prompts" / "work.md").read_text()
+        continue_prompt = (ROOT / "prompts" / "continue.md").read_text()
+        evaluate_prompt = (ROOT / "prompts" / "evaluate.md").read_text()
+        makefile = (ROOT / "Makefile").read_text()
+        orchestrator = (ROOT / "orchestrator.py").read_text()
+        coding_adapter = (ROOT / "scripts" / "run-coding-agent.sh").read_text()
+        evaluator_adapter = (ROOT / "scripts" / "run-evaluator-agent.sh").read_text()
+        skill = (ROOT / "skills" / "ai-agent-harness" / "SKILL.md").read_text()
+        workflows = (ROOT / "skills" / "ai-agent-harness" / "references" / "workflows.md").read_text()
+        template_agents = (ROOT / "skills" / "ai-agent-harness" / "assets" / "template" / "AGENTS.md").read_text()
+        template_workflows = (ROOT / "skills" / "ai-agent-harness" / "assets" / "template" / "skills" / "ai-agent-harness" / "references" / "workflows.md").read_text()
+
+        for phrase in [
+            "Default entrypoint:",
+            "make work",
+            "Manual fallback must be recorded",
+            "must not bypass evaluator pass, evaluator evidence, attempts, failure records, or final `./init.sh` verification",
+            "fail closed with clear configuration guidance",
+            "Treating manual Coding Agent work as the default path",
+        ]:
+            self.assertIn(phrase, agents)
+
+        checks = {
+            readme: ["The default one-feature work entrypoint is:", "make work", "real orchestrator work fails closed", "Manual Coding Agent work is an explicit fallback"],
+            workflow: ["Use the orchestrator as the default entrypoint", "make work", "Manual fallback must not bypass evaluator pass"],
+            work_prompt: ["Default invocation", "normally dispatched by the orchestrator through `make work`", "explicit fallback"],
+            continue_prompt: ["use `make work` first", "Do not silently fall back from orchestrator adapter failure"],
+            evaluate_prompt: ["orchestrator-first work requirements", "manual fallback record", "silently bypassed the orchestrator-first default entrypoint"],
+            makefile: ["work:", "python3 orchestrator.py --max-rounds 1"],
+            orchestrator: ["ensure_adapter_configured", "still the template adapter", "default work entrypoint is orchestrator-first", "before running orchestrator work"],
+            coding_adapter: ["default work entrypoint is orchestrator-first", "before running `make work`", "do not bypass"],
+            evaluator_adapter: ["default work entrypoint is orchestrator-first", "before running `make work`", "EVAL_PASS", "EVAL_FAIL"],
+            skill: ["orchestrator-first entrypoint", "normally `make work`", "explicit fallback"],
+            workflows: ["Default to orchestrator-first work", "make work", "fail-closed adapter setup gap"],
+            template_agents: ["Default entrypoint:", "make work", "Manual fallback must be recorded"],
+            template_workflows: ["Default to orchestrator-first work", "make work", "fail-closed adapter setup gap"],
+        }
+        for text, phrases in checks.items():
+            for phrase in phrases:
+                self.assertIn(phrase, text)
 
     def test_real_world_usage_references_are_documented(self):
         readme = (ROOT / "README.md").read_text()

@@ -524,6 +524,43 @@
       "attempts": 1,
       "last_error": "",
       "priority": "P0"
+    },
+    {
+      "id": "F030",
+      "title": "Make orchestrator the default work entrypoint",
+      "description": "Update the harness so one-feature implementation and evaluation normally begin through the orchestrator, with manual Coding Agent work documented only as an explicit fallback when adapters are unavailable or the user requests interactive/manual work.",
+      "acceptance": [
+        "AGENTS.md, README.md, docs/agent-workflow.md, prompts, SKILL.md, workflow references, and bundled template files describe the orchestrator as the default work entrypoint for one-feature implementation and evaluation",
+        "A documented convenience command or target runs one orchestrator round for the next unfinished feature",
+        "Manual Coding Agent work is documented as an explicit fallback and must not bypass evaluator gating, evaluator evidence, attempts, failure records, or final ./init.sh verification",
+        "Adapter-unavailable flows fail closed with clear guidance instead of silently marking feature state by hand",
+        "Contract tests verify the orchestrator-first default entrypoint and manual-fallback boundaries",
+        "./init.sh and scripts/validate-feature.sh F030 pass after evaluator evidence is recorded"
+      ],
+      "passes": true,
+      "status": "done",
+      "attempts": 1,
+      "last_error": "",
+      "priority": "P0"
+    },
+    {
+      "id": "F031",
+      "title": "Make orchestrator-first agent provider configurable",
+      "description": "Add an explicit provider configuration path for orchestrator role adapters so downstream projects can choose Codex, Claude Code, Cursor Agent, or a custom provider without unsafe implicit guessing.",
+      "acceptance": [
+        "The harness defines a durable provider configuration contract for the Coding Agent and Evaluator Agent adapters",
+        "Provider execution is explicit and fails closed when no provider is configured, the configured command is missing, or multiple provider candidates are present without a selection",
+        "Codex, Claude Code, Cursor Agent, and custom-provider setup guidance is documented without assuming unverified CLI flags or output schemas",
+        "External provider command behavior trusted by the adapters is verified through real help output, official documentation, captured logs, or real-shaped fixtures before being used",
+        "Unit or contract tests cover configured provider dispatch, unconfigured provider failure, missing-command failure, and ambiguous-provider handling",
+        "README.md, SPEC.md, docs/capability-gaps.md, docs/external-behavior.md, SKILL.md, workflow references, and bundled template files stay consistent",
+        "./init.sh and scripts/validate-feature.sh F031 pass after evaluator evidence is recorded"
+      ],
+      "passes": false,
+      "status": "todo",
+      "attempts": 0,
+      "last_error": "",
+      "priority": "P0"
     }
   ]
 }

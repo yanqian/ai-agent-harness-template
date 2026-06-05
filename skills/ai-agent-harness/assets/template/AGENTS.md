@@ -79,6 +79,17 @@ Strict rules:
 
 Use this role to implement exactly one feature.
 
+Default entrypoint:
+
+- For one-feature implementation and evaluation, use the orchestrator first:
+
+  ```bash
+  make work
+  ```
+
+- Use manual or interactive Coding Agent work only as an explicit fallback when role adapters are not configured, unavailable, or the user explicitly asks for manual work.
+- Manual fallback must be recorded in `progress.md` or `runs/` and must not bypass evaluator pass, evaluator evidence, attempts, failure records, or final `./init.sh` verification.
+
 Responsibilities:
 
 - Follow the startup protocol.
@@ -120,7 +131,7 @@ EVAL_FAIL: Fxxx: <reason>
 
 ### Orchestrator
 
-`orchestrator.py` owns optional unattended feature execution.
+`orchestrator.py` owns the default one-feature work entrypoint and optional unattended feature execution.
 
 Responsibilities:
 
@@ -140,6 +151,8 @@ The template orchestrator is vendor-neutral. By default it supports `--dry-run` 
 - `scripts/run-evaluator-agent.sh`
 
 The orchestrator sends each role prompt to the corresponding adapter on stdin.
+
+If either role adapter is missing, not executable, or still the template adapter, real orchestrator work must fail closed with clear configuration guidance before silently treating manual state edits as completion.
 
 ## State Files
 
@@ -301,6 +314,8 @@ When implementing behavior that parses output from external tools such as Codex 
 - Always run `./init.sh` before declaring success.
 - The Coding Agent updates state and progress for its target feature.
 - The Evaluator Agent verifies without implementation changes.
+- The orchestrator is the default entrypoint for one-feature implementation and evaluation.
+- Manual Coding Agent work is an explicit fallback only when adapters are unavailable or the user requests it.
 - The orchestrator owns unattended feature state transitions.
 - From the evaluator-evidence baseline onward, do not mark a feature done unless `runs/` contains `EVAL_PASS: Fxxx` evidence for that feature.
 
@@ -325,6 +340,8 @@ When the user explicitly asks to commit approved feature work:
 - Bypassing missing required capabilities with hand-written generated code, skipped verification, weakened scope, or local-only environment changes.
 - Treating harness verification as project recovery after a minspec requires a runnable skeleton.
 - Implementing project-level requirements inside default examples instead of project-owned source and tests.
+- Treating manual Coding Agent work as the default path when orchestrator adapters should be used.
+- Silently falling back from orchestrator adapter failure to hand-edited feature completion.
 - Coding Agent committing during orchestrated runs.
 - Committing approved feature work without the feature ID in the commit subject.
 - Marking a feature done without evaluator evidence in `runs/`.
@@ -354,4 +371,10 @@ Optional orchestration preview uses:
 
 ```bash
 python3 orchestrator.py --dry-run
+```
+
+Default one-feature work uses:
+
+```bash
+make work
 ```

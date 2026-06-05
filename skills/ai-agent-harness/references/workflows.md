@@ -49,16 +49,22 @@ Use when the user describes new work before implementation.
 Use when the user asks to implement, continue, or work on a harness feature.
 
 1. Follow the repository startup protocol.
-2. Select exactly one feature unless the user explicitly names one.
-3. Implement only that feature.
-4. Preserve unrelated working-tree changes.
-5. Update `progress.md`.
-6. Update only the selected feature in `feature_list.json`.
-7. Record a run note in `runs/` for non-trivial work, external behavior verification, failures, or evaluator handoff.
-8. When a required capability is missing, follow `docs/capability-gaps.md`; make the capability durable, block the feature, or create follow-up work instead of relying on local-only workarounds.
-9. When implementation touches `examples/`, follow `docs/example-boundaries.md`; do not use default examples as the product implementation surface.
-10. Run `./init.sh` after changes.
-11. Do not stage or commit during orchestrated Coding Agent work.
+2. Default to orchestrator-first work:
+
+   ```bash
+   make work
+   ```
+
+3. Let the orchestrator select one unfinished feature, mark it `in_progress`, increment attempts, run Coding Agent and Evaluator Agent adapters, and mark done only after evaluator pass.
+4. If adapters are missing, unavailable, or still templates, treat that as a fail-closed adapter setup gap. Do not silently hand-edit feature completion.
+5. Use manual or interactive Coding Agent work only as an explicit fallback when adapters are not configured or the user asks for manual work.
+6. For manual fallback, select exactly one feature, implement only that feature, preserve unrelated working-tree changes, update `progress.md`, and update only the selected feature in `feature_list.json`.
+7. Manual fallback must record that it was a fallback in `progress.md` or `runs/` and must not bypass evaluator pass, evaluator evidence, attempts, failure records, or final `./init.sh` verification.
+8. Record a run note in `runs/` for non-trivial work, external behavior verification, failures, or evaluator handoff.
+9. When a required capability is missing, follow `docs/capability-gaps.md`; make the capability durable, block the feature, or create follow-up work instead of relying on local-only workarounds.
+10. When implementation touches `examples/`, follow `docs/example-boundaries.md`; do not use default examples as the product implementation surface.
+11. Run `./init.sh` after changes.
+12. Do not stage or commit during orchestrated Coding Agent work.
 
 ## Evaluate Feature
 
@@ -84,9 +90,11 @@ Use after interruption or when the user asks to resume.
 2. Read `progress.md`, `feature_list.json`, `AGENTS.md`, and recent commits.
 3. Run `./init.sh`.
 4. Identify the next safe action from repository state.
-5. Inspect `docs/capability-gaps.md` when prior work used local-only workarounds for missing capabilities.
-6. Inspect `docs/example-boundaries.md` when prior work modified `examples/`.
-7. Stop and report exact conflicts if state is unsafe.
+5. Continue implementation or evaluation through `make work` first.
+6. Use manual continuation only as an explicit fallback when adapters are unavailable or the user asks for interactive/manual work.
+7. Inspect `docs/capability-gaps.md` when prior work used local-only workarounds for missing capabilities.
+8. Inspect `docs/example-boundaries.md` when prior work modified `examples/`.
+9. Stop and report exact conflicts if state is unsafe.
 
 ## Finalize And Commit
 

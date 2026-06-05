@@ -4,6 +4,8 @@ Act as Coding Agent for one selected feature.
 
 Feature ID: `Fxxx`
 
+Default invocation: the Coding Agent prompt is normally dispatched by the orchestrator through `make work`. If you are running this prompt manually, treat that as an explicit fallback because role adapters are unavailable or the user requested interactive/manual work. Record the fallback in `progress.md` or `runs/`, and do not bypass evaluator gating, evaluator evidence, attempts, failure records, or final `./init.sh` verification.
+
 You must:
 
 1. Read `AGENTS.md`.

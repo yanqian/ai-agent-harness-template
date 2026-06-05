@@ -73,8 +73,9 @@ The workflow was extracted from real agent projects such as [home-guard-tg](http
 3. Replace `SPEC.md` with your project goal.
 4. Add your first feature to `feature_list.json`.
 5. Run `make init`.
-6. Ask Codex, Claude Code, Cursor Agent, or another coding agent to follow `AGENTS.md`.
-7. Validate one feature with `make validate FEATURE=F001`.
+6. Configure role adapters when you want unattended agent execution, then run one feature through `make work`.
+7. Ask Codex, Claude Code, Cursor Agent, or another coding agent to follow `AGENTS.md` only as an explicit manual fallback when adapters are unavailable or interactive work is requested.
+8. Validate one feature with `make validate FEATURE=F001`.
 
 ### Install The Skill
 
@@ -199,11 +200,12 @@ Expected result:
 2. Decompose broad requirements into independently verifiable features using `docs/feature-decomposition.md`.
 3. For a fresh project with an accepted minspec, add a runnable-skeleton feature using `docs/project-recovery-init.md`.
 4. Append new features to `feature_list.json`.
-5. Implement one feature at a time.
-6. Run `make init`.
-7. Run `make validate FEATURE=Fxxx`.
-8. Update `progress.md`.
-9. Commit only after verification passes.
+5. Implement and evaluate one feature through `make work`.
+6. Use manual Coding Agent work only as an explicit fallback when adapters are unavailable or the user requests interactive work.
+7. Run `make init`.
+8. Run `make validate FEATURE=Fxxx`.
+9. Update `progress.md`.
+10. Commit only after verification passes.
 
 ## Make Targets
 
@@ -211,12 +213,21 @@ Expected result:
 - `make validate FEATURE=Fxxx` validates one feature.
 - `make unit`, `make contract`, and `make smoke` run individual test layers.
 - `make go-example` runs the Go server example tests.
+- `make work` runs one orchestrator round for the next unfinished feature.
 - `make dry-run` previews the next orchestrator round.
 - `make summarize` prints progress and run summaries.
 - `make clean` resets project-specific state after copying the template.
 - `make ci` runs the same commands used by GitHub Actions.
 
 ## Orchestrator
+
+The default one-feature work entrypoint is:
+
+```bash
+make work
+```
+
+`make work` runs `python3 orchestrator.py --max-rounds 1`. The orchestrator selects one unfinished feature, marks it in progress, increments attempts, dispatches Coding Agent and Evaluator Agent role prompts, and marks the feature done only after evaluator pass.
 
 Preview the next one-feature round:
 
@@ -231,6 +242,8 @@ python3 orchestrator.py --eval-only F001 --dry-run
 ```
 
 The template does not assume a specific AI coding tool. To execute a real agent instead of previewing prompts, replace `scripts/run-coding-agent.sh` and `scripts/run-evaluator-agent.sh` with project-specific adapters. The orchestrator sends the selected role prompt to the adapter on stdin. Orchestrator dry-run and `scripts/validate-feature.sh` are manual checks outside `./init.sh` because they run `./init.sh` as part of their own protocol.
+
+If adapters are missing, not executable, or still the template adapters, real orchestrator work fails closed with setup guidance before silently treating manual state edits as completion. Manual Coding Agent work is an explicit fallback only when adapters are unavailable or the user asks for interactive work; record the fallback in `progress.md` or `runs/`, and do not bypass evaluator gating, evaluator evidence, attempts, failure records, or final `./init.sh` verification.
 
 The orchestrator is intentionally boring: it does not make agents smarter. It only selects one feature, enforces the startup protocol, dispatches role prompts, and records state transitions.
 

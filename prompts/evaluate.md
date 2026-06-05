@@ -21,6 +21,7 @@ You must:
 13. Check `docs/evaluator-evidence.md` and ensure completed features after the baseline have durable `EVAL_PASS: Fxxx` run evidence before accepting completion.
 14. Check `docs/capability-gaps.md` and reject missing required capabilities that were bypassed instead of made durable or tracked.
 15. Check `docs/example-boundaries.md` and reject project-level work implemented by repurposing default examples.
+16. Check `AGENTS.md` and `docs/agent-workflow.md` for orchestrator-first work requirements; reject completion that silently bypassed `make work` or adapter failure without an explicit manual fallback record.
 
 Strict rules:
 
@@ -36,6 +37,7 @@ Strict rules:
 - If a feature is over-bundled, reject it and require decomposition before implementation continues.
 - If a required capability is missing, do not accept hand-written generated artifacts, weakened scope, skipped verification, or local-only environment changes as durable completion.
 - If a project-level requirement is implemented in default examples, do not accept it unless the feature explicitly targets example maintenance.
+- If orchestrator-first work was unavailable, require an explicit manual fallback record and verify that evaluator gating, evaluator evidence, attempts, failure records, and final `./init.sh` verification were not bypassed.
 
 Output exactly one of:
 
@@ -50,3 +52,4 @@ Use `example_scope_gap` when default examples were used as the product implement
 Use `feature_decomposition_gap` when a feature is too broad or bundles unrelated independently verifiable work.
 Use `requirement_gap` when the SPEC, feature description, or acceptance criteria are ambiguous, incomplete, or missing required spec normalization fields.
 Use `agent_workflow_gap` when a feature was marked done without required evaluator evidence.
+Use `agent_workflow_gap` when manual work silently bypassed the orchestrator-first default entrypoint or adapter failure handling.
