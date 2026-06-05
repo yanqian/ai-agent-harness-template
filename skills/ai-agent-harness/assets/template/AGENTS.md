@@ -154,6 +154,8 @@ The orchestrator sends each role prompt to the corresponding adapter on stdin.
 
 If either role adapter is missing, not executable, or still the template adapter, real orchestrator work must fail closed with clear configuration guidance before silently treating manual state edits as completion.
 
+Default adapters delegate to `scripts/run-agent-provider.py`. Configure them by copying `agent-provider.example.json` to `agent-provider.json` and selecting an explicit provider. Do not guess between Codex, Claude Code, Cursor Agent, or custom providers; missing, ambiguous, or unavailable provider setup is a capability gap.
+
 ## State Files
 
 ## Repository Knowledge Map
@@ -165,6 +167,7 @@ Use these durable knowledge files:
 - `docs/README.md` for the repository knowledge index.
 - `docs/architecture.md` for structure and boundaries.
 - `docs/testing.md` for verification layers.
+- `docs/agent-provider-configuration.md` for explicit Codex, Claude Code, Cursor Agent, and custom provider configuration.
 - `docs/spec-normalization.md` for converting vague requirements into clear SPEC additions before feature decomposition.
 - `docs/feature-decomposition.md` for requirement-to-feature splitting rules.
 - `docs/project-recovery-init.md` for separating harness verification from project recovery.

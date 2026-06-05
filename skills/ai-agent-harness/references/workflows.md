@@ -56,15 +56,16 @@ Use when the user asks to implement, continue, or work on a harness feature.
    ```
 
 3. Let the orchestrator select one unfinished feature, mark it `in_progress`, increment attempts, run Coding Agent and Evaluator Agent adapters, and mark done only after evaluator pass.
-4. If adapters are missing, unavailable, or still templates, treat that as a fail-closed adapter setup gap. Do not silently hand-edit feature completion.
-5. Use manual or interactive Coding Agent work only as an explicit fallback when adapters are not configured or the user asks for manual work.
-6. For manual fallback, select exactly one feature, implement only that feature, preserve unrelated working-tree changes, update `progress.md`, and update only the selected feature in `feature_list.json`.
-7. Manual fallback must record that it was a fallback in `progress.md` or `runs/` and must not bypass evaluator pass, evaluator evidence, attempts, failure records, or final `./init.sh` verification.
-8. Record a run note in `runs/` for non-trivial work, external behavior verification, failures, or evaluator handoff.
-9. When a required capability is missing, follow `docs/capability-gaps.md`; make the capability durable, block the feature, or create follow-up work instead of relying on local-only workarounds.
-10. When implementation touches `examples/`, follow `docs/example-boundaries.md`; do not use default examples as the product implementation surface.
-11. Run `./init.sh` after changes.
-12. Do not stage or commit during orchestrated Coding Agent work.
+4. Configure `agent-provider.json` from `agent-provider.example.json` using `docs/agent-provider-configuration.md` before real provider execution.
+5. If adapters or providers are missing, unavailable, ambiguous, or still unconfigured, treat that as a fail-closed adapter setup gap. Do not silently hand-edit feature completion.
+6. Use manual or interactive Coding Agent work only as an explicit fallback when adapters are not configured or the user asks for manual work.
+7. For manual fallback, select exactly one feature, implement only that feature, preserve unrelated working-tree changes, update `progress.md`, and update only the selected feature in `feature_list.json`.
+8. Manual fallback must record that it was a fallback in `progress.md` or `runs/` and must not bypass evaluator pass, evaluator evidence, attempts, failure records, or final `./init.sh` verification.
+9. Record a run note in `runs/` for non-trivial work, external behavior verification, failures, or evaluator handoff.
+10. When a required capability is missing, follow `docs/capability-gaps.md`; make the capability durable, block the feature, or create follow-up work instead of relying on local-only workarounds.
+11. When implementation touches `examples/`, follow `docs/example-boundaries.md`; do not use default examples as the product implementation surface.
+12. Run `./init.sh` after changes.
+13. Do not stage or commit during orchestrated Coding Agent work.
 
 ## Evaluate Feature
 

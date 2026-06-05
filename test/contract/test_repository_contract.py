@@ -116,6 +116,7 @@ class RepositoryContractTests(unittest.TestCase):
             "# Capability Gaps",
             "Hand-writing generated bindings or generated artifacts only because the generator is missing.",
             "setting `GOCACHE` under a temporary directory is acceptable for local verification only",
+            "agent provider capability gap",
             "Use `capability_gap` as the primary failure domain",
         ]:
             self.assertIn(phrase, capability)
@@ -130,6 +131,54 @@ class RepositoryContractTests(unittest.TestCase):
             skill: ["docs/capability-gaps.md", "local-only workarounds"],
             workflows: ["Identify required capabilities", "Check `docs/capability-gaps.md`"],
             initializer: ["docs/capability-gaps.md", "Capability Gap Handling", "TEMPLATE_VERSION = \"0.3.3\""],
+        }
+        for text, phrases in checks.items():
+            for phrase in phrases:
+                self.assertIn(phrase, text)
+
+    def test_agent_provider_configuration_is_documented_and_enforced(self):
+        agents = (ROOT / "AGENTS.md").read_text()
+        readme = (ROOT / "README.md").read_text()
+        docs_index = (ROOT / "docs" / "README.md").read_text()
+        provider_doc = (ROOT / "docs" / "agent-provider-configuration.md").read_text()
+        external = (ROOT / "docs" / "external-behavior.md").read_text()
+        workflow = (ROOT / "docs" / "agent-workflow.md").read_text()
+        skill = (ROOT / "skills" / "ai-agent-harness" / "SKILL.md").read_text()
+        workflows = (ROOT / "skills" / "ai-agent-harness" / "references" / "workflows.md").read_text()
+        example = json.loads((ROOT / "agent-provider.example.json").read_text())
+        dispatcher = (ROOT / "scripts" / "run-agent-provider.py").read_text()
+        coding_adapter = (ROOT / "scripts" / "run-coding-agent.sh").read_text()
+        evaluator_adapter = (ROOT / "scripts" / "run-evaluator-agent.sh").read_text()
+        init = (ROOT / "scripts" / "init.sh").read_text()
+        template_doc = (ROOT / "skills" / "ai-agent-harness" / "assets" / "template" / "docs" / "agent-provider-configuration.md").read_text()
+        template_example = json.loads((ROOT / "skills" / "ai-agent-harness" / "assets" / "template" / "agent-provider.example.json").read_text())
+
+        self.assertEqual(example["provider"], "codex")
+        self.assertEqual(example["providers"]["codex"]["command"], ["codex", "exec", "-"])
+        self.assertEqual(example, template_example)
+        for provider in ["claude-code", "cursor-agent", "custom"]:
+            self.assertEqual(example["providers"][provider]["command"], [])
+
+        for phrase in [
+            "Configure them by copying `agent-provider.example.json` to `agent-provider.json`",
+            "Do not guess between Codex, Claude Code, Cursor Agent, or custom providers",
+            "missing, ambiguous, or unavailable provider setup is a capability gap",
+        ]:
+            self.assertIn(phrase, agents)
+
+        checks = {
+            readme: ["agent-provider.example.json", "agent-provider.json", "docs/agent-provider-configuration.md", "[\"codex\", \"exec\", \"-\"]"],
+            docs_index: ["agent-provider-configuration.md", "explicit provider configuration"],
+            provider_doc: ["# Agent Provider Configuration", "`provider` must be explicit", "The adapters fail closed", "Multiple known provider CLIs", "Codex:", "Claude Code:", "Cursor Agent:"],
+            external: ["Agent Provider Commands", "Do not infer Claude Code, Cursor Agent, or custom provider command shapes from Codex examples"],
+            workflow: ["agent-provider.json", "docs/agent-provider-configuration.md", "Missing, ambiguous, or unavailable provider setup is a capability gap"],
+            skill: ["agent-provider.example.json", "docs/agent-provider-configuration.md", "Do not guess between Codex, Claude Code, Cursor Agent, or custom providers"],
+            workflows: ["agent-provider.json", "docs/agent-provider-configuration.md", "ambiguous, or still unconfigured"],
+            dispatcher: ["HARNESS_AGENT_PROVIDER_CONFIG", "KNOWN_PROVIDER_EXECUTABLES", "multiple agent provider candidates detected", "--check", "subprocess.run(command, input=prompt"],
+            coding_adapter: ["run-agent-provider.py --role coding", "HARNESS_AGENT_PROVIDER_CHECK"],
+            evaluator_adapter: ["run-agent-provider.py --role evaluator", "HARNESS_AGENT_PROVIDER_CHECK"],
+            init: ["agent-provider.example.json", "docs/agent-provider-configuration.md", "scripts/run-agent-provider.py"],
+            template_doc: ["# Agent Provider Configuration", "`provider` must be explicit"],
         }
         for text, phrases in checks.items():
             for phrase in phrases:
@@ -555,9 +604,9 @@ class RepositoryContractTests(unittest.TestCase):
             continue_prompt: ["use `make work` first", "Do not silently fall back from orchestrator adapter failure"],
             evaluate_prompt: ["orchestrator-first work requirements", "manual fallback record", "silently bypassed the orchestrator-first default entrypoint"],
             makefile: ["work:", "python3 orchestrator.py --max-rounds 1"],
-            orchestrator: ["ensure_adapter_configured", "still the template adapter", "default work entrypoint is orchestrator-first", "before running orchestrator work"],
-            coding_adapter: ["default work entrypoint is orchestrator-first", "before running `make work`", "do not bypass"],
-            evaluator_adapter: ["default work entrypoint is orchestrator-first", "before running `make work`", "EVAL_PASS", "EVAL_FAIL"],
+            orchestrator: ["ensure_adapter_configured", "provider is not configured for orchestrator-first work", "default work entrypoint is orchestrator-first", "before running orchestrator work"],
+            coding_adapter: ["run-agent-provider.py --role coding", "HARNESS_AGENT_PROVIDER_CHECK"],
+            evaluator_adapter: ["run-agent-provider.py --role evaluator", "HARNESS_AGENT_PROVIDER_CHECK"],
             skill: ["orchestrator-first entrypoint", "normally `make work`", "explicit fallback"],
             workflows: ["Default to orchestrator-first work", "make work", "fail-closed adapter setup gap"],
             template_agents: ["Default entrypoint:", "make work", "Manual fallback must be recorded"],
@@ -854,10 +903,10 @@ class RepositoryContractTests(unittest.TestCase):
     def test_orchestrator_uses_explicit_role_adapters(self):
         coding = (ROOT / "scripts/run-coding-agent.sh").read_text()
         evaluator = (ROOT / "scripts/run-evaluator-agent.sh").read_text()
-        self.assertIn("Coding Agent prompt on stdin", coding)
-        self.assertIn("Evaluator Agent prompt on stdin", evaluator)
-        self.assertIn("EVAL_PASS", evaluator)
-        self.assertIn("EVAL_FAIL", evaluator)
+        self.assertIn("run-agent-provider.py --role coding", coding)
+        self.assertIn("run-agent-provider.py --role evaluator", evaluator)
+        self.assertIn("HARNESS_AGENT_PROVIDER_CHECK", coding)
+        self.assertIn("HARNESS_AGENT_PROVIDER_CHECK", evaluator)
 
 
 if __name__ == "__main__":

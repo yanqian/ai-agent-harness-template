@@ -19,3 +19,15 @@ Preferred evidence:
 
 If behavior cannot be verified directly, document the uncertainty in `SPEC.md`, `progress.md`, `runs/`, or implementation notes and choose the safer default.
 
+## Agent Provider Commands
+
+Orchestrator agent providers are external CLI behavior. Before trusting a provider command, verify its help output, official documentation, or captured logs for:
+
+- argv and flag shape;
+- prompt stdin behavior;
+- stdout and stderr behavior;
+- exit-code behavior;
+- cwd and environment behavior;
+- structured output shape when any parser depends on it.
+
+Do not infer Claude Code, Cursor Agent, or custom provider command shapes from Codex examples. Configure them only after local verification, and record that verification in `agent-provider.json` or run evidence.

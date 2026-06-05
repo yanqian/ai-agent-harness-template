@@ -2,6 +2,7 @@
 import argparse
 from datetime import datetime, timezone
 import json
+import os
 import re
 import subprocess
 import sys
@@ -200,6 +201,16 @@ def ensure_adapter_configured(label: str, adapter_path: Path) -> None:
             "and Evaluator Agent adapters. Configure an agent provider, or explicitly use the manual fallback "
             "without bypassing evaluator pass evidence or final ./init.sh verification."
         )
+    if "run-agent-provider.py" in adapter_text:
+        env = os.environ.copy()
+        env["HARNESS_AGENT_PROVIDER_CHECK"] = "1"
+        result = subprocess.run([str(adapter_path)], text=True, capture_output=True, env=env)
+        if result.returncode != 0:
+            detail = "\n".join(part.strip() for part in [result.stdout, result.stderr] if part.strip())
+            raise OrchestratorError(
+                f"{label} provider is not configured for orchestrator-first work. "
+                f"{detail or f'{adapter_path} exited with code {result.returncode}'}"
+            )
 
 
 def run_agent(prompt: str, dry_run: bool, label: str, adapter_path: Path) -> subprocess.CompletedProcess[str]:

@@ -10,11 +10,16 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 
 
-def run_command(args, env=None):
+def run_command(args, env=None, input_text=None):
     merged_env = os.environ.copy()
     if env:
         merged_env.update(env)
-    return subprocess.run(args, cwd=ROOT, text=True, capture_output=True, env=merged_env)
+    return subprocess.run(args, cwd=ROOT, text=True, capture_output=True, env=merged_env, input=input_text)
+
+
+def write_executable(path, text):
+    path.write_text(text)
+    path.chmod(0o755)
 
 
 class ScriptUnitTests(unittest.TestCase):
@@ -216,6 +221,79 @@ class ScriptUnitTests(unittest.TestCase):
             self.assertIn("blocking_conflicts:", result.stdout)
             self.assertIn("AGENTS.md", result.stdout)
             self.assertEqual((project / "AGENTS.md").read_text(), "custom project agent rules\n")
+
+    def test_agent_provider_fails_when_no_config_is_present(self):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            env = {
+                "HARNESS_AGENT_PROVIDER_CONFIG": str(Path(tmp_dir) / "agent-provider.json"),
+                "PATH": str(Path(tmp_dir) / "bin"),
+            }
+            result = run_command([sys.executable, "scripts/run-agent-provider.py", "--role", "coding", "--check"], env=env)
+            self.assertEqual(result.returncode, 2)
+            self.assertIn("no agent provider configured", result.stderr)
+
+    def test_agent_provider_rejects_ambiguous_unconfigured_candidates(self):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            bin_dir = Path(tmp_dir) / "bin"
+            bin_dir.mkdir()
+            write_executable(bin_dir / "codex", "#!/usr/bin/env bash\nexit 0\n")
+            write_executable(bin_dir / "claude", "#!/usr/bin/env bash\nexit 0\n")
+            env = {
+                "HARNESS_AGENT_PROVIDER_CONFIG": str(Path(tmp_dir) / "agent-provider.json"),
+                "PATH": str(bin_dir),
+            }
+            result = run_command([sys.executable, "scripts/run-agent-provider.py", "--role", "coding", "--check"], env=env)
+            self.assertEqual(result.returncode, 2)
+            self.assertIn("multiple agent provider candidates detected", result.stderr)
+            self.assertIn("codex", result.stderr)
+            self.assertIn("claude-code", result.stderr)
+
+    def test_agent_provider_rejects_missing_configured_command(self):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            config = Path(tmp_dir) / "agent-provider.json"
+            config.write_text(json.dumps({
+                "provider": "custom",
+                "providers": {
+                    "custom": {
+                        "command": ["missing-agent-provider-command"]
+                    }
+                }
+            }))
+            env = {"HARNESS_AGENT_PROVIDER_CONFIG": str(config)}
+            result = run_command([sys.executable, "scripts/run-agent-provider.py", "--role", "coding", "--check"], env=env)
+            self.assertEqual(result.returncode, 2)
+            self.assertIn("configured provider command is missing", result.stderr)
+
+    def test_agent_provider_dispatches_configured_provider(self):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            provider = Path(tmp_dir) / "provider.py"
+            provider.write_text(
+                "import sys\n"
+                "prompt = sys.stdin.read()\n"
+                "print('provider received: ' + prompt)\n"
+            )
+            config = Path(tmp_dir) / "agent-provider.json"
+            config.write_text(json.dumps({
+                "provider": "custom",
+                "providers": {
+                    "custom": {
+                        "command": [sys.executable, str(provider)]
+                    }
+                }
+            }))
+            env = {"HARNESS_AGENT_PROVIDER_CONFIG": str(config)}
+
+            check = run_command([sys.executable, "scripts/run-agent-provider.py", "--role", "evaluator", "--check"], env=env)
+            self.assertEqual(check.returncode, 0, check.stderr)
+            self.assertIn("agent_provider_check=ok", check.stdout)
+
+            result = run_command(
+                [sys.executable, "scripts/run-agent-provider.py", "--role", "evaluator"],
+                env=env,
+                input_text="hello evaluator",
+            )
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn("provider received: hello evaluator", result.stdout)
 
 
 if __name__ == "__main__":

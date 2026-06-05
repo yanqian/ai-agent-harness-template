@@ -245,6 +245,8 @@ The template does not assume a specific AI coding tool. To execute a real agent 
 
 If adapters are missing, not executable, or still the template adapters, real orchestrator work fails closed with setup guidance before silently treating manual state edits as completion. Manual Coding Agent work is an explicit fallback only when adapters are unavailable or the user asks for interactive work; record the fallback in `progress.md` or `runs/`, and do not bypass evaluator gating, evaluator evidence, attempts, failure records, or final `./init.sh` verification.
 
+The default adapters delegate to `scripts/run-agent-provider.py`. To configure them, copy `agent-provider.example.json` to `agent-provider.json`, set an explicit provider, and verify the provider command behavior before relying on it. Codex can use the verified sample `["codex", "exec", "-"]`; Claude Code, Cursor Agent, and custom providers must be configured only after checking their local CLI help or official documentation. See [docs/agent-provider-configuration.md](docs/agent-provider-configuration.md).
+
 The orchestrator is intentionally boring: it does not make agents smarter. It only selects one feature, enforces the startup protocol, dispatches role prompts, and records state transitions.
 
 Adapter examples:

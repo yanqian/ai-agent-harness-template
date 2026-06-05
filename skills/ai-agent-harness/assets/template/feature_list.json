@@ -556,9 +556,9 @@
         "README.md, SPEC.md, docs/capability-gaps.md, docs/external-behavior.md, SKILL.md, workflow references, and bundled template files stay consistent",
         "./init.sh and scripts/validate-feature.sh F031 pass after evaluator evidence is recorded"
       ],
-      "passes": false,
-      "status": "todo",
-      "attempts": 0,
+      "passes": true,
+      "status": "done",
+      "attempts": 1,
       "last_error": "",
       "priority": "P0"
     }

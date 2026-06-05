@@ -42,25 +42,26 @@ Implemented components:
 - Minspec-to-SPEC normalization governance so planners must clarify goal, scope, flows, constraints, ambiguities, capabilities, implementation paths, and verification before appending features.
 - Evaluator-evidence guardrail so features cannot be marked done without durable `EVAL_PASS: Fxxx` run evidence.
 - Orchestrator-first work entrypoint so implementation and evaluation default to `make work` instead of manual state edits, with adapter-unavailable flows failing closed.
-- Planned explicit agent-provider configuration so orchestrator adapters can use Codex, Claude Code, Cursor Agent, or a custom provider without unsafe guessing.
+- Explicit agent-provider configuration so orchestrator adapters can use Codex, Claude Code, Cursor Agent, or a custom provider without unsafe guessing.
 - Tiny dependency-free Python CLI example in `examples/tiny-cli/`.
 - Dependency-free Go server example in `examples/go-server/`.
 
 ## Last Completed Feature
 
-`F030` - Make orchestrator the default work entrypoint.
+`F031` - Make orchestrator-first agent provider configurable.
 
 ## Next Feature
 
-`F031` - Make orchestrator-first agent provider configurable.
+`F011` - Explore concurrent agent execution. This is a P2 backlog item only; implement it only if the harness needs parallel agent throughput.
 
 ## Known Issues
 
 - The template orchestrator is intentionally lightweight and vendor-neutral.
-- Vendor-specific command wrappers for Codex, Claude Code, and Cursor Agent remain unconfigured until `F031` is implemented.
+- `agent-provider.json` is intentionally absent by default; copy `agent-provider.example.json` and select an explicit provider before real `make work` execution.
 - `F011` remains a P2 backlog item and should not preempt the new P0 orchestrator-first work.
 
 ## Recovery Notes
 
 - F030 used explicit manual fallback because role adapters are still template adapters until F031.
 - `make work` was verified to run the startup protocol and fail closed before mutating F030 state when adapters are unconfigured.
+- F031 verified Codex command shape with `codex exec --help`; Claude Code and Cursor Agent command shapes remain intentionally unconfigured until verified on a machine that has those CLIs.

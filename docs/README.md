@@ -9,6 +9,7 @@ This directory is the expandable knowledge base for agents.
 - `architecture.md` - repository structure, boundaries, and extension points.
 - `testing.md` - verification layers and how to add project-specific tests.
 - `external-behavior.md` - rules for validating CLIs, APIs, runtimes, and structured tool output.
+- `agent-provider-configuration.md` - explicit provider configuration for orchestrator Coding Agent and Evaluator Agent adapters.
 - `spec-normalization.md` - rules for turning vague user input into explicit SPEC additions.
 - `feature-decomposition.md` - rules for splitting broad requirements into independently verifiable feature entries.
 - `project-recovery-init.md` - rules separating harness verification from the root project recovery entry point.

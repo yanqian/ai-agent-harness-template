@@ -8,6 +8,7 @@ echo "== Required files =="
 for path in \
   AGENTS.md \
   .agent-harness-template.json \
+  agent-provider.example.json \
   SPEC.md \
   feature_list.json \
   progress.md \
@@ -28,6 +29,7 @@ for path in \
   docs/architecture.md \
   docs/testing.md \
   docs/external-behavior.md \
+  docs/agent-provider-configuration.md \
   docs/spec-normalization.md \
   docs/feature-decomposition.md \
   docs/project-recovery-init.md \
@@ -51,6 +53,7 @@ for path in \
   scripts/summarize-progress.sh \
   scripts/summarize-runs.sh \
   scripts/check-failure-domains.sh \
+  scripts/run-agent-provider.py \
   scripts/run-coding-agent.sh \
   scripts/run-evaluator-agent.sh \
   skills/ai-agent-harness/SKILL.md \
@@ -80,6 +83,7 @@ python3 - <<'PY'
 from pathlib import Path
 
 compile(Path("orchestrator.py").read_text(), "orchestrator.py", "exec")
+compile(Path("scripts/run-agent-provider.py").read_text(), "scripts/run-agent-provider.py", "exec")
 PY
 
 echo "== Tiny example =="

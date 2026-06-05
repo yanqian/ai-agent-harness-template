@@ -84,6 +84,8 @@ When project work touches `examples/`, follow the target repository's `docs/exam
 
 For one-feature implementation and evaluation, default to the repository's orchestrator-first entrypoint, normally `make work`. Manual or interactive Coding Agent work is an explicit fallback only when role adapters are unavailable or the user asks for manual work; it must not bypass evaluator gating, evaluator evidence, or final `./init.sh` verification.
 
+When `make work` needs real agent execution, configure the target repository's provider contract from `agent-provider.example.json` using `docs/agent-provider-configuration.md`. Do not guess between Codex, Claude Code, Cursor Agent, or custom providers; missing or ambiguous provider setup is a capability gap.
+
 ## Commit Boundary
 
 Only commit after the user explicitly says they are satisfied or asks to commit.

@@ -33,6 +33,8 @@ If `go test` fails because the default Go build cache is not writable, setting `
 
 If a third-party API, deployment CLI, or model output schema is needed, capture a primary-source shape or real-shaped fixture before parsing or trusting it.
 
+If orchestrator-first work cannot run because `agent-provider.json` is missing, the configured provider command is unavailable, or multiple provider CLIs exist without an explicit selection, treat that as an agent provider capability gap. Add durable provider configuration, adapter documentation, or a follow-up feature instead of silently falling back to manual completion.
+
 ## Evaluation
 
 Evaluators should fail a feature when a required capability is bypassed instead of made durable. Use `capability_gap` as the primary failure domain when the main problem is a missing or implicit capability.
