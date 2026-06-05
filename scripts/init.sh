@@ -27,6 +27,7 @@ for path in \
   orchestrator.py \
   docs/README.md \
   docs/architecture.md \
+  docs/new-project-flow.md \
   docs/testing.md \
   docs/external-behavior.md \
   docs/agent-provider-configuration.md \

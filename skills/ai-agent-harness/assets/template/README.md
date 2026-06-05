@@ -66,6 +66,8 @@ The workflow was extracted from real agent projects such as [home-guard-tg](http
 
 ## Quick Start
 
+For the complete first-project path, see [New Project Flow](docs/new-project-flow.md). It includes a one-screen diagram of what the skill does and what humans must provide.
+
 ### Use This Template
 
 1. Copy this template into your project root.

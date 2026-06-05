@@ -43,12 +43,13 @@ Implemented components:
 - Evaluator-evidence guardrail so features cannot be marked done without durable `EVAL_PASS: Fxxx` run evidence.
 - Orchestrator-first work entrypoint so implementation and evaluation default to `make work` instead of manual state edits, with adapter-unavailable flows failing closed.
 - Explicit agent-provider configuration so orchestrator adapters can use Codex, Claude Code, Cursor Agent, or a custom provider without unsafe guessing.
+- New-project flow guide with a one-screen Mermaid diagram linking skill initialization, minspec planning, runnable skeleton, provider setup, orchestrator work, evaluator evidence, init verification, and commit approval.
 - Tiny dependency-free Python CLI example in `examples/tiny-cli/`.
 - Dependency-free Go server example in `examples/go-server/`.
 
 ## Last Completed Feature
 
-`F031` - Make orchestrator-first agent provider configurable.
+`F032` - Document the new-project skill flow.
 
 ## Next Feature
 
@@ -65,3 +66,4 @@ Implemented components:
 - F030 used explicit manual fallback because role adapters are still template adapters until F031.
 - `make work` was verified to run the startup protocol and fail closed before mutating F030 state when adapters are unconfigured.
 - F031 verified Codex command shape with `codex exec --help`; Claude Code and Cursor Agent command shapes remain intentionally unconfigured until verified on a machine that has those CLIs.
+- F032 added `docs/new-project-flow.md` and README onboarding link so new users can see the full skill-assisted path at a glance.

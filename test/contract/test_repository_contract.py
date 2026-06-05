@@ -34,6 +34,8 @@ class RepositoryContractTests(unittest.TestCase):
             "## Why This Exists",
             "The template dogfoods its own state model",
             "### Use This Template",
+            "New Project Flow",
+            "docs/new-project-flow.md",
             "### Verify This Repository",
             "make validate FEATURE=F001",
             "The orchestrator is intentionally boring",
@@ -42,6 +44,52 @@ class RepositoryContractTests(unittest.TestCase):
             "https://yanqian.github.io/posts/publish/i-built-a-small-harness-to-stop-ai-coding-projects-from-forgetting-state/",
         ]:
             self.assertIn(phrase, text)
+
+    def test_new_project_flow_is_documented_with_diagram(self):
+        readme = (ROOT / "README.md").read_text()
+        docs_index = (ROOT / "docs" / "README.md").read_text()
+        flow = (ROOT / "docs" / "new-project-flow.md").read_text()
+        spec = (ROOT / "SPEC.md").read_text()
+        init = (ROOT / "scripts" / "init.sh").read_text()
+        template_flow = (ROOT / "skills" / "ai-agent-harness" / "assets" / "template" / "docs" / "new-project-flow.md").read_text()
+
+        for phrase in ["New Project Flow", "docs/new-project-flow.md", "one-screen diagram"]:
+            self.assertIn(phrase, readme)
+
+        for phrase in ["new-project-flow.md", "skill actions", "human inputs", "provider setup", "commit approval"]:
+            self.assertIn(phrase, docs_index)
+
+        for phrase in [
+            "# New Project Flow",
+            "```mermaid",
+            "flowchart TD",
+            "Human: ask `Use $ai-agent-harness to initialize this project`",
+            "Skill: check/adopt/new/repair harness",
+            "Planning Agent: normalize minspec into SPEC",
+            "Feature: runnable skeleton updates root `./init.sh`",
+            "Human: choose agent provider or explicit manual fallback",
+            "Orchestrator: `make work` selects one feature",
+            "Evaluator Agent: verify acceptance criteria",
+            "Run evidence: `EVAL_PASS: Fxxx`",
+            "Root `./init.sh`: dependency setup, service startup, smoke test",
+            "What Humans Must Provide",
+            "Commit approval",
+            "docs/project-recovery-init.md",
+            "docs/agent-provider-configuration.md",
+        ]:
+            self.assertIn(phrase, flow)
+
+        for phrase in [
+            "New Project Flow",
+            "visual map",
+            "skill invocation",
+            "minspec input",
+            "approved commit",
+        ]:
+            self.assertIn(phrase, spec)
+
+        self.assertIn("docs/new-project-flow.md", init)
+        self.assertEqual(flow, template_flow)
 
     def test_oss_readiness_files_are_present(self):
         required_files = [

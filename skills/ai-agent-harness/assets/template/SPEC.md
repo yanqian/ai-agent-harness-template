@@ -29,6 +29,7 @@ The harness makes project state recoverable by storing requirements, feature sta
 - A `Makefile` with common local and CI verification targets.
 - A GitHub Actions workflow that runs harness verification on push and pull request.
 - Public-facing README positioning for resumable AI coding projects.
+- A new-project flow guide with a visual diagram that shows what the skill does and what humans must provide.
 - OSS readiness files for licensing, contribution, security reporting, changelog, and issue triage.
 - A distributable AI Agent Harness skill that can initialize projects, guide planning, implementation, evaluation, and commit approved work while preserving the repository protocol as the source of durable state.
 - A test plan and dependency-free unit, contract, and smoke tests.
@@ -145,6 +146,14 @@ The harness can also be used through a distributable skill. The skill is a conve
 
 The skill must not become a hidden state store. `AGENTS.md`, `SPEC.md`, `feature_list.json`, `progress.md`, `docs/`, `QUALITY.md`, `runs/`, and git history remain the durable sources of truth.
 
+### New Project Flow
+
+New users need a single visual map for the first project run. The durable flow guide must show the path from skill invocation, harness initialization, minspec input, SPEC normalization, feature decomposition, runnable skeleton, provider configuration, `make work`, evaluator pass, `./init.sh`, and approved commit.
+
+The flow guide must distinguish what the skill does from what the human must provide. Required human inputs include project location or install mode, minspec content, clarification for ambiguous requirements, provider choice, approval to run real agent work, and explicit approval before commit.
+
+The guide must link to the detailed recovery, spec normalization, feature decomposition, provider configuration, evaluator evidence, and commit rules instead of duplicating the whole manual.
+
 ### Project Recovery Init
 
 Installed user projects need a clear distinction between harness verification and project recovery. `.agent-harness/scripts/init.sh` verifies that the harness itself is installed, semantically valid, and runnable. The root `./init.sh` is the project recovery entry point.
@@ -208,6 +217,7 @@ The template keeps automated checks in explicit layers:
 - `.github/workflows/ci.yml` runs `make ci` on GitHub Actions.
 - `make clean` resets `feature_list.json`, `progress.md`, and recorded run artifacts for a fresh project.
 - README explains the project as a repository-level harness for resumable AI coding, not a prompt collection.
+- README links to the new-project flow guide and the guide includes a visual diagram of the skill-assisted path.
 - README and `docs/real-world-usage.md` link real projects that informed the harness design.
 - `LICENSE`, `CONTRIBUTING.md`, `SECURITY.md`, `CHANGELOG.md`, and GitHub issue templates are present.
 - `skills/ai-agent-harness/` contains a distributable skill with initialization, planning, one-feature work, evaluation, and explicit finalize-and-commit workflows.

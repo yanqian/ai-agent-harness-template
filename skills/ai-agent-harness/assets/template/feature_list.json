@@ -561,6 +561,24 @@
       "attempts": 1,
       "last_error": "",
       "priority": "P0"
+    },
+    {
+      "id": "F032",
+      "title": "Document the new-project skill flow",
+      "description": "Add a concise new-project flow guide with a visual diagram so users can see what the AI Agent Harness skill does, what inputs humans must provide, and how initialization, minspec planning, runnable skeleton, provider setup, orchestrator work, evaluation, init verification, and commit approval fit together.",
+      "acceptance": [
+        "docs/new-project-flow.md explains the end-to-end new project flow from skill invocation through approved commit",
+        "The guide includes a Mermaid flow diagram that distinguishes skill actions, human inputs, orchestrator work, evaluator gating, and ./init.sh verification",
+        "The guide explicitly lists required human inputs: project/install choice, minspec, clarification answers, provider choice, approval to run real agent work, and commit approval",
+        "README.md links to docs/new-project-flow.md near the onboarding path",
+        "docs/README.md, SPEC.md, scripts/init.sh, contract tests, and bundled template files stay consistent",
+        "./init.sh and scripts/validate-feature.sh F032 pass after evaluator evidence is recorded"
+      ],
+      "passes": true,
+      "status": "done",
+      "attempts": 1,
+      "last_error": "",
+      "priority": "P0"
     }
   ]
 }

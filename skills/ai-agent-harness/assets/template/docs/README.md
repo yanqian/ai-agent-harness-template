@@ -7,6 +7,7 @@ This directory is the expandable knowledge base for agents.
 ## Index
 
 - `architecture.md` - repository structure, boundaries, and extension points.
+- `new-project-flow.md` - visual first-project flow showing skill actions, human inputs, provider setup, orchestrator work, evaluation, init verification, and commit approval.
 - `testing.md` - verification layers and how to add project-specific tests.
 - `external-behavior.md` - rules for validating CLIs, APIs, runtimes, and structured tool output.
 - `agent-provider-configuration.md` - explicit provider configuration for orchestrator Coding Agent and Evaluator Agent adapters.
