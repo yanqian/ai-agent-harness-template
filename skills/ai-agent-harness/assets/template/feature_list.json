@@ -579,6 +579,25 @@
       "attempts": 1,
       "last_error": "",
       "priority": "P0"
+    },
+    {
+      "id": "F033",
+      "title": "Normalize final role verdicts",
+      "description": "Fix orchestrator role-output handling so historical run evidence echoed by agents cannot override the final Coding Agent or Evaluator Agent verdict, and so structured pass verdicts can recover from provider exit-code contradictions.",
+      "acceptance": [
+        "The orchestrator evaluates the last matching `EVAL_PASS` or `EVAL_FAIL` line for the selected feature instead of failing on earlier historical output",
+        "The Coding Agent prompt defines final `CODING_PASS` and `CODING_FAIL` verdict lines for provider output normalization",
+        "The orchestrator can continue after a non-zero provider exit when the final structured Coding Agent or Evaluator Agent verdict is a matching pass",
+        "Unit tests cover historical fail-before-pass evaluator output and structured coding pass output after an earlier failure",
+        "Provider configuration docs explain final verdict preservation and non-zero provider exit-code contradiction handling",
+        "The bundled skill template includes the same orchestrator, prompt, docs, and tests so newly initialized projects receive the fix",
+        "./init.sh and scripts/validate-feature.sh F033 pass after evaluator evidence is recorded"
+      ],
+      "passes": true,
+      "status": "done",
+      "attempts": 1,
+      "last_error": "",
+      "priority": "P0"
     }
   ]
 }

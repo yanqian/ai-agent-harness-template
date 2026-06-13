@@ -44,16 +44,17 @@ Implemented components:
 - Orchestrator-first work entrypoint so implementation and evaluation default to `make work` instead of manual state edits, with adapter-unavailable flows failing closed.
 - Explicit agent-provider configuration so orchestrator adapters can use Codex, Claude Code, Cursor Agent, or a custom provider without unsafe guessing.
 - New-project flow guide with a one-screen Mermaid diagram linking skill initialization, minspec planning, runnable skeleton, provider setup, orchestrator work, evaluator evidence, init verification, and commit approval.
+- Final role verdict normalization so historical run evidence echoed by agents cannot override final Coding Agent or Evaluator Agent pass/fail lines, and structured pass verdicts can recover provider exit-code contradictions.
 - Tiny dependency-free Python CLI example in `examples/tiny-cli/`.
 - Dependency-free Go server example in `examples/go-server/`.
 
 ## Last Completed Feature
 
-`F032` - Document the new-project skill flow.
+`F033` - Normalize final role verdicts.
 
 ## Next Feature
 
-`F011` - Explore concurrent agent execution. This is a P2 backlog item only; implement it only if the harness needs parallel agent throughput.
+`F011` - Explore concurrent agent execution. This remains a P2 backlog item only; implement it only if the harness needs parallel agent throughput.
 
 ## Known Issues
 
@@ -67,3 +68,4 @@ Implemented components:
 - `make work` was verified to run the startup protocol and fail closed before mutating F030 state when adapters are unconfigured.
 - F031 verified Codex command shape with `codex exec --help`; Claude Code and Cursor Agent command shapes remain intentionally unconfigured until verified on a machine that has those CLIs.
 - F032 added `docs/new-project-flow.md` and README onboarding link so new users can see the full skill-assisted path at a glance.
+- F033 fixed final role verdict parsing and synchronized the fix into the bundled skill template; downstream installed projects should receive the same harness file update.
