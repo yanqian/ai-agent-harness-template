@@ -598,6 +598,26 @@
       "attempts": 1,
       "last_error": "",
       "priority": "P0"
+    },
+    {
+      "id": "F034",
+      "title": "Preflight provider runtime permissions",
+      "description": "Add provider-agnostic runtime preflight checks so the orchestrator can detect when a configured agent provider needs user-approved escalated runtime permissions before feature state is mutated.",
+      "acceptance": [
+        "Provider configuration supports optional `runtime_check_command`, `coding_runtime_check_command`, and `evaluator_runtime_check_command` entries as non-shell string arrays",
+        "Adapter preflight runs the selected runtime check before the orchestrator marks a feature `in_progress`",
+        "Permission-like runtime check failures emit a machine-readable `PROVIDER_RUNTIME_PERMISSION_REQUIRED` message that tells the outer agent or user to approve escalated provider runtime execution",
+        "Runtime check failures remain provider capability gaps and are not treated as business-code failures or evaluator rejections",
+        "Codex documentation includes a verified runtime-check example while Claude Code, Cursor Agent, and custom providers retain equivalent configuration entry points without guessed command shapes",
+        "Unit tests cover successful runtime checks, permission-required runtime check failures, and role-specific runtime check commands",
+        "The bundled skill template includes the same runtime preflight implementation, docs, example config, and tests",
+        "./init.sh and scripts/validate-feature.sh F034 pass after evaluator evidence is recorded"
+      ],
+      "passes": true,
+      "status": "done",
+      "attempts": 1,
+      "last_error": "",
+      "priority": "P0"
     }
   ]
 }
