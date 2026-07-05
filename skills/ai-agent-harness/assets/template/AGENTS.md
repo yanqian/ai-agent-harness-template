@@ -87,6 +87,13 @@ Default entrypoint:
   make work
   ```
 
+- In hidden-layout installs, the harness Makefile lives under `.agent-harness/`; from the project root run:
+
+  ```bash
+  make -C .agent-harness work
+  ```
+
+  or `cd .agent-harness && make work`. A missing root `Makefile` is not an orchestrator-unavailable condition in hidden layout.
 - Use manual or interactive Coding Agent work only as an explicit fallback when role adapters are not configured, unavailable, or the user explicitly asks for manual work.
 - Manual fallback must be recorded in `progress.md` or `runs/` and must not bypass evaluator pass, evaluator evidence, attempts, failure records, or final `./init.sh` verification.
 
@@ -380,4 +387,10 @@ Default one-feature work uses:
 
 ```bash
 make work
+```
+
+In hidden-layout installs, run the equivalent from the project root:
+
+```bash
+make -C .agent-harness work
 ```

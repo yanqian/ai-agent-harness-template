@@ -55,6 +55,13 @@ Use when the user asks to implement, continue, or work on a harness feature.
    make work
    ```
 
+   In hidden-layout installs, run this from the project root instead:
+
+   ```bash
+   make -C .agent-harness work
+   ```
+
+   You can also `cd .agent-harness && make work`. Do not treat a missing root `Makefile` as a fail-closed adapter setup gap.
 3. Let the orchestrator select one unfinished feature, mark it `in_progress`, increment attempts, run Coding Agent and Evaluator Agent adapters, and mark done only after evaluator pass.
 4. Configure `agent-provider.json` from `agent-provider.example.json` using `docs/agent-provider-configuration.md` before real provider execution.
 5. If adapters or providers are missing, unavailable, ambiguous, or still unconfigured, treat that as a fail-closed adapter setup gap. Do not silently hand-edit feature completion.
@@ -91,7 +98,7 @@ Use after interruption or when the user asks to resume.
 2. Read `progress.md`, `feature_list.json`, `AGENTS.md`, and recent commits.
 3. Run `./init.sh`.
 4. Identify the next safe action from repository state.
-5. Continue implementation or evaluation through `make work` first.
+5. Continue implementation or evaluation through `make work` first, using `make -C .agent-harness work` from the project root in hidden-layout installs.
 6. Use manual continuation only as an explicit fallback when adapters are unavailable or the user asks for interactive/manual work.
 7. Inspect `docs/capability-gaps.md` when prior work used local-only workarounds for missing capabilities.
 8. Inspect `docs/example-boundaries.md` when prior work modified `examples/`.

@@ -21,7 +21,7 @@ You must:
 13. Check `docs/evaluator-evidence.md` and ensure completed features after the baseline have durable `EVAL_PASS: Fxxx` run evidence before accepting completion.
 14. Check `docs/capability-gaps.md` and reject missing required capabilities that were bypassed instead of made durable or tracked.
 15. Check `docs/example-boundaries.md` and reject project-level work implemented by repurposing default examples.
-16. Check `AGENTS.md` and `docs/agent-workflow.md` for orchestrator-first work requirements; reject completion that silently bypassed `make work` or adapter failure without an explicit manual fallback record.
+16. Check `AGENTS.md` and `docs/agent-workflow.md` for orchestrator-first work requirements; in hidden-layout installs, require `make -C .agent-harness work` from the project root or `make work` from inside `.agent-harness/`. Reject completion that silently bypassed orchestrator work, treated a missing root `Makefile` as orchestrator unavailability, or ignored adapter failure without an explicit manual fallback record.
 
 Strict rules:
 

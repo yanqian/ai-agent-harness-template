@@ -178,7 +178,7 @@ class RepositoryContractTests(unittest.TestCase):
             init: ["docs/capability-gaps.md"],
             skill: ["docs/capability-gaps.md", "local-only workarounds"],
             workflows: ["Identify required capabilities", "Check `docs/capability-gaps.md`"],
-            initializer: ["docs/capability-gaps.md", "Capability Gap Handling", "TEMPLATE_VERSION = \"0.3.3\""],
+            initializer: ["docs/capability-gaps.md", "Capability Gap Handling", "TEMPLATE_VERSION = \"0.3.4\""],
         }
         for text, phrases in checks.items():
             for phrase in phrases:
@@ -276,7 +276,7 @@ class RepositoryContractTests(unittest.TestCase):
             init: ["docs/feature-decomposition.md"],
             skill: ["docs/feature-decomposition.md", "Split independently verifiable behavior"],
             workflows: ["Use `docs/feature-decomposition.md`", "reject over-bundled features"],
-            initializer: ["docs/feature-decomposition.md", "TEMPLATE_VERSION = \"0.3.3\""],
+            initializer: ["docs/feature-decomposition.md", "TEMPLATE_VERSION = \"0.3.4\""],
         }
         for text, phrases in checks.items():
             for phrase in phrases:
@@ -484,7 +484,7 @@ class RepositoryContractTests(unittest.TestCase):
             init: ["docs/commit-messages.md"],
             skill: ["docs/commit-messages.md", "Fxxx <Action> <concise summary>"],
             workflows: ["Read `docs/commit-messages.md`", "starts with the feature ID", "Verify every feature ID referenced"],
-            initializer: ["docs/commit-messages.md", "TEMPLATE_VERSION = \"0.3.3\""],
+            initializer: ["docs/commit-messages.md", "TEMPLATE_VERSION = \"0.3.4\""],
         }
         for text, phrases in checks.items():
             for phrase in phrases:
@@ -532,7 +532,7 @@ class RepositoryContractTests(unittest.TestCase):
             init: ["docs/example-boundaries.md"],
             skill: ["docs/example-boundaries.md", "Default examples are references"],
             workflows: ["Identify project-owned implementation and verification paths", "do not use default examples as the product implementation surface"],
-            initializer: ["docs/example-boundaries.md", "TEMPLATE_VERSION = \"0.3.3\""],
+            initializer: ["docs/example-boundaries.md", "TEMPLATE_VERSION = \"0.3.4\""],
         }
         for text, phrases in checks.items():
             for phrase in phrases:
@@ -638,6 +638,8 @@ class RepositoryContractTests(unittest.TestCase):
         for phrase in [
             "Default entrypoint:",
             "make work",
+            "make -C .agent-harness work",
+            "A missing root `Makefile` is not an orchestrator-unavailable condition in hidden layout.",
             "Manual fallback must be recorded",
             "must not bypass evaluator pass, evaluator evidence, attempts, failure records, or final `./init.sh` verification",
             "fail closed with clear configuration guidance",
@@ -646,19 +648,19 @@ class RepositoryContractTests(unittest.TestCase):
             self.assertIn(phrase, agents)
 
         checks = {
-            readme: ["The default one-feature work entrypoint is:", "make work", "real orchestrator work fails closed", "Manual Coding Agent work is an explicit fallback"],
-            workflow: ["Use the orchestrator as the default entrypoint", "make work", "Manual fallback must not bypass evaluator pass"],
-            work_prompt: ["Default invocation", "normally dispatched by the orchestrator through `make work`", "explicit fallback"],
-            continue_prompt: ["use `make work` first", "Do not silently fall back from orchestrator adapter failure"],
-            evaluate_prompt: ["orchestrator-first work requirements", "manual fallback record", "silently bypassed the orchestrator-first default entrypoint"],
+            readme: ["The default one-feature work entrypoint is:", "make work", "make -C .agent-harness work", "missing root `Makefile`", "real orchestrator work fails closed", "Manual Coding Agent work is an explicit fallback"],
+            workflow: ["Use the orchestrator as the default entrypoint", "make work", "make -C .agent-harness work", "missing root `Makefile`", "Manual fallback must not bypass evaluator pass"],
+            work_prompt: ["Default invocation", "normally dispatched by the orchestrator through `make work`", "make -C .agent-harness work", "missing root `Makefile`", "explicit fallback"],
+            continue_prompt: ["use `make work` first", "make -C .agent-harness work", "Do not silently fall back from orchestrator adapter failure"],
+            evaluate_prompt: ["orchestrator-first work requirements", "make -C .agent-harness work", "treated a missing root `Makefile` as orchestrator unavailability", "manual fallback record"],
             makefile: ["work:", "python3 orchestrator.py --max-rounds 1"],
             orchestrator: ["ensure_adapter_configured", "provider is not configured for orchestrator-first work", "default work entrypoint is orchestrator-first", "before running orchestrator work"],
             coding_adapter: ["run-agent-provider.py --role coding", "HARNESS_AGENT_PROVIDER_CHECK"],
             evaluator_adapter: ["run-agent-provider.py --role evaluator", "HARNESS_AGENT_PROVIDER_CHECK"],
-            skill: ["orchestrator-first entrypoint", "normally `make work`", "explicit fallback"],
-            workflows: ["Default to orchestrator-first work", "make work", "fail-closed adapter setup gap"],
-            template_agents: ["Default entrypoint:", "make work", "Manual fallback must be recorded"],
-            template_workflows: ["Default to orchestrator-first work", "make work", "fail-closed adapter setup gap"],
+            skill: ["orchestrator-first entrypoint", "normally `make work`", "make -C .agent-harness work", "missing root `Makefile`", "explicit fallback"],
+            workflows: ["Default to orchestrator-first work", "make work", "make -C .agent-harness work", "missing root `Makefile`", "fail-closed adapter setup gap"],
+            template_agents: ["Default entrypoint:", "make work", "make -C .agent-harness work", "Manual fallback must be recorded"],
+            template_workflows: ["Default to orchestrator-first work", "make work", "make -C .agent-harness work", "fail-closed adapter setup gap"],
         }
         for text, phrases in checks.items():
             for phrase in phrases:
@@ -759,7 +761,7 @@ class RepositoryContractTests(unittest.TestCase):
             "next_action",
         ]:
             self.assertIn(phrase, initializer)
-        self.assertEqual(template_manifest["template_version"], "0.3.3")
+        self.assertEqual(template_manifest["template_version"], "0.3.4")
         self.assertEqual(template_manifest["default_layout"], "hidden")
         self.assertIn("hidden", template_manifest["layouts"])
         self.assertIn("visible", template_manifest["layouts"])

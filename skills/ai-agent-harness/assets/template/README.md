@@ -202,7 +202,7 @@ Expected result:
 2. Decompose broad requirements into independently verifiable features using `docs/feature-decomposition.md`.
 3. For a fresh project with an accepted minspec, add a runnable-skeleton feature using `docs/project-recovery-init.md`.
 4. Append new features to `feature_list.json`.
-5. Implement and evaluate one feature through `make work`.
+5. Implement and evaluate one feature through `make work` in visible layout, or `make -C .agent-harness work` from a hidden-layout project root.
 6. Use manual Coding Agent work only as an explicit fallback when adapters are unavailable or the user requests interactive work.
 7. Run `make init`.
 8. Run `make validate FEATURE=Fxxx`.
@@ -215,7 +215,7 @@ Expected result:
 - `make validate FEATURE=Fxxx` validates one feature.
 - `make unit`, `make contract`, and `make smoke` run individual test layers.
 - `make go-example` runs the Go server example tests.
-- `make work` runs one orchestrator round for the next unfinished feature.
+- `make work` runs one orchestrator round for the next unfinished feature in visible layout or from inside `.agent-harness/`.
 - `make dry-run` previews the next orchestrator round.
 - `make summarize` prints progress and run summaries.
 - `make clean` resets project-specific state after copying the template.
@@ -228,6 +228,14 @@ The default one-feature work entrypoint is:
 ```bash
 make work
 ```
+
+In hidden-layout installs, the harness Makefile lives under `.agent-harness/`. From the project root, use:
+
+```bash
+make -C .agent-harness work
+```
+
+or change into `.agent-harness/` and run `make work`. A missing root `Makefile` in hidden layout does not mean orchestrator work is unavailable.
 
 `make work` runs `python3 orchestrator.py --max-rounds 1`. The orchestrator selects one unfinished feature, marks it in progress, increments attempts, dispatches Coding Agent and Evaluator Agent role prompts, and marks the feature done only after evaluator pass.
 

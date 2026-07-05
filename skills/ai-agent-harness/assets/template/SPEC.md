@@ -112,6 +112,26 @@ Implementation paths: `AGENTS.md`, `README.md`, `Makefile`, `docs/agent-workflow
 
 Verification surface: `./init.sh`, contract tests for orchestrator-first language and targets, orchestrator dry-run checks, and feature validation for the new feature.
 
+### Hidden Layout Work Directory
+
+Goal: prevent agents from treating `make work` as missing in installed projects that use the default hidden layout, where the harness Makefile lives under `.agent-harness/` instead of the project root.
+
+Included scope: document the harness work directory resolution rule in root hidden-layout `AGENTS.md`, full harness rules, workflow docs, prompts, README guidance, skill workflow references, and bundled template files. The visible template keeps `make work` as the local command, while hidden-layout installs must direct agents to run `make -C .agent-harness work` or `cd .agent-harness && make work`.
+
+Excluded scope: generating or overwriting a root project `Makefile`, changing provider configuration semantics, changing project-owned source locations, or making manual fallback acceptable merely because the agent started in the project root.
+
+Core flows: an agent starts in a hidden-layout project root; it reads root `AGENTS.md`, sees that `.agent-harness/Makefile` is the harness work target, and runs `make -C .agent-harness work`; an agent starts inside the harness body and runs `make work`; if provider adapters are unconfigured, the existing fail-closed provider guidance still applies.
+
+Constraints: root project files remain project-owned in hidden layout; harness implementation work still belongs under `.agent-harness/` only when the selected feature changes the harness; project feature implementation belongs in project-owned source and test paths; root `./init.sh` remains the project recovery entry point.
+
+Ambiguities or assumptions: hidden-layout user projects may or may not have their own root `Makefile`; therefore the harness must not depend on or overwrite a root `Makefile` for agent orchestration.
+
+Required capabilities: clear directory-sensitive command guidance, generated hidden-layout root instructions, synchronized bundled skill template files, and contract tests that lock the hidden-layout command.
+
+Implementation paths: `AGENTS.md`, `README.md`, `docs/agent-workflow.md`, prompts, `skills/ai-agent-harness/`, bundled template files, `feature_list.json`, `progress.md`, and contract tests.
+
+Verification surface: `python3 -m unittest discover -s test/contract -p 'test_*.py'`, `./init.sh`, and `scripts/validate-feature.sh F035`.
+
 ### Agent Provider Configuration
 
 Goal: let downstream projects explicitly configure which agent provider the orchestrator adapters use, so Codex users can use Codex, Claude Code users can use Claude Code, Cursor users can use Cursor Agent, and no provider is chosen by unsafe guessing.

@@ -20,6 +20,14 @@ Use the orchestrator as the default entrypoint for one selected feature:
 make work
 ```
 
+In visible layout, run this from the repository root. In hidden-layout installs, the harness Makefile lives under `.agent-harness/`; from the project root use:
+
+```bash
+make -C .agent-harness work
+```
+
+or change into `.agent-harness/` and run `make work`. A missing root `Makefile` in hidden layout is not a reason to bypass the orchestrator-first flow.
+
 `make work` runs one orchestrator round for the next unfinished feature. The orchestrator owns feature selection, `in_progress` state, attempt increments, Coding Agent dispatch, Evaluator Agent dispatch, pass/fail state transitions, failure records, and evaluator-gated completion.
 
 Before real provider execution, configure `agent-provider.json` from `agent-provider.example.json` using `docs/agent-provider-configuration.md`. Missing, ambiguous, or unavailable provider setup is a capability gap and must fail closed before completion.
@@ -58,7 +66,7 @@ Use `prompts/continue.md` after interruptions.
 
 Continuation reconstructs context from repository files and git history only.
 
-When implementation or evaluation remains, continue through `make work` first. Use manual continuation only as an explicit fallback when adapters are unavailable or the user asks for interactive/manual work.
+When implementation or evaluation remains, continue through `make work` first, using `make -C .agent-harness work` from the project root in hidden-layout installs. Use manual continuation only as an explicit fallback when adapters are unavailable or the user asks for interactive/manual work.
 
 ## Finalize And Commit
 

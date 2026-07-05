@@ -618,6 +618,23 @@
       "attempts": 1,
       "last_error": "",
       "priority": "P0"
+    },
+    {
+      "id": "F035",
+      "title": "Clarify hidden-layout work directory",
+      "description": "Update hidden-layout harness guidance so agents know that the orchestrator Makefile lives under .agent-harness/ and must run make from that directory instead of treating make work as unavailable from the project root.",
+      "acceptance": [
+        "Generated hidden-layout root AGENTS.md tells agents to run `make -C .agent-harness work` or `cd .agent-harness && make work` for orchestrator work",
+        "AGENTS.md, docs/agent-workflow.md, prompts, README.md, SKILL.md, workflow references, and bundled template files distinguish visible-layout `make work` from hidden-layout harness work directory usage",
+        "Guidance says a missing root Makefile in hidden layout is not a reason to bypass the orchestrator-first flow",
+        "Contract tests verify hidden-layout work-directory guidance",
+        "./init.sh and scripts/validate-feature.sh F035 pass after evaluator evidence is recorded"
+      ],
+      "passes": true,
+      "status": "done",
+      "attempts": 1,
+      "last_error": "",
+      "priority": "P0"
     }
   ]
 }

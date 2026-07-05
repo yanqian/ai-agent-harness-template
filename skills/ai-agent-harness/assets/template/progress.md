@@ -46,12 +46,13 @@ Implemented components:
 - New-project flow guide with a one-screen Mermaid diagram linking skill initialization, minspec planning, runnable skeleton, provider setup, orchestrator work, evaluator evidence, init verification, and commit approval.
 - Final role verdict normalization so historical run evidence echoed by agents cannot override final Coding Agent or Evaluator Agent pass/fail lines, and structured pass verdicts can recover provider exit-code contradictions.
 - Provider runtime preflight checks so configured agent providers can report permission gaps before feature state is mutated and outer agents can request user-approved escalation.
+- Hidden-layout work-directory guidance so agents run `make -C .agent-harness work` from installed project roots instead of treating a missing root `Makefile` as orchestrator unavailability.
 - Tiny dependency-free Python CLI example in `examples/tiny-cli/`.
 - Dependency-free Go server example in `examples/go-server/`.
 
 ## Last Completed Feature
 
-`F034` - Preflight provider runtime permissions.
+`F035` - Clarify hidden-layout work directory.
 
 ## Next Feature
 
@@ -71,3 +72,4 @@ Implemented components:
 - F032 added `docs/new-project-flow.md` and README onboarding link so new users can see the full skill-assisted path at a glance.
 - F033 fixed final role verdict parsing and synchronized the fix into the bundled skill template; downstream installed projects should receive the same harness file update.
 - F034 added provider runtime preflight commands and a machine-readable `PROVIDER_RUNTIME_PERMISSION_REQUIRED` marker so outer agents can ask users to approve escalated provider runtime execution.
+- F035 used explicit manual fallback because provider adapters are intentionally unconfigured in this template checkout. It clarified that hidden-layout installs should use `make -C .agent-harness work` from the project root or `make work` inside `.agent-harness/`, synchronized the bundled skill template, bumped the template version to 0.3.4, and added contract plus initializer coverage.

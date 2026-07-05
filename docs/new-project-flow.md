@@ -78,6 +78,8 @@ Run one real orchestrator round after provider configuration:
 make work
 ```
 
+From a hidden-layout project root, use `make -C .agent-harness work` instead because the harness Makefile lives inside `.agent-harness/`.
+
 ## Required Follow-On Decisions
 
 Before a minspec exists, root `./init.sh` may only prove that the harness is runnable. After a minspec is accepted, the first project setup feature must turn root `./init.sh` into the recovery contract:

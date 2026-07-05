@@ -14,7 +14,7 @@ SKILL_DIR = Path(__file__).resolve().parents[1]
 BUNDLED_TEMPLATE = SKILL_DIR / "assets" / "template"
 TEMPLATE_MANIFEST = ".agent-harness-template.json"
 INSTALL_MANIFEST = ".agent-harness/manifest.json"
-TEMPLATE_VERSION = "0.3.3"
+TEMPLATE_VERSION = "0.3.4"
 MODE_CHOICES = {"new", "adopt", "repair", "check"}
 LAYOUT_CHOICES = {"hidden", "visible"}
 DEFAULT_LAYOUT = "hidden"
@@ -184,6 +184,14 @@ Before planning, coding, evaluating, or resuming work:
 
 Full harness rules live in `.agent-harness/AGENTS.md`.
 Project-specific implementation should live in project-owned source and test paths, not in `.agent-harness/` unless the selected feature explicitly changes the harness.
+
+For orchestrator work, the harness Makefile is inside `.agent-harness/`. From the project root, run:
+
+```bash
+make -C .agent-harness work
+```
+
+Equivalently, run `cd .agent-harness && make work`. Do not treat a missing root `Makefile` as a reason to bypass the orchestrator-first workflow.
 
 Root `./init.sh` starts as harness verification only. Before a minspec exists, it proves the harness can plan and resume. After minspec acceptance, plan a runnable-skeleton feature that turns root `./init.sh` into the project recovery contract described in `.agent-harness/docs/project-recovery-init.md`.
 
