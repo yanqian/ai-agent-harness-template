@@ -178,7 +178,7 @@ class RepositoryContractTests(unittest.TestCase):
             init: ["docs/capability-gaps.md"],
             skill: ["docs/capability-gaps.md", "local-only workarounds"],
             workflows: ["Identify required capabilities", "Check `docs/capability-gaps.md`"],
-            initializer: ["docs/capability-gaps.md", "Capability Gap Handling", "TEMPLATE_VERSION = \"0.3.5\""],
+            initializer: ["docs/capability-gaps.md", "Capability Gap Handling", "TEMPLATE_VERSION = \"0.3.6\""],
         }
         for text, phrases in checks.items():
             for phrase in phrases:
@@ -276,7 +276,7 @@ class RepositoryContractTests(unittest.TestCase):
             init: ["docs/feature-decomposition.md"],
             skill: ["docs/feature-decomposition.md", "Split independently verifiable behavior"],
             workflows: ["Use `docs/feature-decomposition.md`", "reject over-bundled features"],
-            initializer: ["docs/feature-decomposition.md", "TEMPLATE_VERSION = \"0.3.5\""],
+            initializer: ["docs/feature-decomposition.md", "TEMPLATE_VERSION = \"0.3.6\""],
         }
         for text, phrases in checks.items():
             for phrase in phrases:
@@ -484,7 +484,7 @@ class RepositoryContractTests(unittest.TestCase):
             init: ["docs/commit-messages.md"],
             skill: ["docs/commit-messages.md", "Fxxx <Action> <concise summary>"],
             workflows: ["Read `docs/commit-messages.md`", "starts with the feature ID", "Verify every feature ID referenced"],
-            initializer: ["docs/commit-messages.md", "TEMPLATE_VERSION = \"0.3.5\""],
+            initializer: ["docs/commit-messages.md", "TEMPLATE_VERSION = \"0.3.6\""],
         }
         for text, phrases in checks.items():
             for phrase in phrases:
@@ -532,7 +532,7 @@ class RepositoryContractTests(unittest.TestCase):
             init: ["docs/example-boundaries.md"],
             skill: ["docs/example-boundaries.md", "Default examples are references"],
             workflows: ["Identify project-owned implementation and verification paths", "do not use default examples as the product implementation surface"],
-            initializer: ["docs/example-boundaries.md", "TEMPLATE_VERSION = \"0.3.5\""],
+            initializer: ["docs/example-boundaries.md", "TEMPLATE_VERSION = \"0.3.6\""],
         }
         for text, phrases in checks.items():
             for phrase in phrases:
@@ -761,7 +761,7 @@ class RepositoryContractTests(unittest.TestCase):
             "next_action",
         ]:
             self.assertIn(phrase, initializer)
-        self.assertEqual(template_manifest["template_version"], "0.3.5")
+        self.assertEqual(template_manifest["template_version"], "0.3.6")
         self.assertEqual(template_manifest["default_layout"], "hidden")
         self.assertIn("hidden", template_manifest["layouts"])
         self.assertIn("visible", template_manifest["layouts"])
@@ -960,13 +960,16 @@ class RepositoryContractTests(unittest.TestCase):
         orchestrator = (ROOT / "orchestrator.py").read_text()
         skill = (ROOT / "skills" / "ai-agent-harness" / "SKILL.md").read_text()
         workflows = (ROOT / "skills" / "ai-agent-harness" / "references" / "workflows.md").read_text()
+        template_agents = (ROOT / "skills" / "ai-agent-harness" / "assets" / "template" / "AGENTS.md").read_text()
         template_makefile = (ROOT / "skills" / "ai-agent-harness" / "assets" / "template" / "Makefile").read_text()
         template_orchestrator = (ROOT / "skills" / "ai-agent-harness" / "assets" / "template" / "orchestrator.py").read_text()
         template_fast_prompt = (ROOT / "skills" / "ai-agent-harness" / "assets" / "template" / "prompts" / "work-fast.md").read_text()
         template_workflows = (ROOT / "skills" / "ai-agent-harness" / "assets" / "template" / "skills" / "ai-agent-harness" / "references" / "workflows.md").read_text()
+        initializer = (ROOT / "skills" / "ai-agent-harness" / "scripts" / "init_harness.py").read_text()
+        template_initializer = (ROOT / "skills" / "ai-agent-harness" / "assets" / "template" / "skills" / "ai-agent-harness" / "scripts" / "init_harness.py").read_text()
 
         checks = {
-            agents: ["make work-fast", "A/B alternative", "separate cold-start Evaluator Agent child process", "coding evidence cannot substitute for evaluator evidence"],
+            agents: ["Preferred interactive mode", "make work-fast", "current agent/provider-native session", "FAST_CODING_EVIDENCE: Fxxx", "Use baseline `make work`"],
             readme: ["make work-fast", "fast A/B", "FAST_CODING_EVIDENCE: Fxxx", "must not write `EVAL_PASS: Fxxx`", "status=done", "passes=true"],
             workflow: ["make work-fast", "does not invoke the Coding Agent role adapter", "FAST_CODING_EVIDENCE: Fxxx", "separate cold-start child process"],
             fast_prompt: ["Work-Fast Coding Handoff", "does not invoke the Coding Agent role adapter", "FAST_CODING_EVIDENCE: Fxxx", "Do not write `EVAL_PASS: Fxxx`", "Do not mark the selected feature `passes=true` or `status=done`"],
@@ -976,10 +979,13 @@ class RepositoryContractTests(unittest.TestCase):
             orchestrator: ["--work-fast", "FAST_CODING_EVIDENCE_PREFIX", "FAST_CODING_HANDOFF_PREFIX", "fast_coding_evidence_result", "EVALUATOR_AGENT_ADAPTER"],
             skill: ["make work-fast", "provider-native coding", "must not write `EVAL_PASS: Fxxx`"],
             workflows: ["make work-fast", "FAST_CODING_EVIDENCE: Fxxx", "separate cold-start Evaluator Agent child process"],
+            template_agents: ["Preferred interactive mode", "make work-fast", "current agent/provider-native session", "FAST_CODING_EVIDENCE: Fxxx", "Use baseline `make work`"],
             template_makefile: ["work-fast:", "python3 orchestrator.py --work-fast --max-rounds 1"],
             template_orchestrator: ["--work-fast", "FAST_CODING_EVIDENCE_PREFIX", "fast_coding_evidence_result"],
             template_fast_prompt: ["Work-Fast Coding Handoff", "FAST_CODING_EVIDENCE: Fxxx", "Do not write `EVAL_PASS: Fxxx`"],
             template_workflows: ["make work-fast", "FAST_CODING_EVIDENCE: Fxxx", "separate cold-start Evaluator Agent child process"],
+            initializer: ["Preferred interactive mode", "make -C .agent-harness work-fast", "FAST_CODING_EVIDENCE: Fxxx", "Use baseline `make -C .agent-harness work`"],
+            template_initializer: ["Preferred interactive mode", "make -C .agent-harness work-fast", "FAST_CODING_EVIDENCE: Fxxx", "Use baseline `make -C .agent-harness work`"],
         }
         for text, phrases in checks.items():
             for phrase in phrases:
