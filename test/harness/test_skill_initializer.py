@@ -59,6 +59,15 @@ def run_project_init(project: Path):
     )
 
 
+def run_installed_contract_tests(project: Path):
+    return subprocess.run(
+        [sys.executable, "-m", "unittest", "discover", "-s", "test/contract"],
+        cwd=project / ".agent-harness",
+        text=True,
+        capture_output=True,
+    )
+
+
 class SkillInitializerHarnessTests(unittest.TestCase):
     EXECUTABLE_PATHS = [
         "init.sh",
@@ -87,7 +96,7 @@ class SkillInitializerHarnessTests(unittest.TestCase):
             data = json.loads((project / ".agent-harness" / "feature_list.json").read_text())
             self.assertEqual(data, {"features": []})
             manifest = json.loads((project / ".agent-harness" / "manifest.json").read_text())
-            self.assertEqual(manifest["template_version"], "0.3.7")
+            self.assertEqual(manifest["template_version"], "0.3.8")
             self.assertEqual(manifest["layout"], "hidden")
             self.assertIn("category", manifest["files"][".agent-harness/scripts/validate-state.py"])
             self.assertTrue((project / "AGENTS.md").exists())
@@ -123,8 +132,8 @@ class SkillInitializerHarnessTests(unittest.TestCase):
             check = run_initializer(project, "check")
             self.assertEqual(check.returncode, 0, check.stdout + check.stderr)
             self.assertIn("layout=hidden", check.stdout)
-            self.assertIn("template_version=0.3.7", check.stdout)
-            self.assertIn("installed_version=0.3.7", check.stdout)
+            self.assertIn("template_version=0.3.8", check.stdout)
+            self.assertIn("installed_version=0.3.8", check.stdout)
             self.assertIn("state_valid=true", check.stdout)
             self.assertIn("runnable_harness=true", check.stdout)
             self.assertIn("project_state_changed=", check.stdout)
@@ -263,7 +272,9 @@ class SkillInitializerHarnessTests(unittest.TestCase):
                 "## Next Feature\n\nF123\n\n"
                 "## Known Issues\n\nNone.\n"
             )
+            custom_spec = "# Project SPEC\n\nProject-owned requirements replace template-specific SPEC prose.\n"
             custom_init = "#!/usr/bin/env bash\nset -euo pipefail\necho project recovery\n"
+            (project / ".agent-harness" / "SPEC.md").write_text(custom_spec)
             (project / ".agent-harness" / "feature_list.json").write_text(json.dumps(custom_features, indent=2) + "\n")
             (project / ".agent-harness" / "progress.md").write_text(custom_progress)
             (project / "init.sh").write_text(custom_init)
@@ -293,13 +304,16 @@ class SkillInitializerHarnessTests(unittest.TestCase):
             self.assertIn("work-fast:", (project / ".agent-harness" / "Makefile").read_text())
             self.assertTrue((project / ".agent-harness" / "prompts" / "work-fast.md").exists())
             self.assertNotIn("old static drift", (project / ".agent-harness" / "scripts" / "validate-state.py").read_text())
+            self.assertEqual((project / ".agent-harness" / "SPEC.md").read_text(), custom_spec)
             self.assertEqual(json.loads((project / ".agent-harness" / "feature_list.json").read_text()), custom_features)
             self.assertEqual((project / ".agent-harness" / "progress.md").read_text(), custom_progress)
             self.assertEqual((project / "init.sh").read_text(), custom_init)
             self.assertFalse((project / ".agent-harness" / "skills" / "ai-agent-harness" / "assets").exists())
             upgraded_manifest = json.loads(manifest_path.read_text())
-            self.assertEqual(upgraded_manifest["template_version"], "0.3.7")
+            self.assertEqual(upgraded_manifest["template_version"], "0.3.8")
             self.assertEqual(upgraded_manifest["mode"], "upgrade")
+            contracts = run_installed_contract_tests(project)
+            self.assertEqual(contracts.returncode, 0, contracts.stdout + contracts.stderr)
 
     def test_check_reports_complete_diagnostics_and_version_drift(self):
         with tempfile.TemporaryDirectory() as tmp_dir:
@@ -318,7 +332,7 @@ class SkillInitializerHarnessTests(unittest.TestCase):
             self.assertEqual(check.returncode, 1)
             for phrase in [
                 "mode=check",
-                "template_version=0.3.7",
+                "template_version=0.3.8",
                 "installed_version=0.0.0",
                 "state_valid=false",
                 "runnable_harness=false",
