@@ -178,7 +178,7 @@ class RepositoryContractTests(unittest.TestCase):
             init: ["docs/capability-gaps.md"],
             skill: ["docs/capability-gaps.md", "local-only workarounds"],
             workflows: ["Identify required capabilities", "Check `docs/capability-gaps.md`"],
-            initializer: ["docs/capability-gaps.md", "Capability Gap Handling", "TEMPLATE_VERSION = \"0.3.4\""],
+            initializer: ["docs/capability-gaps.md", "Capability Gap Handling", "TEMPLATE_VERSION = \"0.3.5\""],
         }
         for text, phrases in checks.items():
             for phrase in phrases:
@@ -276,7 +276,7 @@ class RepositoryContractTests(unittest.TestCase):
             init: ["docs/feature-decomposition.md"],
             skill: ["docs/feature-decomposition.md", "Split independently verifiable behavior"],
             workflows: ["Use `docs/feature-decomposition.md`", "reject over-bundled features"],
-            initializer: ["docs/feature-decomposition.md", "TEMPLATE_VERSION = \"0.3.4\""],
+            initializer: ["docs/feature-decomposition.md", "TEMPLATE_VERSION = \"0.3.5\""],
         }
         for text, phrases in checks.items():
             for phrase in phrases:
@@ -484,7 +484,7 @@ class RepositoryContractTests(unittest.TestCase):
             init: ["docs/commit-messages.md"],
             skill: ["docs/commit-messages.md", "Fxxx <Action> <concise summary>"],
             workflows: ["Read `docs/commit-messages.md`", "starts with the feature ID", "Verify every feature ID referenced"],
-            initializer: ["docs/commit-messages.md", "TEMPLATE_VERSION = \"0.3.4\""],
+            initializer: ["docs/commit-messages.md", "TEMPLATE_VERSION = \"0.3.5\""],
         }
         for text, phrases in checks.items():
             for phrase in phrases:
@@ -532,7 +532,7 @@ class RepositoryContractTests(unittest.TestCase):
             init: ["docs/example-boundaries.md"],
             skill: ["docs/example-boundaries.md", "Default examples are references"],
             workflows: ["Identify project-owned implementation and verification paths", "do not use default examples as the product implementation surface"],
-            initializer: ["docs/example-boundaries.md", "TEMPLATE_VERSION = \"0.3.4\""],
+            initializer: ["docs/example-boundaries.md", "TEMPLATE_VERSION = \"0.3.5\""],
         }
         for text, phrases in checks.items():
             for phrase in phrases:
@@ -608,9 +608,9 @@ class RepositoryContractTests(unittest.TestCase):
         readme = (ROOT / "README.md").read_text()
         init = (ROOT / "scripts" / "init.sh").read_text()
 
-        for target in ["init:", "test:", "validate:", "unit:", "contract:", "smoke:", "go-example:", "work:", "dry-run:", "summarize:", "clean:", "ci:"]:
+        for target in ["init:", "test:", "validate:", "unit:", "contract:", "smoke:", "go-example:", "work:", "work-fast:", "dry-run:", "summarize:", "clean:", "ci:"]:
             self.assertIn(target, makefile)
-        for phrase in ["./init.sh", "scripts/validate-feature.sh $(FEATURE)", "python3 orchestrator.py --max-rounds 1", "python3 orchestrator.py --dry-run", "python3 scripts/clean-state.py", "$(MAKE) validate FEATURE=F001"]:
+        for phrase in ["./init.sh", "scripts/validate-feature.sh $(FEATURE)", "python3 orchestrator.py --max-rounds 1", "python3 orchestrator.py --work-fast --max-rounds 1", "python3 orchestrator.py --dry-run", "python3 scripts/clean-state.py", "$(MAKE) validate FEATURE=F001"]:
             self.assertIn(phrase, makefile)
         for phrase in ["push:", "pull_request:", "workflow_dispatch:", "actions/checkout@v4", "actions/setup-go@v5", "make ci"]:
             self.assertIn(phrase, workflow)
@@ -650,7 +650,7 @@ class RepositoryContractTests(unittest.TestCase):
         checks = {
             readme: ["The default one-feature work entrypoint is:", "make work", "make -C .agent-harness work", "missing root `Makefile`", "real orchestrator work fails closed", "Manual Coding Agent work is an explicit fallback"],
             workflow: ["Use the orchestrator as the default entrypoint", "make work", "make -C .agent-harness work", "missing root `Makefile`", "Manual fallback must not bypass evaluator pass"],
-            work_prompt: ["Default invocation", "normally dispatched by the orchestrator through `make work`", "make -C .agent-harness work", "missing root `Makefile`", "explicit fallback"],
+            work_prompt: ["Default invocation", "baseline `make work`, not the fast `make work-fast` handoff", "make -C .agent-harness work", "missing root `Makefile`", "explicit fallback"],
             continue_prompt: ["use `make work` first", "make -C .agent-harness work", "Do not silently fall back from orchestrator adapter failure"],
             evaluate_prompt: ["orchestrator-first work requirements", "make -C .agent-harness work", "treated a missing root `Makefile` as orchestrator unavailability", "manual fallback record"],
             makefile: ["work:", "python3 orchestrator.py --max-rounds 1"],
@@ -761,7 +761,7 @@ class RepositoryContractTests(unittest.TestCase):
             "next_action",
         ]:
             self.assertIn(phrase, initializer)
-        self.assertEqual(template_manifest["template_version"], "0.3.4")
+        self.assertEqual(template_manifest["template_version"], "0.3.5")
         self.assertEqual(template_manifest["default_layout"], "hidden")
         self.assertIn("hidden", template_manifest["layouts"])
         self.assertIn("visible", template_manifest["layouts"])
@@ -948,6 +948,42 @@ class RepositoryContractTests(unittest.TestCase):
             "if args.eval_only:",
         ]:
             self.assertIn(phrase, text)
+
+    def test_work_fast_flow_is_documented_and_evaluator_gated(self):
+        agents = (ROOT / "AGENTS.md").read_text()
+        readme = (ROOT / "README.md").read_text()
+        workflow = (ROOT / "docs" / "agent-workflow.md").read_text()
+        fast_prompt = (ROOT / "prompts" / "work-fast.md").read_text()
+        continue_prompt = (ROOT / "prompts" / "continue.md").read_text()
+        evaluate_prompt = (ROOT / "prompts" / "evaluate.md").read_text()
+        makefile = (ROOT / "Makefile").read_text()
+        orchestrator = (ROOT / "orchestrator.py").read_text()
+        skill = (ROOT / "skills" / "ai-agent-harness" / "SKILL.md").read_text()
+        workflows = (ROOT / "skills" / "ai-agent-harness" / "references" / "workflows.md").read_text()
+        template_makefile = (ROOT / "skills" / "ai-agent-harness" / "assets" / "template" / "Makefile").read_text()
+        template_orchestrator = (ROOT / "skills" / "ai-agent-harness" / "assets" / "template" / "orchestrator.py").read_text()
+        template_fast_prompt = (ROOT / "skills" / "ai-agent-harness" / "assets" / "template" / "prompts" / "work-fast.md").read_text()
+        template_workflows = (ROOT / "skills" / "ai-agent-harness" / "assets" / "template" / "skills" / "ai-agent-harness" / "references" / "workflows.md").read_text()
+
+        checks = {
+            agents: ["make work-fast", "A/B alternative", "separate cold-start Evaluator Agent child process", "coding evidence cannot substitute for evaluator evidence"],
+            readme: ["make work-fast", "fast A/B", "FAST_CODING_EVIDENCE: Fxxx", "must not write `EVAL_PASS: Fxxx`", "status=done", "passes=true"],
+            workflow: ["make work-fast", "does not invoke the Coding Agent role adapter", "FAST_CODING_EVIDENCE: Fxxx", "separate cold-start child process"],
+            fast_prompt: ["Work-Fast Coding Handoff", "does not invoke the Coding Agent role adapter", "FAST_CODING_EVIDENCE: Fxxx", "Do not write `EVAL_PASS: Fxxx`", "Do not mark the selected feature `passes=true` or `status=done`"],
+            continue_prompt: ["make work-fast", "FAST_CODING_EVIDENCE: Fxxx", "separate cold-start Evaluator Agent child process"],
+            evaluate_prompt: ["make work-fast", "FAST_CODING_EVIDENCE: Fxxx", "coding-phase evaluator pass spoofing", "separate cold-start Evaluator Agent child process"],
+            makefile: ["work-fast:", "python3 orchestrator.py --work-fast --max-rounds 1"],
+            orchestrator: ["--work-fast", "FAST_CODING_EVIDENCE_PREFIX", "FAST_CODING_HANDOFF_PREFIX", "fast_coding_evidence_result", "EVALUATOR_AGENT_ADAPTER"],
+            skill: ["make work-fast", "provider-native coding", "must not write `EVAL_PASS: Fxxx`"],
+            workflows: ["make work-fast", "FAST_CODING_EVIDENCE: Fxxx", "separate cold-start Evaluator Agent child process"],
+            template_makefile: ["work-fast:", "python3 orchestrator.py --work-fast --max-rounds 1"],
+            template_orchestrator: ["--work-fast", "FAST_CODING_EVIDENCE_PREFIX", "fast_coding_evidence_result"],
+            template_fast_prompt: ["Work-Fast Coding Handoff", "FAST_CODING_EVIDENCE: Fxxx", "Do not write `EVAL_PASS: Fxxx`"],
+            template_workflows: ["make work-fast", "FAST_CODING_EVIDENCE: Fxxx", "separate cold-start Evaluator Agent child process"],
+        }
+        for text, phrases in checks.items():
+            for phrase in phrases:
+                self.assertIn(phrase, text)
         self.assertNotIn("HARNESS_AGENT_COMMAND", text)
 
     def test_orchestrator_uses_explicit_role_adapters(self):

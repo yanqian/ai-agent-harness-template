@@ -84,6 +84,8 @@ When project work touches `examples/`, follow the target repository's `docs/exam
 
 For one-feature implementation and evaluation, default to the repository's orchestrator-first entrypoint, normally `make work`. In hidden-layout installs, run `make -C .agent-harness work` from the project root, or `make work` from inside `.agent-harness/`; a missing root `Makefile` is not an orchestrator-unavailable condition. Manual or interactive Coding Agent work is an explicit fallback only when role adapters are unavailable or the user asks for manual work; it must not bypass evaluator gating, evaluator evidence, or final `./init.sh` verification.
 
+Use `make work-fast` only as the evaluator-gated fast A/B alternative to `make work`: provider-native coding must record `FAST_CODING_EVIDENCE: Fxxx` and `CODING_PASS: Fxxx`, must not write `EVAL_PASS: Fxxx`, and must rerun the orchestrator so a separate cold-start Evaluator Agent child process gates completion.
+
 When `make work` needs real agent execution, configure the target repository's provider contract from `agent-provider.example.json` using `docs/agent-provider-configuration.md`. Do not guess between Codex, Claude Code, Cursor Agent, or custom providers; missing or ambiguous provider setup is a capability gap.
 
 ## Commit Boundary

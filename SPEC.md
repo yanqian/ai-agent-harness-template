@@ -112,6 +112,26 @@ Implementation paths: `AGENTS.md`, `README.md`, `Makefile`, `docs/agent-workflow
 
 Verification surface: `./init.sh`, contract tests for orchestrator-first language and targets, orchestrator dry-run checks, and feature validation for the new feature.
 
+### Work-Fast Evaluator-Gated Mode
+
+Goal: add an A/B-testable fast work entrypoint that avoids an extra Coding Agent child process while preserving mandatory cold-start Evaluator Agent isolation and evaluator-gated completion.
+
+Included scope: add a `make work-fast` entrypoint and orchestrator mode that selects one unfinished feature, marks it `in_progress`, increments attempts, emits a Coding Agent prompt or handoff for the current configured provider surface to execute without spawning the Coding Agent role adapter, requires coding evidence from that implementation phase, then always runs the Evaluator Agent adapter in a separate child process before any feature can be marked done. The mode must remain provider-neutral: Codex, Claude Code, Cursor Agent, or a custom provider may perform the coding phase when that provider is the selected implementation surface.
+
+Excluded scope: weakening evaluator evidence, making evaluator child execution optional, allowing the coding phase to write `EVAL_PASS`, automatically committing work, replacing the existing two-child-process `make work` flow, or using chat history as durable state.
+
+Core flows: a user runs `make work-fast`; the harness performs the startup protocol, selects one unfinished feature, marks it in progress, increments attempts, and prints or records the selected feature plus coding instructions for provider-native implementation; the coding phase updates project files and writes coding evidence but does not mark the feature done; the harness resumes the fast flow and runs the Evaluator Agent child process cold against repository state, git diff, acceptance criteria, and `QUALITY.md`; only a matching `EVAL_PASS: Fxxx` allows the harness to set `passes=true` and `status=done`; evaluator failure leaves durable failure evidence and a non-done feature state.
+
+Constraints: `make work` remains the baseline two-child-process orchestrator flow for unattended/batch comparison; `make work-fast` must not silently skip evaluator execution; the Evaluator Agent must reconstruct context from repository files and git history; coding evidence cannot substitute for evaluator evidence; state transitions must preserve one-feature-per-round, attempts, failure records, and final `./init.sh` verification.
+
+Ambiguities or assumptions: the fast mode is intended for interactive/provider-native coding where the current agent surface can perform implementation more quickly than a nested Coding Agent process. If no coding evidence exists when the fast flow reaches evaluation, the feature must not be marked done merely because local tests pass.
+
+Required capabilities: a deterministic `work-fast` make target, orchestrator CLI support for the fast mode or equivalent scripts, durable coding-evidence requirements, mandatory evaluator child adapter invocation, clear documentation that `work-fast` is an A/B alternative to `work`, and tests that prove evaluator gating remains mandatory.
+
+Implementation paths: `Makefile`, `orchestrator.py`, `AGENTS.md`, `README.md`, `docs/agent-workflow.md`, `prompts/`, `skills/ai-agent-harness/`, bundled template files, unit tests, contract tests, `feature_list.json`, `progress.md`, and `runs/`.
+
+Verification surface: `./init.sh`, `make work-fast --dry-run` or the documented dry-run equivalent, unit tests for orchestrator fast-mode state and evaluator requirements, contract tests for documentation and prompt guardrails, and `scripts/validate-feature.sh F036`.
+
 ### Hidden Layout Work Directory
 
 Goal: prevent agents from treating `make work` as missing in installed projects that use the default hidden layout, where the harness Makefile lives under `.agent-harness/` instead of the project root.

@@ -30,6 +30,12 @@ or change into `.agent-harness/` and run `make work`. A missing root `Makefile` 
 
 `make work` runs one orchestrator round for the next unfinished feature. The orchestrator owns feature selection, `in_progress` state, attempt increments, Coding Agent dispatch, Evaluator Agent dispatch, pass/fail state transitions, failure records, and evaluator-gated completion.
 
+Use `make work-fast` only as the fast A/B alternative to `make work`.
+
+`make work-fast` selects or resumes one unfinished feature and preserves the same one-feature-per-round state safety, but it does not invoke the Coding Agent role adapter. Instead, it records a fast coding handoff and requires the provider-native coding phase to write durable run evidence containing `FAST_CODING_EVIDENCE: Fxxx` and `CODING_PASS: Fxxx`.
+
+Fast coding evidence must not contain `EVAL_PASS: Fxxx`, must not mark the feature done, and cannot substitute for evaluator evidence. After coding evidence exists, rerun `make work-fast`; the orchestrator must invoke the Evaluator Agent adapter as a separate cold-start child process before any fast-flow feature can become `status=done` and `passes=true`.
+
 Before real provider execution, configure `agent-provider.json` from `agent-provider.example.json` using `docs/agent-provider-configuration.md`. Missing, ambiguous, or unavailable provider setup is a capability gap and must fail closed before completion.
 
 Use `prompts/work.md` manually only as an explicit fallback when role adapters are not configured, unavailable, or the user asks for interactive work.
@@ -66,7 +72,7 @@ Use `prompts/continue.md` after interruptions.
 
 Continuation reconstructs context from repository files and git history only.
 
-When implementation or evaluation remains, continue through `make work` first, using `make -C .agent-harness work` from the project root in hidden-layout installs. Use manual continuation only as an explicit fallback when adapters are unavailable or the user asks for interactive/manual work.
+When implementation or evaluation remains, continue through `make work` first, using `make -C .agent-harness work` from the project root in hidden-layout installs. Use `make work-fast` only when continuing a recorded fast A/B handoff or starting one intentionally. Use manual continuation only as an explicit fallback when adapters are unavailable or the user asks for interactive/manual work.
 
 ## Finalize And Commit
 

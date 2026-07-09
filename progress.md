@@ -47,12 +47,13 @@ Implemented components:
 - Final role verdict normalization so historical run evidence echoed by agents cannot override final Coding Agent or Evaluator Agent pass/fail lines, and structured pass verdicts can recover provider exit-code contradictions.
 - Provider runtime preflight checks so configured agent providers can report permission gaps before feature state is mutated and outer agents can request user-approved escalation.
 - Hidden-layout work-directory guidance so agents run `make -C .agent-harness work` from installed project roots instead of treating a missing root `Makefile` as orchestrator unavailability.
+- Evaluator-gated `make work-fast`, including fast handoff/evidence parsing, mandatory evaluator-child gating, documentation, tests, bundled template sync, and evaluator pass evidence.
 - Tiny dependency-free Python CLI example in `examples/tiny-cli/`.
 - Dependency-free Go server example in `examples/go-server/`.
 
 ## Last Completed Feature
 
-`F035` - Clarify hidden-layout work directory.
+`F036` - Add evaluator-gated work-fast mode.
 
 ## Next Feature
 
@@ -63,6 +64,7 @@ Implemented components:
 - The template orchestrator is intentionally lightweight and vendor-neutral.
 - `agent-provider.json` is intentionally absent by default; copy `agent-provider.example.json` and select an explicit provider before real `make work` execution.
 - `F011` remains a P2 backlog item and should not preempt the new P0 orchestrator-first work.
+- `F036` is a P0 A/B workflow experiment: keep `make work` as the two-child-process baseline and add `make work-fast` with provider-native coding plus mandatory cold-start evaluator child gating.
 
 ## Recovery Notes
 
@@ -73,3 +75,5 @@ Implemented components:
 - F033 fixed final role verdict parsing and synchronized the fix into the bundled skill template; downstream installed projects should receive the same harness file update.
 - F034 added provider runtime preflight commands and a machine-readable `PROVIDER_RUNTIME_PERMISSION_REQUIRED` marker so outer agents can ask users to approve escalated provider runtime execution.
 - F035 used explicit manual fallback because provider adapters are intentionally unconfigured in this template checkout. It clarified that hidden-layout installs should use `make -C .agent-harness work` from the project root or `make work` inside `.agent-harness/`, synchronized the bundled skill template, bumped the template version to 0.3.4, and added contract plus initializer coverage.
+- F036 planning was added on branch `codex-work-fast-flow`. The first orchestrated `make work` attempt received approved escalated runtime execution but failed before implementation because the local Codex provider command started outside a trusted repository root: `Not inside a trusted directory and --skip-git-repo-check was not specified.` The failure is recorded in `runs/20260707T095608Z-F036-failure.md`; retry requires correcting local provider working directory/trust configuration rather than manual feature implementation.
+- F036 was completed through the orchestrator after the local provider command was corrected. Coding evidence is recorded in `runs/20260707T152121Z-F036-work-fast-coding.md`, evaluator approval is recorded as `EVAL_PASS: F036` in `runs/20260707T152614Z-F036-evaluation.md`, and final `./init.sh` plus `scripts/validate-feature.sh F036` passed.

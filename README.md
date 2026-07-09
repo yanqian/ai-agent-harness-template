@@ -76,8 +76,9 @@ For the complete first-project path, see [New Project Flow](docs/new-project-flo
 4. Add your first feature to `feature_list.json`.
 5. Run `make init`.
 6. Configure role adapters when you want unattended agent execution, then run one feature through `make work`.
-7. Ask Codex, Claude Code, Cursor Agent, or another coding agent to follow `AGENTS.md` only as an explicit manual fallback when adapters are unavailable or interactive work is requested.
-8. Validate one feature with `make validate FEATURE=F001`.
+7. Use `make work-fast` only when you want the fast A/B flow: provider-native coding evidence first, then a mandatory cold-start Evaluator Agent child process.
+8. Ask Codex, Claude Code, Cursor Agent, or another coding agent to follow `AGENTS.md` only as an explicit manual fallback when adapters are unavailable or interactive work is requested.
+9. Validate one feature with `make validate FEATURE=F001`.
 
 ### Install The Skill
 
@@ -203,11 +204,12 @@ Expected result:
 3. For a fresh project with an accepted minspec, add a runnable-skeleton feature using `docs/project-recovery-init.md`.
 4. Append new features to `feature_list.json`.
 5. Implement and evaluate one feature through `make work` in visible layout, or `make -C .agent-harness work` from a hidden-layout project root.
-6. Use manual Coding Agent work only as an explicit fallback when adapters are unavailable or the user requests interactive work.
-7. Run `make init`.
-8. Run `make validate FEATURE=Fxxx`.
-9. Update `progress.md`.
-10. Commit only after verification passes.
+6. Use `make work-fast` as the fast A/B alternative only when coding evidence will be recorded in `runs/` and evaluator child gating remains mandatory.
+7. Use manual Coding Agent work only as an explicit fallback when adapters are unavailable or the user requests interactive work.
+8. Run `make init`.
+9. Run `make validate FEATURE=Fxxx`.
+10. Update `progress.md`.
+11. Commit only after verification passes.
 
 ## Make Targets
 
@@ -216,6 +218,7 @@ Expected result:
 - `make unit`, `make contract`, and `make smoke` run individual test layers.
 - `make go-example` runs the Go server example tests.
 - `make work` runs one orchestrator round for the next unfinished feature in visible layout or from inside `.agent-harness/`.
+- `make work-fast` runs the evaluator-gated fast A/B flow without invoking the Coding Agent role adapter.
 - `make dry-run` previews the next orchestrator round.
 - `make summarize` prints progress and run summaries.
 - `make clean` resets project-specific state after copying the template.
@@ -238,6 +241,14 @@ make -C .agent-harness work
 or change into `.agent-harness/` and run `make work`. A missing root `Makefile` in hidden layout does not mean orchestrator work is unavailable.
 
 `make work` runs `python3 orchestrator.py --max-rounds 1`. The orchestrator selects one unfinished feature, marks it in progress, increments attempts, dispatches Coding Agent and Evaluator Agent role prompts, and marks the feature done only after evaluator pass.
+
+The fast A/B entrypoint is:
+
+```bash
+make work-fast
+```
+
+`make work-fast` runs `python3 orchestrator.py --work-fast --max-rounds 1`. The orchestrator selects or resumes one unfinished feature, marks it in progress, increments attempts when starting new work, and writes a durable fast coding handoff. The provider-native coding phase must record `FAST_CODING_EVIDENCE: Fxxx` plus `CODING_PASS: Fxxx` in `runs/` and must not write `EVAL_PASS: Fxxx` or mark the feature done. After coding evidence exists, rerun `make work-fast`; the orchestrator invokes the Evaluator Agent adapter as a separate cold-start child process before it can set `status=done` and `passes=true`.
 
 Preview the next one-feature round:
 

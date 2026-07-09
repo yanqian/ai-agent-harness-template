@@ -635,6 +635,32 @@
       "attempts": 1,
       "last_error": "",
       "priority": "P0"
+    },
+    {
+      "id": "F036",
+      "title": "Add evaluator-gated work-fast mode",
+      "description": "Add an A/B-testable make work-fast flow that lets the configured provider perform coding without an extra Coding Agent child process while always requiring a cold-start Evaluator Agent child process before completion.",
+      "acceptance": [
+        "Makefile exposes a `work-fast` entrypoint that is documented as the fast A/B alternative to the existing two-child-process `make work` flow",
+        "The fast flow selects one unfinished feature, marks it `in_progress`, increments attempts, and preserves one-feature-per-round state safety without invoking the Coding Agent role adapter",
+        "The coding phase must produce durable coding evidence and must not write `EVAL_PASS` or mark the feature done",
+        "The Evaluator Agent adapter is always invoked as a separate cold-start child process before any fast-flow feature can become `status=done` and `passes=true`",
+        "Evaluator failure leaves the feature non-done and records durable failure evidence instead of being bypassed by local tests or coding evidence",
+        "AGENTS.md, README.md, docs/agent-workflow.md, prompts, skill workflow references, bundled template files, and tests distinguish `make work` from `make work-fast`",
+        "Unit or contract tests cover the fast-flow state transitions, mandatory evaluator child gating, and the prohibition against coding-phase evaluator pass spoofing",
+        "./init.sh and scripts/validate-feature.sh F036 pass after evaluator evidence is recorded"
+      ],
+      "passes": true,
+      "status": "done",
+      "attempts": 2,
+      "last_error": "",
+      "priority": "P0",
+      "depends_on": [
+        "F030",
+        "F031",
+        "F033",
+        "F034"
+      ]
     }
   ]
 }
