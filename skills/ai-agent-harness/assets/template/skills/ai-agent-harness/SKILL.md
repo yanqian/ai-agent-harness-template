@@ -33,6 +33,7 @@ Modes:
 - `new`: install the harness into a new or empty project and reset project state.
 - `adopt`: install missing harness files into an existing project and reset project state; default mode.
 - `repair`: add missing harness files but preserve existing `feature_list.json` and `progress.md`.
+- `upgrade`: update an already installed harness to the current template version after the global skill has been updated; preserve project-owned state and root project recovery files unless `--force` is explicitly approved.
 - `check`: report missing files, merge-sensitive conflicts, harness-owned drift, project state changes, installed/template versions, semantic validity, runnable status, and next action guidance without writing.
 
 Layouts:
@@ -55,7 +56,10 @@ Examples:
 python3 /path/to/skill/scripts/init_harness.py --root /path/to/project --mode adopt
 python3 /path/to/skill/scripts/init_harness.py --root /path/to/project --mode check
 python3 /path/to/skill/scripts/init_harness.py --root /path/to/project --mode repair
+python3 /path/to/skill/scripts/init_harness.py --root /path/to/project --mode upgrade
 ```
+
+After updating the global skill, run `check` in existing projects. If `installed_version` is older than `template_version`, run `upgrade` to refresh harness-owned files, installed runtime scripts, prompts, docs, and manifest metadata. Do not use `--force` unless the user explicitly approves overwriting merge-sensitive project files such as root `AGENTS.md` or root `init.sh`.
 
 ## Workflows
 

@@ -64,7 +64,7 @@ class RepositoryContractTests(unittest.TestCase):
             "```mermaid",
             "flowchart TD",
             "Human: ask `Use $ai-agent-harness to initialize this project`",
-            "Skill: check/adopt/new/repair harness",
+            "Skill: check/adopt/new/repair/upgrade harness",
             "Planning Agent: normalize minspec into SPEC",
             "Feature: runnable skeleton updates root `./init.sh`",
             "Human: choose agent provider or explicit manual fallback",
@@ -178,7 +178,7 @@ class RepositoryContractTests(unittest.TestCase):
             init: ["docs/capability-gaps.md"],
             skill: ["docs/capability-gaps.md", "local-only workarounds"],
             workflows: ["Identify required capabilities", "Check `docs/capability-gaps.md`"],
-            initializer: ["docs/capability-gaps.md", "Capability Gap Handling", "TEMPLATE_VERSION = \"0.3.6\""],
+            initializer: ["docs/capability-gaps.md", "Capability Gap Handling", "TEMPLATE_VERSION = \"0.3.7\""],
         }
         for text, phrases in checks.items():
             for phrase in phrases:
@@ -276,7 +276,7 @@ class RepositoryContractTests(unittest.TestCase):
             init: ["docs/feature-decomposition.md"],
             skill: ["docs/feature-decomposition.md", "Split independently verifiable behavior"],
             workflows: ["Use `docs/feature-decomposition.md`", "reject over-bundled features"],
-            initializer: ["docs/feature-decomposition.md", "TEMPLATE_VERSION = \"0.3.6\""],
+            initializer: ["docs/feature-decomposition.md", "TEMPLATE_VERSION = \"0.3.7\""],
         }
         for text, phrases in checks.items():
             for phrase in phrases:
@@ -484,7 +484,7 @@ class RepositoryContractTests(unittest.TestCase):
             init: ["docs/commit-messages.md"],
             skill: ["docs/commit-messages.md", "Fxxx <Action> <concise summary>"],
             workflows: ["Read `docs/commit-messages.md`", "starts with the feature ID", "Verify every feature ID referenced"],
-            initializer: ["docs/commit-messages.md", "TEMPLATE_VERSION = \"0.3.6\""],
+            initializer: ["docs/commit-messages.md", "TEMPLATE_VERSION = \"0.3.7\""],
         }
         for text, phrases in checks.items():
             for phrase in phrases:
@@ -532,7 +532,7 @@ class RepositoryContractTests(unittest.TestCase):
             init: ["docs/example-boundaries.md"],
             skill: ["docs/example-boundaries.md", "Default examples are references"],
             workflows: ["Identify project-owned implementation and verification paths", "do not use default examples as the product implementation surface"],
-            initializer: ["docs/example-boundaries.md", "TEMPLATE_VERSION = \"0.3.6\""],
+            initializer: ["docs/example-boundaries.md", "TEMPLATE_VERSION = \"0.3.7\""],
         }
         for text, phrases in checks.items():
             for phrase in phrases:
@@ -727,6 +727,7 @@ class RepositoryContractTests(unittest.TestCase):
             "new",
             "adopt",
             "repair",
+            "upgrade",
             "check",
             "Never commit merely because implementation finished.",
             "The commit boundary is user satisfaction.",
@@ -739,6 +740,7 @@ class RepositoryContractTests(unittest.TestCase):
             "new",
             "adopt",
             "repair",
+            "upgrade",
             "check",
             "--layout",
             "hidden_agents_text",
@@ -756,12 +758,14 @@ class RepositoryContractTests(unittest.TestCase):
             "ensure_executable_mode",
             "item_should_be_executable",
             "semantic_validation",
+            "remove_obsolete_paths",
+            "should_upgrade_drift",
             "write_install_manifest",
             "project_state_changed",
             "next_action",
         ]:
             self.assertIn(phrase, initializer)
-        self.assertEqual(template_manifest["template_version"], "0.3.6")
+        self.assertEqual(template_manifest["template_version"], "0.3.7")
         self.assertEqual(template_manifest["default_layout"], "hidden")
         self.assertIn("hidden", template_manifest["layouts"])
         self.assertIn("visible", template_manifest["layouts"])
@@ -782,12 +786,14 @@ class RepositoryContractTests(unittest.TestCase):
             "does not replace repository state",
             "does not overwrite conflicting files unless `--force` is used",
             ".agent-harness/manifest.json",
+            "`upgrade`",
             "--layout hidden",
             "--layout visible",
             "Root keeps thin `AGENTS.md` and `init.sh` entry points",
             "project-owned state",
             "runnable_harness=true",
             "version drift",
+            "update the global skill first",
             "### Install The Skill",
             "### Use The Installed Skill",
             "### Manual Script Usage",
@@ -822,11 +828,12 @@ class RepositoryContractTests(unittest.TestCase):
             "convenience layer",
             "preserve the template's vendor-neutral boundary",
             "skills/ai-agent-harness/",
-            "new`, `adopt`, `repair`, and `check` modes",
+            "new`, `adopt`, `repair`, `upgrade`, and `check` modes",
             "installation layouts",
             "default `hidden` layout",
             "root `AGENTS.md` and `init.sh` as thin entry points",
             "`visible` layout",
+            "Installed Harness Upgrade Workflow",
             "version drift handling",
             "semantically valid",
             "installed skill usage",
@@ -840,6 +847,7 @@ class RepositoryContractTests(unittest.TestCase):
             "skills/ai-agent-harness/scripts/init_harness.py",
         ]:
             self.assertIn(path, init)
+        self.assertIn('rel.parts[:3] == ("skills", "ai-agent-harness", "assets")', initializer)
 
     def test_feature_schema_requires_acceptance_and_state(self):
         schema = json.loads((ROOT / "schemas/feature_list.schema.json").read_text())

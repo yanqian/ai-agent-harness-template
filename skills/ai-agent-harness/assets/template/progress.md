@@ -47,22 +47,26 @@ Implemented components:
 - Final role verdict normalization so historical run evidence echoed by agents cannot override final Coding Agent or Evaluator Agent pass/fail lines, and structured pass verdicts can recover provider exit-code contradictions.
 - Provider runtime preflight checks so configured agent providers can report permission gaps before feature state is mutated and outer agents can request user-approved escalation.
 - Hidden-layout work-directory guidance so agents run `make -C .agent-harness work` from installed project roots instead of treating a missing root `Makefile` as orchestrator unavailability.
+- Evaluator-gated `make work-fast`, including fast handoff/evidence parsing, mandatory evaluator-child gating, documentation, tests, bundled template sync, and evaluator pass evidence.
+- Preferred interactive work-fast guidance in AGENTS instructions, including visible-layout and generated hidden-layout command choices.
+- Installed-harness upgrade workflow so global skill/template updates can be safely propagated into already installed hidden-layout projects.
 - Tiny dependency-free Python CLI example in `examples/tiny-cli/`.
 - Dependency-free Go server example in `examples/go-server/`.
 
 ## Last Completed Feature
 
-`F035` - Clarify hidden-layout work directory.
+`F038` - Add installed harness upgrade workflow.
 
 ## Next Feature
 
-`F011` - Explore concurrent agent execution. This remains a P2 backlog item only; implement it only if the harness needs parallel agent throughput.
+`F011` - Explore concurrent agent execution.
 
 ## Known Issues
 
 - The template orchestrator is intentionally lightweight and vendor-neutral.
 - `agent-provider.json` is intentionally absent by default; copy `agent-provider.example.json` and select an explicit provider before real `make work` execution.
 - `F011` remains a P2 backlog item and should not preempt the new P0 orchestrator-first work.
+- `F036` is a P0 A/B workflow experiment: keep `make work` as the two-child-process baseline and add `make work-fast` with provider-native coding plus mandatory cold-start evaluator child gating.
 
 ## Recovery Notes
 
@@ -73,3 +77,8 @@ Implemented components:
 - F033 fixed final role verdict parsing and synchronized the fix into the bundled skill template; downstream installed projects should receive the same harness file update.
 - F034 added provider runtime preflight commands and a machine-readable `PROVIDER_RUNTIME_PERMISSION_REQUIRED` marker so outer agents can ask users to approve escalated provider runtime execution.
 - F035 used explicit manual fallback because provider adapters are intentionally unconfigured in this template checkout. It clarified that hidden-layout installs should use `make -C .agent-harness work` from the project root or `make work` inside `.agent-harness/`, synchronized the bundled skill template, bumped the template version to 0.3.4, and added contract plus initializer coverage.
+- F036 planning was added on branch `codex-work-fast-flow`. The first orchestrated `make work` attempt received approved escalated runtime execution but failed before implementation because the local Codex provider command started outside a trusted repository root: `Not inside a trusted directory and --skip-git-repo-check was not specified.` The failure is recorded in `runs/20260707T095608Z-F036-failure.md`; retry requires correcting local provider working directory/trust configuration rather than manual feature implementation.
+- F036 was completed through the orchestrator after the local provider command was corrected. Coding evidence is recorded in `runs/20260707T152121Z-F036-work-fast-coding.md`, evaluator approval is recorded as `EVAL_PASS: F036` in `runs/20260707T152614Z-F036-evaluation.md`, and final `./init.sh` plus `scripts/validate-feature.sh F036` passed.
+- F037 completed through work-fast provider-native implementation. Root and bundled template AGENTS now tell agents to default to evaluator-gated `work-fast` for interactive user-led development while preserving baseline `make work` for explicit full two-child-process, unattended, or batch runs. A first evaluator rerun exposed a work-fast handoff/evidence parser false positive and recorded `runs/20260709T035347Z-F037-failure.md`; the coding pass fixed that parser edge case and updated the coding evidence at `runs/20260709T035143Z-F037-work-fast-coding.md`. Evaluator approval is recorded as `EVAL_PASS: F037` in `runs/20260709T040001Z-F037-evaluation.md`, and final `./init.sh` plus `scripts/validate-feature.sh F037` passed.
+- F038 was planned after a real hidden-layout project repair showed a lifecycle gap: the global skill had `work-fast`, but the installed project-local `.agent-harness` remained on an older template without the target. The planned fix adds an explicit upgrade workflow and reduces nested template vendoring in installed projects.
+- F038 completed through work-fast provider-native implementation. The initializer now has explicit `upgrade` mode, hidden-layout harness runtime files are upgradeable without overwriting root project recovery entrypoints, obsolete nested template assets are removed during upgrade, and the template version is now 0.3.7. Coding evidence is recorded in `runs/20260709T061705Z-F038-work-fast-coding.md`, evaluator approval is recorded as `EVAL_PASS: F038` in `runs/20260709T062151Z-F038-evaluation.md`, and final `./init.sh` plus `scripts/validate-feature.sh F038` passed.

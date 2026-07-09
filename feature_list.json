@@ -682,6 +682,30 @@
       "depends_on": [
         "F036"
       ]
+    },
+    {
+      "id": "F038",
+      "title": "Add installed harness upgrade workflow",
+      "description": "Add an explicit safe upgrade workflow for already installed hidden-layout harnesses so skill/template updates can propagate into project-local .agent-harness installs without overwriting project-owned state or merge-sensitive recovery files.",
+      "acceptance": [
+        "The skill initializer exposes an `upgrade` mode distinct from `repair`, `adopt`, `new`, and `check`",
+        "`upgrade` updates harness-owned static files, template metadata, missing files, and drifted installed skill/runtime files while preserving `.agent-harness/SPEC.md`, `.agent-harness/feature_list.json`, `.agent-harness/progress.md`, `.agent-harness/runs/`, and root project recovery `init.sh` unless explicit force is used",
+        "`check` and documentation tell operators when an installed project has template version drift and should run upgrade after updating the global skill",
+        "Hidden-layout installs no longer vendor the nested `skills/ai-agent-harness/assets/template/` tree into project-local `.agent-harness`, reducing project-specific drift after global skill updates",
+        "Tests cover upgrading an older hidden-layout install to the current template version, preserving project-owned state and root recovery init, and installing without nested template assets",
+        "SKILL.md, workflow references, README or docs, bundled template files, and contract tests document the update-global-skill then upgrade-project-harness flow",
+        "./init.sh and scripts/validate-feature.sh F038 pass after evaluator evidence is recorded"
+      ],
+      "passes": true,
+      "status": "done",
+      "attempts": 1,
+      "last_error": "",
+      "priority": "P0",
+      "depends_on": [
+        "F023",
+        "F036",
+        "F037"
+      ]
     }
   ]
 }

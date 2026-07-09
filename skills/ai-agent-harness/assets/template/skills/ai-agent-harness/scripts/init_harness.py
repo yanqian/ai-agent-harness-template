@@ -14,8 +14,8 @@ SKILL_DIR = Path(__file__).resolve().parents[1]
 BUNDLED_TEMPLATE = SKILL_DIR / "assets" / "template"
 TEMPLATE_MANIFEST = ".agent-harness-template.json"
 INSTALL_MANIFEST = ".agent-harness/manifest.json"
-TEMPLATE_VERSION = "0.3.6"
-MODE_CHOICES = {"new", "adopt", "repair", "check"}
+TEMPLATE_VERSION = "0.3.7"
+MODE_CHOICES = {"new", "adopt", "repair", "upgrade", "check"}
 LAYOUT_CHOICES = {"hidden", "visible"}
 DEFAULT_LAYOUT = "hidden"
 EXECUTABLE_TEMPLATE_PATHS = {
@@ -89,7 +89,7 @@ class HarnessInitError(Exception):
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Initialize or repair an AI Agent Harness project.")
+    parser = argparse.ArgumentParser(description="Initialize, repair, or upgrade an AI Agent Harness project.")
     parser.add_argument("--root", default=".", help="Target project root. Defaults to the current directory.")
     parser.add_argument("--mode", choices=sorted(MODE_CHOICES), default="adopt")
     parser.add_argument(
@@ -229,12 +229,15 @@ exec "$ROOT_DIR/.agent-harness/scripts/init.sh" "$@"
 def install_items(template_root: Path, layout: str):
     for rel in iter_template_files(template_root):
         target = rel if layout == "visible" else Path(".agent-harness") / rel
+        category = category_for(rel)
+        if layout == "hidden" and category == "merge-sensitive":
+            category = "harness-owned static"
         yield {
             "source": template_root / rel,
             "content": None,
             "logical": rel,
             "target": target,
-            "category": category_for(rel),
+            "category": category,
         }
     if layout == "hidden":
         yield {
@@ -549,6 +552,27 @@ def ensure_runs_gitkeep(root: Path, layout: str, dry_run: bool) -> None:
     gitkeep.write_text("")
 
 
+def obsolete_hidden_paths(root: Path, layout: str) -> list[Path]:
+    if layout != "hidden":
+        return []
+    return [root / ".agent-harness" / "skills" / "ai-agent-harness" / "assets"]
+
+
+def remove_obsolete_paths(root: Path, layout: str, dry_run: bool) -> list[Path]:
+    removed = []
+    for path in obsolete_hidden_paths(root, layout):
+        if not path.exists():
+            continue
+        removed.append(path.relative_to(root))
+        if dry_run:
+            continue
+        if path.is_dir():
+            shutil.rmtree(path)
+        else:
+            path.unlink()
+    return removed
+
+
 def should_copy_missing(mode: str, item: dict) -> bool:
     category = item["category"]
     if mode == "repair":
@@ -559,7 +583,18 @@ def should_copy_missing(mode: str, item: dict) -> bool:
             "project-owned state",
             "merge-sensitive",
         }
+    if mode == "upgrade":
+        return category != "project-owned state"
     return True
+
+
+def should_upgrade_drift(item: dict, force: bool) -> bool:
+    category = item["category"]
+    if category in {"harness-owned static", "template manifest"}:
+        return True
+    if force and category in {"merge-sensitive", "optional integration"}:
+        return True
+    return False
 
 
 def initialize(args: argparse.Namespace) -> int:
@@ -582,7 +617,7 @@ def initialize(args: argparse.Namespace) -> int:
     created = []
     overwritten = []
     reset = []
-    blocking_conflicts = [] if args.force else conflicts
+    blocking_conflicts = [] if (args.force or args.mode == "upgrade") else conflicts
     if blocking_conflicts:
         print_summary(args.mode, layout, template_root, target_root, classification, semantic, installed, [], blocking_conflicts, [], [])
         return 1
@@ -593,6 +628,8 @@ def initialize(args: argparse.Namespace) -> int:
             created.append(item)
 
     writable_conflicts = conflicts + drift if args.force else []
+    if args.mode == "upgrade" and not args.force:
+        writable_conflicts = [item for item in drift if should_upgrade_drift(item, args.force)]
     for item in writable_conflicts:
         write_item(item, target_root, args.dry_run)
         overwritten.append(item)
@@ -605,6 +642,7 @@ def initialize(args: argparse.Namespace) -> int:
             if rel in {item["logical"].as_posix() for item in missing}:
                 reset.append(f"{prefix}{rel}")
 
+    removed = remove_obsolete_paths(target_root, layout, args.dry_run) if args.mode == "upgrade" else []
     ensure_runs_gitkeep(target_root, layout, args.dry_run)
     if not blocking_conflicts:
         write_install_manifest(target_root, template_root, args.mode, layout, args.dry_run)
@@ -624,6 +662,7 @@ def initialize(args: argparse.Namespace) -> int:
         blocking_conflicts,
         overwritten,
         reset,
+        removed,
     )
     return 1 if blocking_conflicts else 0
 
@@ -641,16 +680,21 @@ def check_is_clean(classification: dict, semantic: dict, installed: Optional[dic
 
 
 def next_action(classification: dict, semantic: dict, installed: Optional[dict]) -> str:
+    version_drift = installed is not None and installed.get("template_version") != TEMPLATE_VERSION
     if classification["conflicts"]:
+        if version_drift:
+            return "review merge-sensitive conflicts; run upgrade to update harness-owned files, using --force only after explicit approval"
         return "review merge-sensitive conflicts; rerun with --force only after explicit approval"
     if classification["missing"]:
+        if version_drift:
+            return "run upgrade to update installed harness and restore missing non-state files"
         return "run repair to restore missing harness files"
     if classification["drift"]:
-        return "review harness-owned drift; repair missing files or use explicit force/upgrade when appropriate"
+        return "run upgrade to update harness-owned drift after reviewing merge-sensitive files"
     if installed is None:
         return "run repair to write an installation manifest"
-    if installed.get("template_version") != TEMPLATE_VERSION:
-        return "template version drift detected; review changes before upgrade"
+    if version_drift:
+        return "run upgrade to update installed harness template version"
     if semantic["state_valid"] != "true":
         return "fix semantic harness validation errors"
     return "harness is installed and runnable"
@@ -682,6 +726,7 @@ def print_summary(
     blocking_conflicts: list[Path],
     overwritten: list[Path],
     reset: list[str],
+    removed: list[Path] | None = None,
 ) -> None:
     print(f"mode={mode}")
     print(f"layout={layout}")
@@ -699,6 +744,7 @@ def print_summary(
     print_list("optional_changed", classification["optional_changed"])
     print_list("created", created)
     print_list("overwritten", overwritten)
+    print_list("removed", removed or [])
     print(f"state_reset={','.join(reset) if reset else 'none'}")
     if semantic["state_errors"]:
         print("state_errors:")

@@ -635,6 +635,77 @@
       "attempts": 1,
       "last_error": "",
       "priority": "P0"
+    },
+    {
+      "id": "F036",
+      "title": "Add evaluator-gated work-fast mode",
+      "description": "Add an A/B-testable make work-fast flow that lets the configured provider perform coding without an extra Coding Agent child process while always requiring a cold-start Evaluator Agent child process before completion.",
+      "acceptance": [
+        "Makefile exposes a `work-fast` entrypoint that is documented as the fast A/B alternative to the existing two-child-process `make work` flow",
+        "The fast flow selects one unfinished feature, marks it `in_progress`, increments attempts, and preserves one-feature-per-round state safety without invoking the Coding Agent role adapter",
+        "The coding phase must produce durable coding evidence and must not write `EVAL_PASS` or mark the feature done",
+        "The Evaluator Agent adapter is always invoked as a separate cold-start child process before any fast-flow feature can become `status=done` and `passes=true`",
+        "Evaluator failure leaves the feature non-done and records durable failure evidence instead of being bypassed by local tests or coding evidence",
+        "AGENTS.md, README.md, docs/agent-workflow.md, prompts, skill workflow references, bundled template files, and tests distinguish `make work` from `make work-fast`",
+        "Unit or contract tests cover the fast-flow state transitions, mandatory evaluator child gating, and the prohibition against coding-phase evaluator pass spoofing",
+        "./init.sh and scripts/validate-feature.sh F036 pass after evaluator evidence is recorded"
+      ],
+      "passes": true,
+      "status": "done",
+      "attempts": 2,
+      "last_error": "",
+      "priority": "P0",
+      "depends_on": [
+        "F030",
+        "F031",
+        "F033",
+        "F034"
+      ]
+    },
+    {
+      "id": "F037",
+      "title": "Document interactive work-fast default in AGENTS",
+      "description": "Update repository agent instructions so interactive user-led AI Agent Harness work defaults to evaluator-gated work-fast mode while preserving baseline make work for explicit full two-child-process, unattended, or batch runs.",
+      "acceptance": [
+        "Root AGENTS.md includes a Preferred Work Mode section that tells agents to default to `make work-fast` for interactive development in visible-layout repositories",
+        "Bundled hidden-layout template AGENTS.md includes equivalent guidance using `make -C .agent-harness work-fast` from the project root",
+        "The guidance states that coding evidence must contain `FAST_CODING_EVIDENCE: Fxxx` and `CODING_PASS: Fxxx`, must not include `EVAL_PASS: Fxxx`, and must not mark the feature done before evaluator approval",
+        "The guidance preserves baseline `make work` for explicit full two-child-process, unattended, or batch workflows",
+        "Contract tests verify the preferred work-fast guidance in both root and bundled AGENTS.md files",
+        "./init.sh and scripts/validate-feature.sh F037 pass after evaluator evidence is recorded"
+      ],
+      "passes": true,
+      "status": "done",
+      "attempts": 1,
+      "last_error": "",
+      "priority": "P0",
+      "depends_on": [
+        "F036"
+      ]
+    },
+    {
+      "id": "F038",
+      "title": "Add installed harness upgrade workflow",
+      "description": "Add an explicit safe upgrade workflow for already installed hidden-layout harnesses so skill/template updates can propagate into project-local .agent-harness installs without overwriting project-owned state or merge-sensitive recovery files.",
+      "acceptance": [
+        "The skill initializer exposes an `upgrade` mode distinct from `repair`, `adopt`, `new`, and `check`",
+        "`upgrade` updates harness-owned static files, template metadata, missing files, and drifted installed skill/runtime files while preserving `.agent-harness/SPEC.md`, `.agent-harness/feature_list.json`, `.agent-harness/progress.md`, `.agent-harness/runs/`, and root project recovery `init.sh` unless explicit force is used",
+        "`check` and documentation tell operators when an installed project has template version drift and should run upgrade after updating the global skill",
+        "Hidden-layout installs no longer vendor the nested `skills/ai-agent-harness/assets/template/` tree into project-local `.agent-harness`, reducing project-specific drift after global skill updates",
+        "Tests cover upgrading an older hidden-layout install to the current template version, preserving project-owned state and root recovery init, and installing without nested template assets",
+        "SKILL.md, workflow references, README or docs, bundled template files, and contract tests document the update-global-skill then upgrade-project-harness flow",
+        "./init.sh and scripts/validate-feature.sh F038 pass after evaluator evidence is recorded"
+      ],
+      "passes": false,
+      "status": "in_progress",
+      "attempts": 1,
+      "last_error": "",
+      "priority": "P0",
+      "depends_on": [
+        "F023",
+        "F036",
+        "F037"
+      ]
     }
   ]
 }

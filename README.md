@@ -134,7 +134,7 @@ Once installed, invoke it by name:
 Use $ai-agent-harness to initialize this project.
 ```
 
-You can also ask naturally about installing a harness, adopting `AGENTS.md`, repairing `feature_list.json`, or checking a resumable AI coding workflow.
+You can also ask naturally about installing a harness, adopting `AGENTS.md`, repairing `feature_list.json`, upgrading an installed project harness, or checking a resumable AI coding workflow.
 
 The skill is designed to remain vendor-neutral even when loaded by Codex as `SKILL.md`.
 
@@ -145,11 +145,12 @@ If you are using this repository checkout directly, or using another agent tool 
 ```bash
 python3 skills/ai-agent-harness/scripts/init_harness.py --root /path/to/project --mode adopt
 python3 skills/ai-agent-harness/scripts/init_harness.py --root /path/to/project --mode check
+python3 skills/ai-agent-harness/scripts/init_harness.py --root /path/to/project --mode upgrade
 ```
 
 Manual `python3 skills/ai-agent-harness/scripts/init_harness.py` commands are repository-checkout or vendor-neutral fallback usage, not the primary installed-skill experience.
 
-The initializer supports `new`, `adopt`, `repair`, and `check` modes. It does not overwrite conflicting files unless `--force` is used after explicit approval.
+The initializer supports `new`, `adopt`, `repair`, `upgrade`, and `check` modes. It does not overwrite conflicting files unless `--force` is used after explicit approval.
 
 The initializer also supports layout profiles:
 
@@ -162,12 +163,12 @@ The initializer writes `.agent-harness/manifest.json` in installed projects and 
 
 - harness-owned static files are copied and drift-checked by hash;
 - project-owned state such as `SPEC.md`, `feature_list.json`, and `progress.md` is validated semantically after initialization;
-- merge-sensitive files such as `AGENTS.md`, `README.md`, and `Makefile` are not overwritten by default;
+- root merge-sensitive entrypoints such as `AGENTS.md` and `init.sh` are not overwritten by default in hidden-layout projects;
 - optional integrations such as GitHub workflow files and examples are reported separately.
 
 A project counts as an installed harness when `./init.sh` succeeds, the installed layout's `feature_list.json` is valid, progress and agent rules contain the required workflow sections, scripts and prompts are present, run templates are available, and skill `check` reports `runnable_harness=true`. This is stronger than checking for file existence alone.
 
-For version drift handling, run skill `check` first. Use `repair` to restore missing files and write a manifest. Review drift before using explicit overwrite or a future upgrade flow.
+For version drift handling, update the global skill first, then run skill `check` in each installed project. Use `repair` to restore missing files. Use `upgrade` to update harness-owned static files, template metadata, and installed runtime files while preserving project-owned state such as `SPEC.md`, `feature_list.json`, `progress.md`, `runs/`, and root project recovery `init.sh`. Review merge-sensitive conflicts before using `--force`.
 
 After installation, distinguish harness recovery from project recovery. In hidden layout, root `./init.sh` starts as a thin wrapper around `.agent-harness/scripts/init.sh`; before a minspec exists, that only proves the harness can plan and resume. Once a minspec is accepted, the first project setup feature should turn root `./init.sh` into the project recovery contract: install dependencies, start required services, run a real endpoint or core-function smoke test, print clear logs, and fail non-zero on setup, startup, or verification failure. See [docs/project-recovery-init.md](docs/project-recovery-init.md).
 

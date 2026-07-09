@@ -112,6 +112,46 @@ Implementation paths: `AGENTS.md`, `README.md`, `Makefile`, `docs/agent-workflow
 
 Verification surface: `./init.sh`, contract tests for orchestrator-first language and targets, orchestrator dry-run checks, and feature validation for the new feature.
 
+### Work-Fast Evaluator-Gated Mode
+
+Goal: add an A/B-testable fast work entrypoint that avoids an extra Coding Agent child process while preserving mandatory cold-start Evaluator Agent isolation and evaluator-gated completion.
+
+Included scope: add a `make work-fast` entrypoint and orchestrator mode that selects one unfinished feature, marks it `in_progress`, increments attempts, emits a Coding Agent prompt or handoff for the current configured provider surface to execute without spawning the Coding Agent role adapter, requires coding evidence from that implementation phase, then always runs the Evaluator Agent adapter in a separate child process before any feature can be marked done. The mode must remain provider-neutral: Codex, Claude Code, Cursor Agent, or a custom provider may perform the coding phase when that provider is the selected implementation surface.
+
+Excluded scope: weakening evaluator evidence, making evaluator child execution optional, allowing the coding phase to write `EVAL_PASS`, automatically committing work, replacing the existing two-child-process `make work` flow, or using chat history as durable state.
+
+Core flows: a user runs `make work-fast`; the harness performs the startup protocol, selects one unfinished feature, marks it in progress, increments attempts, and prints or records the selected feature plus coding instructions for provider-native implementation; the coding phase updates project files and writes coding evidence but does not mark the feature done; the harness resumes the fast flow and runs the Evaluator Agent child process cold against repository state, git diff, acceptance criteria, and `QUALITY.md`; only a matching `EVAL_PASS: Fxxx` allows the harness to set `passes=true` and `status=done`; evaluator failure leaves durable failure evidence and a non-done feature state.
+
+Constraints: `make work` remains the baseline two-child-process orchestrator flow for unattended/batch comparison; `make work-fast` must not silently skip evaluator execution; the Evaluator Agent must reconstruct context from repository files and git history; coding evidence cannot substitute for evaluator evidence; state transitions must preserve one-feature-per-round, attempts, failure records, and final `./init.sh` verification.
+
+Ambiguities or assumptions: the fast mode is intended for interactive/provider-native coding where the current agent surface can perform implementation more quickly than a nested Coding Agent process. If no coding evidence exists when the fast flow reaches evaluation, the feature must not be marked done merely because local tests pass.
+
+Required capabilities: a deterministic `work-fast` make target, orchestrator CLI support for the fast mode or equivalent scripts, durable coding-evidence requirements, mandatory evaluator child adapter invocation, clear documentation that `work-fast` is an A/B alternative to `work`, and tests that prove evaluator gating remains mandatory.
+
+Implementation paths: `Makefile`, `orchestrator.py`, `AGENTS.md`, `README.md`, `docs/agent-workflow.md`, `prompts/`, `skills/ai-agent-harness/`, bundled template files, unit tests, contract tests, `feature_list.json`, `progress.md`, and `runs/`.
+
+Verification surface: `./init.sh`, `make work-fast --dry-run` or the documented dry-run equivalent, unit tests for orchestrator fast-mode state and evaluator requirements, contract tests for documentation and prompt guardrails, and `scripts/validate-feature.sh F036`.
+
+### Interactive Work-Fast Default Guidance
+
+Goal: make repository instructions tell agents that interactive user-led development should default to the evaluator-gated `work-fast` flow, so humans can ask for AI Agent Harness work without re-explaining the mode every time.
+
+Included scope: add a clear preferred-work-mode section to root `AGENTS.md` and generated hidden-layout template `AGENTS.md`; document that interactive development should use `make work-fast` in visible layout and `make -C .agent-harness work-fast` in hidden layout; preserve baseline `make work` for explicit full two-child-process, unattended, or batch work; and add contract coverage so the guidance remains present in both root and bundled template instructions.
+
+Excluded scope: changing orchestrator behavior, adding automatic mode selection, removing `make work`, changing provider configuration, or weakening evaluator evidence.
+
+Core flows: a user asks an agent to use the harness for an interactive requirement; the agent reads `AGENTS.md`, sees the preferred work mode, runs or follows the `work-fast` handoff, implements in the current provider-native session, records fast coding evidence, then reruns `work-fast` so a separate Evaluator Agent child process can accept or reject the feature.
+
+Constraints: coding evidence must still not contain `EVAL_PASS: Fxxx`, must not mark the feature done, and must not substitute for evaluator evidence. Hidden-layout project roots must use `make -C .agent-harness work-fast`; visible-layout template maintenance uses `make work-fast`.
+
+Ambiguities or assumptions: "default" means the recommended interactive workflow in repository instructions; users can still explicitly ask for baseline `make work`.
+
+Required capabilities: durable AGENTS guidance in root and bundled hidden-layout template files, and contract tests that verify the default/preferred wording and command distinction.
+
+Implementation paths: `AGENTS.md`, `skills/ai-agent-harness/assets/template/AGENTS.md`, `test/contract/test_repository_contract.py`, `SPEC.md`, `feature_list.json`, `progress.md`, and `runs/`.
+
+Verification surface: `./init.sh`, contract tests, `make work-fast --dry-run` or equivalent, and `scripts/validate-feature.sh F037`.
+
 ### Hidden Layout Work Directory
 
 Goal: prevent agents from treating `make work` as missing in installed projects that use the default hidden layout, where the harness Makefile lives under `.agent-harness/` instead of the project root.
@@ -234,9 +274,29 @@ Approved feature commits must include their feature ID first in the commit subje
 
 The skill must also preserve the template's vendor-neutral boundary. Codex can load the skill through `SKILL.md`, but the bundled scripts, references, and workflow rules should remain usable by other agent tools.
 
-Skill initialization and repair must be tested against realistic project states. Tests should cover `new`, `adopt`, `repair`, and `check` modes; default non-overwrite behavior for existing project files; repair completeness for missing harness files; complete diagnostic output from `check`; and version drift handling through template and installation manifests. A newly initialized project is considered a harness only when it can run the verification entry point and its state, scripts, prompts, docs, run templates, and workflow invariants are semantically valid, not merely when files exist.
+Skill initialization, repair, and upgrade must be tested against realistic project states. Tests should cover `new`, `adopt`, `repair`, `upgrade`, and `check` modes; default non-overwrite behavior for existing project files; repair completeness for missing harness files; upgrade behavior for installed template-version drift; complete diagnostic output from `check`; and version drift handling through template and installation manifests. A newly initialized project is considered a harness only when it can run the verification entry point and its state, scripts, prompts, docs, run templates, and workflow invariants are semantically valid, not merely when files exist.
 
-Skill initialization supports installation layouts. The default `hidden` layout keeps root `AGENTS.md` and `init.sh` as thin entry points and stores harness state, prompts, docs, scripts, tests, runs, schemas, and examples under `.agent-harness/`. The `visible` layout keeps the current template-maintenance shape with harness files at the repository root. `check` and `repair` must preserve or infer the installed layout from `.agent-harness/manifest.json`.
+Skill initialization supports installation layouts. The default `hidden` layout keeps root `AGENTS.md` and `init.sh` as thin entry points and stores harness state, prompts, docs, scripts, tests, runs, schemas, and examples under `.agent-harness/`. The `visible` layout keeps the current template-maintenance shape with harness files at the repository root. `check`, `repair`, and `upgrade` must preserve or infer the installed layout from `.agent-harness/manifest.json`.
+
+### Installed Harness Upgrade Workflow
+
+Goal: make updates to the AI Agent Harness skill/template safely propagatable into already installed projects, so downstream repositories do not see documentation for new commands such as `work-fast` while their project-local `.agent-harness` still lacks the implementation.
+
+Scope included: add an explicit installed-harness upgrade workflow to the skill initializer; make `check` distinguish clean installs, repairable missing files, version drift, merge-sensitive conflicts, and project-owned state changes; add an `upgrade` mode that updates harness-owned static files and versioned template metadata while preserving project-owned state and merge-sensitive project recovery files unless explicitly forced; document the required sequence after updating the skill; and reduce newly installed hidden-layout vendoring by excluding nested `skills/ai-agent-harness/assets/template/` content from installed projects.
+
+Scope excluded: removing the project-local `.agent-harness` runtime entirely, making projects depend only on a global skill at execution time, automatically overwriting root `init.sh` after a minspec has created a project recovery contract, changing provider execution semantics, or migrating historical installed repositories without an explicit operator command.
+
+Core flows: an operator updates the global skill, runs `init_harness.py --mode check --root <project>`, sees that the installed template version is older, runs `--mode upgrade`, and receives updated harness-owned files plus a refreshed manifest; root `init.sh`, project `SPEC.md`, `feature_list.json`, `progress.md`, and `runs/` are preserved; merge-sensitive conflicts are reported and left for manual review unless `--force` is explicitly supplied; a hidden-layout project upgraded from an older version gains `make -C .agent-harness work-fast` without needing manual file copying; a new hidden-layout install does not vendor a second full copy of the template under `.agent-harness/skills/ai-agent-harness/assets/template/`.
+
+Constraints: installed projects must remain reproducible and runnable without relying solely on an ambient global skill, so the project keeps a minimal local harness runtime; upgrade must not silently rewrite project-owned state; check output must remain machine-readable enough for agents to decide whether to ask for approval, run repair, run upgrade, or stop for merge review; tests must cover old-version upgrade behavior using temporary projects, not the developer's live repositories.
+
+Ambiguities or assumptions: the first implementation keeps a minimal vendored skill entry point in installed projects for local documentation and repair fallback, but excludes nested template assets to reduce drift. More aggressive de-vendoring can be planned later if the project adds a stable global-skill runtime contract.
+
+Required capabilities: initializer upgrade mode, installation manifest refresh, copy-filter tests proving nested template assets are excluded from hidden-layout installs, docs and workflow guidance for update-then-upgrade, contract tests for check/upgrade messaging, and regression tests proving project-owned state plus root recovery init are preserved.
+
+Implementation paths: `skills/ai-agent-harness/scripts/init_harness.py`, bundled template initializer, `SKILL.md`, workflow references, README or docs, `test/harness/test_skill_initializer.py`, `test/contract/test_repository_contract.py`, bundled template sync under `skills/ai-agent-harness/assets/template/`, `feature_list.json`, `progress.md`, and `runs/`.
+
+Verification surface: `python3 -m unittest discover -s test/harness -p 'test_*.py'`, `python3 -m unittest discover -s test/contract -p 'test_*.py'`, `./init.sh`, and `scripts/validate-feature.sh F038`.
 
 Skill documentation must distinguish installed skill usage from manual script usage. Users should understand that installing the skill places `skills/ai-agent-harness/` under their skill directory, requires restarting the agent surface when applicable, and allows prompts such as `Use $ai-agent-harness to initialize this project.` Manual `python3 skills/.../init_harness.py` commands are repository-checkout or vendor-neutral fallback usage, not the primary installed-skill experience.
 
