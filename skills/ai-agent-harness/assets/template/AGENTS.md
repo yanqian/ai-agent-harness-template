@@ -98,6 +98,20 @@ Default entrypoint:
 - Manual fallback must be recorded in `progress.md` or `runs/` and must not bypass evaluator pass, evaluator evidence, attempts, failure records, or final `./init.sh` verification.
 - `make work-fast` is an A/B alternative to `make work`: it skips the Coding Agent role adapter, records provider-native coding evidence, and still requires a separate cold-start Evaluator Agent child process before completion.
 
+Preferred interactive mode:
+
+- For interactive user-led development, default to evaluator-gated fast work:
+
+  ```bash
+  make work-fast
+  ```
+
+- In this mode, the current agent/provider-native session implements the selected feature after the fast handoff.
+- The coding phase must record `FAST_CODING_EVIDENCE: Fxxx` and `CODING_PASS: Fxxx` in `runs/`.
+- The coding phase must not write `EVAL_PASS: Fxxx`, must not mark the feature `passes=true` or `status=done`, and must not treat local tests as evaluator evidence.
+- After coding evidence is recorded, rerun `make work-fast` so a separate cold-start Evaluator Agent child process can accept or reject the feature.
+- Use baseline `make work` when the user explicitly asks for the full two-child-process flow, unattended execution, or batch work.
+
 Responsibilities:
 
 - Follow the startup protocol.

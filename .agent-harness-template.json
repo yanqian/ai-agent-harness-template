@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "template_version": "0.3.5",
+  "template_version": "0.3.6",
   "default_layout": "hidden",
   "file_categories": {
     "harness-owned static": "Copied and drift-checked by content hash.",

@@ -302,6 +302,8 @@ def fast_coding_evidence_result(feature_id: str) -> tuple[Optional[bool], str]:
         if path.name == "RUN_TEMPLATE.md":
             continue
         text = path.read_text(errors="replace")
+        if f"{FAST_CODING_HANDOFF_PREFIX} {feature_id}" in text:
+            continue
         if marker not in text:
             continue
         if eval_pass in text:
@@ -339,9 +341,9 @@ def write_fast_coding_handoff(feature_id: str) -> Path:
         "```\n\n"
         "## Evidence\n\n"
         f"- Fast handoff: {FAST_CODING_HANDOFF_PREFIX} {feature_id}\n"
-        "- Coding evidence required: write a separate run record containing "
-        f"`{FAST_CODING_EVIDENCE_PREFIX} {feature_id}` and `CODING_PASS: {feature_id}` after implementation.\n"
-        f"- Evaluator pass prohibited in coding evidence: do not write `EVAL_PASS: {feature_id}` during the fast coding phase.\n"
+        "- Coding evidence required: write a separate run record containing the fast coding evidence marker "
+        "and matching coding pass verdict after implementation.\n"
+        "- Evaluator pass prohibited in coding evidence: do not write evaluator pass evidence during the fast coding phase.\n"
     )
     print(f"Wrote fast coding handoff: {path}", flush=True)
     return path

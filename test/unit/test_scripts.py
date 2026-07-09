@@ -455,6 +455,15 @@ class ScriptUnitTests(unittest.TestCase):
             with mock.patch.object(orchestrator, "RUNS_DIR", runs_dir):
                 self.assertEqual(orchestrator.fast_coding_evidence_result("F123"), (None, ""))
 
+                (runs_dir / "handoff.md").write_text(
+                    "# Run Record\n\n"
+                    "FAST_CODING_HANDOFF: F123\n"
+                    "FAST_CODING_EVIDENCE: F123\n"
+                    "CODING_PASS: F123\n"
+                    "EVAL_PASS: F123\n"
+                )
+                self.assertEqual(orchestrator.fast_coding_evidence_result("F123"), (None, ""))
+
                 (runs_dir / "valid.md").write_text(
                     "# Run Record\n\n"
                     "FAST_CODING_EVIDENCE: F123\n"

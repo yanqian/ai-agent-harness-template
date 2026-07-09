@@ -661,6 +661,27 @@
         "F033",
         "F034"
       ]
+    },
+    {
+      "id": "F037",
+      "title": "Document interactive work-fast default in AGENTS",
+      "description": "Update repository agent instructions so interactive user-led AI Agent Harness work defaults to evaluator-gated work-fast mode while preserving baseline make work for explicit full two-child-process, unattended, or batch runs.",
+      "acceptance": [
+        "Root AGENTS.md includes a Preferred Work Mode section that tells agents to default to `make work-fast` for interactive development in visible-layout repositories",
+        "Bundled hidden-layout template AGENTS.md includes equivalent guidance using `make -C .agent-harness work-fast` from the project root",
+        "The guidance states that coding evidence must contain `FAST_CODING_EVIDENCE: Fxxx` and `CODING_PASS: Fxxx`, must not include `EVAL_PASS: Fxxx`, and must not mark the feature done before evaluator approval",
+        "The guidance preserves baseline `make work` for explicit full two-child-process, unattended, or batch workflows",
+        "Contract tests verify the preferred work-fast guidance in both root and bundled AGENTS.md files",
+        "./init.sh and scripts/validate-feature.sh F037 pass after evaluator evidence is recorded"
+      ],
+      "passes": true,
+      "status": "done",
+      "attempts": 1,
+      "last_error": "",
+      "priority": "P0",
+      "depends_on": [
+        "F036"
+      ]
     }
   ]
 }

@@ -14,7 +14,7 @@ SKILL_DIR = Path(__file__).resolve().parents[1]
 BUNDLED_TEMPLATE = SKILL_DIR / "assets" / "template"
 TEMPLATE_MANIFEST = ".agent-harness-template.json"
 INSTALL_MANIFEST = ".agent-harness/manifest.json"
-TEMPLATE_VERSION = "0.3.5"
+TEMPLATE_VERSION = "0.3.6"
 MODE_CHOICES = {"new", "adopt", "repair", "check"}
 LAYOUT_CHOICES = {"hidden", "visible"}
 DEFAULT_LAYOUT = "hidden"
@@ -192,6 +192,20 @@ make -C .agent-harness work
 ```
 
 Equivalently, run `cd .agent-harness && make work`. Do not treat a missing root `Makefile` as a reason to bypass the orchestrator-first workflow.
+
+Preferred interactive mode:
+
+- For interactive user-led development, default to evaluator-gated fast work from the project root:
+
+  ```bash
+  make -C .agent-harness work-fast
+  ```
+
+- In this mode, the current agent/provider-native session implements the selected feature after the fast handoff.
+- The coding phase must record `FAST_CODING_EVIDENCE: Fxxx` and `CODING_PASS: Fxxx` in `.agent-harness/runs/`.
+- The coding phase must not write `EVAL_PASS: Fxxx`, must not mark the feature `passes=true` or `status=done`, and must not treat local tests as evaluator evidence.
+- After coding evidence is recorded, rerun `make -C .agent-harness work-fast` so a separate cold-start Evaluator Agent child process can accept or reject the feature.
+- Use baseline `make -C .agent-harness work` when the user explicitly asks for the full two-child-process flow, unattended execution, or batch work.
 
 Root `./init.sh` starts as harness verification only. Before a minspec exists, it proves the harness can plan and resume. After minspec acceptance, plan a runnable-skeleton feature that turns root `./init.sh` into the project recovery contract described in `.agent-harness/docs/project-recovery-init.md`.
 

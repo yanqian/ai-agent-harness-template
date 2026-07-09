@@ -132,6 +132,26 @@ Implementation paths: `Makefile`, `orchestrator.py`, `AGENTS.md`, `README.md`, `
 
 Verification surface: `./init.sh`, `make work-fast --dry-run` or the documented dry-run equivalent, unit tests for orchestrator fast-mode state and evaluator requirements, contract tests for documentation and prompt guardrails, and `scripts/validate-feature.sh F036`.
 
+### Interactive Work-Fast Default Guidance
+
+Goal: make repository instructions tell agents that interactive user-led development should default to the evaluator-gated `work-fast` flow, so humans can ask for AI Agent Harness work without re-explaining the mode every time.
+
+Included scope: add a clear preferred-work-mode section to root `AGENTS.md` and generated hidden-layout template `AGENTS.md`; document that interactive development should use `make work-fast` in visible layout and `make -C .agent-harness work-fast` in hidden layout; preserve baseline `make work` for explicit full two-child-process, unattended, or batch work; and add contract coverage so the guidance remains present in both root and bundled template instructions.
+
+Excluded scope: changing orchestrator behavior, adding automatic mode selection, removing `make work`, changing provider configuration, or weakening evaluator evidence.
+
+Core flows: a user asks an agent to use the harness for an interactive requirement; the agent reads `AGENTS.md`, sees the preferred work mode, runs or follows the `work-fast` handoff, implements in the current provider-native session, records fast coding evidence, then reruns `work-fast` so a separate Evaluator Agent child process can accept or reject the feature.
+
+Constraints: coding evidence must still not contain `EVAL_PASS: Fxxx`, must not mark the feature done, and must not substitute for evaluator evidence. Hidden-layout project roots must use `make -C .agent-harness work-fast`; visible-layout template maintenance uses `make work-fast`.
+
+Ambiguities or assumptions: "default" means the recommended interactive workflow in repository instructions; users can still explicitly ask for baseline `make work`.
+
+Required capabilities: durable AGENTS guidance in root and bundled hidden-layout template files, and contract tests that verify the default/preferred wording and command distinction.
+
+Implementation paths: `AGENTS.md`, `skills/ai-agent-harness/assets/template/AGENTS.md`, `test/contract/test_repository_contract.py`, `SPEC.md`, `feature_list.json`, `progress.md`, and `runs/`.
+
+Verification surface: `./init.sh`, contract tests, `make work-fast --dry-run` or equivalent, and `scripts/validate-feature.sh F037`.
+
 ### Hidden Layout Work Directory
 
 Goal: prevent agents from treating `make work` as missing in installed projects that use the default hidden layout, where the harness Makefile lives under `.agent-harness/` instead of the project root.
