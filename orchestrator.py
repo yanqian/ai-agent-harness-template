@@ -73,7 +73,9 @@ def pick_feature(data: dict, max_attempts: int) -> Optional[dict]:
     for feature in ordered_features:
         attempts = int(feature.get("attempts", 0))
         status = normalize_status(feature)
-        if feature.get("passes") is False and status in {"todo", "in_progress"} and attempts < max_attempts:
+        acceptance = feature.get("human_acceptance", {})
+        reopened = isinstance(acceptance, dict) and acceptance.get("reopen_pending") is True
+        if feature.get("passes") is False and status in {"todo", "in_progress"} and (attempts < max_attempts or reopened):
             candidates.append(feature)
     candidates.sort(key=lambda item: (priority.get(item.get("priority", "P2"), 9), ordered_features.index(item)))
     return candidates[0] if candidates else None
@@ -99,6 +101,9 @@ def mark_in_progress(feature_id: str) -> None:
     feature["status"] = "in_progress"
     feature["attempts"] = int(feature.get("attempts", 0)) + 1
     feature["last_error"] = ""
+    acceptance = feature.get("human_acceptance")
+    if isinstance(acceptance, dict):
+        acceptance["reopen_pending"] = False
     save_state(data)
 
 
@@ -294,8 +299,8 @@ def fast_coding_evidence_result(feature_id: str) -> tuple[Optional[bool], str]:
     if not RUNS_DIR.exists():
         return verdict
 
-    marker = f"{FAST_CODING_EVIDENCE_PREFIX} {feature_id}"
-    eval_pass = f"EVAL_PASS: {feature_id}"
+    marker = re.compile(rf"^\s*{re.escape(FAST_CODING_EVIDENCE_PREFIX)}\s+{re.escape(feature_id)}\s*$", re.MULTILINE)
+    eval_pass = re.compile(rf"^\s*EVAL_PASS:\s+{re.escape(feature_id)}\s*$", re.MULTILINE)
     coding_pass = f"CODING_PASS: {feature_id}"
     coding_fail_prefix = f"CODING_FAIL: {feature_id}:"
     for path in sorted(RUNS_DIR.glob("*.md")):
@@ -304,9 +309,9 @@ def fast_coding_evidence_result(feature_id: str) -> tuple[Optional[bool], str]:
         text = path.read_text(errors="replace")
         if f"{FAST_CODING_HANDOFF_PREFIX} {feature_id}" in text:
             continue
-        if marker not in text:
+        if not marker.search(text):
             continue
-        if eval_pass in text:
+        if eval_pass.search(text):
             return (
                 False,
                 f"fast coding evidence must not contain evaluator pass evidence: {path}",

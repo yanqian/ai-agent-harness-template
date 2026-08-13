@@ -23,6 +23,7 @@ You must:
 15. Check `docs/example-boundaries.md` and reject project-level work implemented by repurposing default examples.
 16. Check `AGENTS.md` and `docs/agent-workflow.md` for orchestrator-first work requirements; in hidden-layout installs, require `make -C .agent-harness work` from the project root or `make work` from inside `.agent-harness/`. Reject completion that silently bypassed orchestrator work, treated a missing root `Makefile` as orchestrator unavailability, or ignored adapter failure without an explicit manual fallback record.
 17. For `make work-fast` work, require durable `FAST_CODING_EVIDENCE: Fxxx` coding evidence and verify that it did not contain `EVAL_PASS: Fxxx`, mark the feature done, or substitute local tests for evaluator evidence.
+18. Human Eval is optional and may be deferred until a batch of Features is ready. Do not require Human Eval before accepting automatic evaluator completion. If a later human review says the original acceptance criteria were unmet, require reopening that same Feature; if it requests independent value, require Planning Agent triage rather than a repair Feature.
 
 Strict rules:
 

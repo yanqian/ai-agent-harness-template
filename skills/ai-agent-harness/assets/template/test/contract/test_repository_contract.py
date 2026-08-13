@@ -215,7 +215,13 @@ class RepositoryContractTests(unittest.TestCase):
         template_example = json.loads(template_file("agent-provider.example.json").read_text())
 
         self.assertEqual(example["provider"], "codex")
-        self.assertEqual(example["providers"]["codex"]["command"], ["codex", "exec", "-"])
+        codex = example["providers"]["codex"]
+        self.assertEqual(codex["command"], ["codex", "exec", "--model", "gpt-5.4", "-"])
+        self.assertEqual(
+            codex["runtime_check_command"],
+            ["codex", "exec", "--model", "gpt-5.4", "--ephemeral", "-"],
+        )
+        self.assertNotIn("Reply exactly: PROVIDER_CHECK_OK", codex["runtime_check_command"])
         self.assertEqual(example, template_example)
         for provider in ["claude-code", "cursor-agent", "custom"]:
             self.assertEqual(example["providers"][provider]["command"], [])
@@ -228,9 +234,9 @@ class RepositoryContractTests(unittest.TestCase):
             self.assertIn(phrase, agents)
 
         checks = {
-            readme: ["agent-provider.example.json", "agent-provider.json", "docs/agent-provider-configuration.md", "[\"codex\", \"exec\", \"-\"]"],
+            readme: ["agent-provider.example.json", "agent-provider.json", "docs/agent-provider-configuration.md", "gpt-5.4"],
             docs_index: ["agent-provider-configuration.md", "explicit provider configuration"],
-            provider_doc: ["# Agent Provider Configuration", "`provider` must be explicit", "The adapters fail closed", "Multiple known provider CLIs", "Codex:", "Claude Code:", "Cursor Agent:"],
+            provider_doc: ["# Agent Provider Configuration", "`provider` must be explicit", "The adapters fail closed", "Multiple known provider CLIs", "Codex:", "Claude Code:", "Cursor Agent:", "Reading additional input from stdin..."],
             external: ["Agent Provider Commands", "Do not infer Claude Code, Cursor Agent, or custom provider command shapes from Codex examples"],
             workflow: ["agent-provider.json", "docs/agent-provider-configuration.md", "Missing, ambiguous, or unavailable provider setup is a capability gap"],
             skill: ["agent-provider.example.json", "docs/agent-provider-configuration.md", "Do not guess between Codex, Claude Code, Cursor Agent, or custom providers"],
@@ -788,7 +794,7 @@ class RepositoryContractTests(unittest.TestCase):
             "next_action",
         ]:
             self.assertIn(phrase, initializer)
-        self.assertEqual(template_manifest["template_version"], "0.3.8")
+        self.assertEqual(template_manifest["template_version"], "0.3.9")
         self.assertEqual(template_manifest["default_layout"], "hidden")
         self.assertIn("hidden", template_manifest["layouts"])
         self.assertIn("visible", template_manifest["layouts"])
@@ -1031,6 +1037,30 @@ class RepositoryContractTests(unittest.TestCase):
         self.assertIn("run-agent-provider.py --role evaluator", evaluator)
         self.assertIn("HARNESS_AGENT_PROVIDER_CHECK", coding)
         self.assertIn("HARNESS_AGENT_PROVIDER_CHECK", evaluator)
+
+    def test_human_eval_contract_keeps_product_feedback_on_the_right_lifecycle(self):
+        script = (ROOT / "scripts" / "human-eval.py").read_text()
+        orchestrator = (ROOT / "orchestrator.py").read_text()
+        schema = (ROOT / "schemas" / "feature_list.schema.json").read_text()
+        agents = (ROOT / "AGENTS.md").read_text()
+        workflow = (ROOT / "docs" / "agent-workflow.md").read_text()
+        readme = (ROOT / "README.md").read_text()
+        template_script = template_file("scripts", "human-eval.py").read_text()
+        template_orchestrator = template_file("orchestrator.py").read_text()
+        for text in [script, template_script]:
+            for phrase in ["current_feature", "new_requirement", "human_acceptance", "reopen_pending", "HUMAN_EVAL_FAIL", "no Feature was appended", "batch-file", "write_batch_record"]:
+                self.assertIn(phrase, text)
+        for text in [orchestrator, template_orchestrator]:
+            self.assertIn("reopen_pending", text)
+            self.assertIn("attempts < max_attempts or reopened", text)
+        for text in [agents, workflow, readme]:
+            self.assertIn("Human Eval", text)
+        self.assertIn("human_acceptance", schema)
+        self.assertIn("must not block unrelated Feature work", agents)
+        self.assertIn("make human-eval", workflow)
+        self.assertIn("make human-eval-batch", workflow)
+        self.assertIn("CLASSIFICATION=current_feature", readme)
+        self.assertIn("human-eval-batch", readme)
 
 
 if __name__ == "__main__":

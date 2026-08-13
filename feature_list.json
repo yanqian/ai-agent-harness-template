@@ -706,6 +706,66 @@
         "F036",
         "F037"
       ]
+    },
+    {
+      "id": "F039",
+      "title": "Decouple Human Eval and reopen the original Feature",
+      "description": "Add a durable Human Product Evaluation lifecycle that is independent from automatic Evaluator completion and reopens the original Feature when human feedback shows its original acceptance criteria were not met.",
+      "acceptance": [
+        "Human Eval records are separate from machine `passes` and `status` and do not block unrelated Features from being developed",
+        "Feedback classified as unmet current Feature scope sets the original Feature back to non-done, preserves attempts/history/unknown fields, and records a durable reopen marker",
+        "The orchestrator selects a human-reopened Feature again even when its previous automatic attempt count reached the retry limit",
+        "Ambiguous or invalid Human Eval classification fails closed, and prompts/documentation state that unmet original scope must remain on the original Feature",
+        "Unit and contract tests cover state preservation, reopen behavior, non-blocking acceptance, and machine-vs-human state boundaries",
+        "The bundled skill template and `./init.sh` remain consistent after the change"
+      ],
+      "passes": true,
+      "status": "done",
+      "attempts": 1,
+      "last_error": "",
+      "priority": "P0"
+    },
+    {
+      "id": "F040",
+      "title": "Support deferred batch Human Eval and new-requirement triage",
+      "description": "Support Human Eval after multiple Features are complete, including mixed batch outcomes and explicit routing of genuinely new requirements into Planning without automatically appending repair Features.",
+      "acceptance": [
+        "A durable batch input and run record can evaluate multiple Feature IDs after their automatic completion without blocking intervening work",
+        "A batch can contain mixed pass, current-Feature-failure, and new-requirement outcomes with each result attributable to its Feature",
+        "New-requirement feedback leaves the original Feature complete and produces a Planning Agent handoff instead of mutating or automatically appending `feature_list.json` entries",
+        "Planning prompts and documentation require SPEC normalization and feature decomposition before a new Feature is appended",
+        "Unit, contract, and smoke tests cover batch routing, mixed outcomes, no-auto-append behavior, and bundled template consistency",
+        "`./init.sh` and `scripts/validate-feature.sh F040` pass after evaluator evidence is recorded"
+      ],
+      "passes": true,
+      "status": "done",
+      "attempts": 1,
+      "last_error": "",
+      "priority": "P0",
+      "depends_on": [
+        "F039"
+      ]
+    },
+    {
+      "id": "F041",
+      "title": "Synchronize Human Eval lifecycle into the distributable skill",
+      "description": "Update the repository-distributed AI Agent Harness skill and workflow reference so installed agents consistently understand deferred and batch Human Eval, durable evidence, same-Feature reopen behavior, and Planning handoff for genuinely new requirements.",
+      "acceptance": [
+        "The distributable SKILL.md documents that Human Eval is optional/deferred, does not block unrelated Features, and is separate from automatic Evaluator evidence",
+        "The workflow reference documents single and batch Human Eval commands, durable run and Feature evidence, current-scope reopen, and new-requirement Planning handoff",
+        "The bundled template skill copies contain equivalent Human Eval lifecycle guidance and remain synchronized with the distributable skill",
+        "Contract tests fail on missing lifecycle rules or drift between the skill documentation surfaces, and ./init.sh passes",
+        "scripts/validate-feature.sh F041 passes after a separate Evaluator Agent records EVAL_PASS: F041"
+      ],
+      "passes": true,
+      "status": "done",
+      "attempts": 1,
+      "last_error": "",
+      "priority": "P0",
+      "depends_on": [
+        "F039",
+        "F040"
+      ]
     }
   ]
 }

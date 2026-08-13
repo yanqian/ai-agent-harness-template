@@ -181,6 +181,10 @@ Default adapters delegate to `scripts/run-agent-provider.py`. Configure them by 
 
 ## State Files
 
+### Human Evaluation
+
+Human Product Evaluation is optional and may happen after several Features are automatically complete. It must not block unrelated Feature work. Use `scripts/human-eval.py` or the documented `make human-eval` target to record feedback. If feedback says the selected Feature's original acceptance criteria are still unmet, classify it as `current_feature`; reopen that same Feature and continue it. Do not create a repair Feature. If feedback requests independent new value, classify it as `new_requirement`; leave the original Feature complete and send the requirement through SPEC normalization and Planning Agent decomposition before appending a new Feature. Human Eval records do not replace Evaluator Agent evidence.
+
 ## Repository Knowledge Map
 
 `AGENTS.md` is the entry point, not the whole manual.

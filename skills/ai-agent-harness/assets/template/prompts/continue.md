@@ -14,8 +14,9 @@ You must reconstruct context from repository state only:
 8. If prior work failed, inspect `runs/` and `docs/failure-domains.md` before deciding the next action.
 9. If prior work used a workaround for a missing tool, dependency, generator, permission, service, credential, runtime setting, CI resource, or verification fixture, inspect `docs/capability-gaps.md` before continuing.
 10. If prior work modified `examples/`, inspect `docs/example-boundaries.md` before continuing.
-11. When implementation or evaluation is required, use `make work` first so the orchestrator owns the one-feature loop. In hidden-layout installs, run `make -C .agent-harness work` from the project root or `make work` from inside `.agent-harness/`.
-12. Use `make work-fast` only when intentionally starting or resuming the fast A/B flow, and require `FAST_CODING_EVIDENCE: Fxxx` before evaluator execution.
+11. If Human Eval feedback exists, determine whether it says the original Feature is incomplete or requests independent new value. Reopen the original Feature for unmet acceptance criteria; route independent new requirements to Planning Agent instead of creating a repair Feature.
+12. When implementation or evaluation is required, use `make work` first so the orchestrator owns the one-feature loop. In hidden-layout installs, run `make -C .agent-harness work` from the project root or `make work` from inside `.agent-harness/`.
+13. Use `make work-fast` only when intentionally starting or resuming the fast A/B flow, and require `FAST_CODING_EVIDENCE: Fxxx` before evaluator execution.
 
 Do not rely on prior chat history.
 Do not reset or discard user changes.

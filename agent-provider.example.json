@@ -2,9 +2,9 @@
   "provider": "codex",
   "providers": {
     "codex": {
-      "command": ["codex", "exec", "-"],
-      "runtime_check_command": ["codex", "exec", "--ephemeral", "Reply exactly: PROVIDER_CHECK_OK"],
-      "verified": "2026-06-13: `codex exec --help` says instructions are read from stdin when PROMPT is omitted or `-` is used, and documents --ephemeral for runs without persisted session files. Runtime checks may still require user-approved escalation when Codex needs access to CODEX_HOME state or app-server resources."
+      "command": ["codex", "exec", "--model", "gpt-5.4", "-"],
+      "runtime_check_command": ["codex", "exec", "--model", "gpt-5.4", "--ephemeral", "-"],
+      "verified": "2026-07-13: Codex CLI reads the harness-supplied prompt from stdin when `-` is used. Keep the prompt out of argv because the harness also writes it to stdin. The project-local model override avoids inheriting an unavailable model from the user's global Codex configuration. Verify that gpt-5.4 is available before execution."
     },
     "claude-code": {
       "command": [],

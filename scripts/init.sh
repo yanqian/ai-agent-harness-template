@@ -50,6 +50,7 @@ for path in \
   prompts/evaluate.md \
   scripts/clean-state.py \
   scripts/validate-state.py \
+  scripts/human-eval.py \
   scripts/validate-feature.sh \
   scripts/summarize-progress.sh \
   scripts/summarize-runs.sh \

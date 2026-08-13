@@ -84,6 +84,8 @@ When a project has just been initialized or a minspec has just been accepted, fo
 
 When completing or evaluating a feature, follow the target repository's `docs/evaluator-evidence.md`. From the enforcement baseline onward, a feature should not be marked done unless `runs/` contains `EVAL_PASS: Fxxx` for that feature.
 
+Human Product Evaluation is an optional, deferred acceptance layer. It may happen after one Feature or after a batch of Features and must not block unrelated Feature work. Record it with `make human-eval` or `make human-eval-batch`; the result belongs in both durable `runs/` evidence and the Feature's `human_acceptance` history. If the original acceptance promise is unmet, classify it as `current_feature` and reopen that same Feature. If it is genuinely new value, classify it as `new_requirement` and hand it to Planning for SPEC normalization and decomposition; do not auto-append a repair Feature. Human Eval does not replace the separate automatic Evaluator `EVAL_PASS` evidence.
+
 When project work touches `examples/`, follow the target repository's `docs/example-boundaries.md`. Default examples are references, not the default place for product requirements.
 
 For one-feature implementation and evaluation, default to the repository's orchestrator-first entrypoint, normally `make work`. In hidden-layout installs, run `make -C .agent-harness work` from the project root, or `make work` from inside `.agent-harness/`; a missing root `Makefile` is not an orchestrator-unavailable condition. Manual or interactive Coding Agent work is an explicit fallback only when role adapters are unavailable or the user asks for manual work; it must not bypass evaluator gating, evaluator evidence, or final `./init.sh` verification.

@@ -1,6 +1,6 @@
 SHELL := /usr/bin/env bash
 
-.PHONY: help init test validate smoke unit contract go-example work work-fast dry-run summarize clean ci
+.PHONY: help init test validate smoke unit contract go-example work work-fast human-eval human-eval-batch dry-run summarize clean ci
 
 FEATURE ?= F001
 
@@ -15,6 +15,8 @@ help:
 	@printf '  %-14s %s\n' 'go-example' 'run the Go server example tests'
 	@printf '  %-14s %s\n' 'work' 'run one orchestrator round for the next unfinished feature'
 	@printf '  %-14s %s\n' 'work-fast' 'run the evaluator-gated fast A/B work flow'
+	@printf '  %-14s %s\n' 'human-eval' 'record optional human acceptance for one Feature'
+	@printf '  %-14s %s\n' 'human-eval-batch' 'record deferred Human Eval from a JSON batch manifest'
 	@printf '  %-14s %s\n' 'dry-run' 'preview the next orchestrator round'
 	@printf '  %-14s %s\n' 'summarize' 'print progress and run summaries'
 	@printf '  %-14s %s\n' 'clean' 'reset project-specific harness state for a fresh project'
@@ -46,6 +48,12 @@ work:
 
 work-fast:
 	python3 orchestrator.py --work-fast --max-rounds 1
+
+human-eval:
+	python3 scripts/human-eval.py $(FEATURE) --result $(RESULT) --classification $(CLASSIFICATION) --feedback "$(FEEDBACK)"
+
+human-eval-batch:
+	python3 scripts/human-eval.py --batch-file $(BATCH_FILE)
 
 dry-run:
 	python3 orchestrator.py --dry-run

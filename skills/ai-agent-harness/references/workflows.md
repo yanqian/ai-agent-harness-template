@@ -30,6 +30,12 @@ In hidden layout, root `./init.sh` starts as harness verification only. Before a
 
 From the evaluator-evidence baseline onward, `./init.sh` also verifies that completed features have matching `EVAL_PASS: Fxxx` run evidence.
 
+## Human Evaluation
+
+Human Eval is optional and may be deferred until several Features are complete. It is product acceptance evidence, not an orchestration gate, and must not block unrelated Feature work. Record one result with `make human-eval` or a mixed batch with `make human-eval-batch`; both write durable run evidence and update the Feature's `human_acceptance` history.
+
+Classify every result explicitly. `current_feature` means the original Feature promise is still unmet: reopen that same Feature and continue its lifecycle, preserving attempts, history, and unknown fields. `new_requirement` means independent new value: leave the original Feature complete and create a Planning Agent handoff. Planning must perform SPEC normalization in `SPEC.md` and decompose the request before appending a new Feature. Human Eval evidence does not replace the automatic Evaluator `EVAL_PASS: Fxxx` evidence.
+
 ## Plan Requirement
 
 Use when the user describes new work before implementation.

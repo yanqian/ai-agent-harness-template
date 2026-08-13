@@ -11,9 +11,9 @@ Copy `agent-provider.example.json` to `agent-provider.json` and set one provider
   "provider": "codex",
   "providers": {
     "codex": {
-      "command": ["codex", "exec", "-"],
-      "runtime_check_command": ["codex", "exec", "--ephemeral", "Reply exactly: PROVIDER_CHECK_OK"],
-      "verified": "2026-06-13: codex exec --help says instructions are read from stdin when PROMPT is omitted or - is used, and documents --ephemeral for runs without persisted session files."
+      "command": ["codex", "exec", "--model", "gpt-5.4", "-"],
+      "runtime_check_command": ["codex", "exec", "--model", "gpt-5.4", "--ephemeral", "-"],
+      "verified": "2026-07-13: Codex CLI reads the harness-supplied prompt from stdin when - is used. The project-local model override prevents an unavailable global model setting from breaking provider startup."
     }
   }
 }
@@ -59,11 +59,13 @@ The harness does not automatically escalate permissions. The outer agent or user
 
 Codex:
 
-- Verified locally on 2026-06-13 with `codex exec --help`.
+- Verified locally on 2026-07-13 with `codex exec --help` and a real evaluator preflight.
 - `codex exec -` reads instructions from stdin.
 - `codex exec --help` documents `--ephemeral` for runs without persisted session files.
-- The sample command is `["codex", "exec", "-"]`.
-- The sample runtime check command is `["codex", "exec", "--ephemeral", "Reply exactly: PROVIDER_CHECK_OK"]`.
+- The harness supplies both role prompts and runtime-check prompts on stdin, so provider commands must use `-` and must not also include a prompt argument. Mixing an argv prompt with harness-supplied stdin can make Codex print `Reading additional input from stdin...` and exit unsuccessfully.
+- The sample command is `["codex", "exec", "--model", "gpt-5.4", "-"]`.
+- The sample runtime check command is `["codex", "exec", "--model", "gpt-5.4", "--ephemeral", "-"]`.
+- The explicit model is a project-local known-good default. If it is unavailable in the installed CLI/account, replace it with a locally verified model instead of inheriting an unknown global model setting.
 - If Codex cannot access `$CODEX_HOME` state such as `~/.codex/state_5.sqlite` or app-server resources, treat it as a provider runtime permission gap and ask the user to approve escalated execution.
 
 Claude Code:

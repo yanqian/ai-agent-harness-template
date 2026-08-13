@@ -33,7 +33,107 @@ def load_orchestrator():
     return module
 
 
+def load_human_eval():
+    spec = importlib.util.spec_from_file_location("human_eval", ROOT / "scripts" / "human-eval.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
 class ScriptUnitTests(unittest.TestCase):
+    def test_human_eval_reopens_same_feature_and_preserves_state(self):
+        human_eval = load_human_eval()
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp = Path(tmp_dir)
+            feature_path = tmp / "feature_list.json"
+            runs_dir = tmp / "runs"
+            runs_dir.mkdir()
+            feature_path.write_text(json.dumps({"features": [{
+                "id": "F039", "title": "feature", "description": "desc", "acceptance": ["works"],
+                "passes": True, "status": "done", "attempts": 3, "last_error": "",
+                "custom_field": "preserve"
+            }]}))
+            with mock.patch.object(human_eval, "FEATURES_PATH", feature_path), mock.patch.object(human_eval, "RUNS_DIR", runs_dir), mock.patch.object(sys, "argv", ["human-eval.py", "F039", "--result", "fail", "--classification", "current_feature", "--feedback", "flow is incomplete"]):
+                self.assertEqual(human_eval.main(), 0)
+            feature = json.loads(feature_path.read_text())["features"][0]
+            self.assertFalse(feature["passes"])
+            self.assertEqual(feature["status"], "todo")
+            self.assertEqual(feature["attempts"], 3)
+            self.assertEqual(feature["custom_field"], "preserve")
+            self.assertTrue(feature["human_acceptance"]["reopen_pending"])
+            self.assertEqual(len(list(runs_dir.glob("*human-eval.md"))), 1)
+
+    def test_orchestrator_selects_human_reopened_feature_after_attempt_limit(self):
+        orchestrator = load_orchestrator()
+        data = {"features": [{
+            "id": "F039", "title": "feature", "description": "desc", "acceptance": ["works"],
+            "passes": False, "status": "todo", "attempts": 3, "last_error": "",
+            "human_acceptance": {"reopen_pending": True}
+        }]}
+        self.assertEqual(orchestrator.pick_feature(data, 3)["id"], "F039")
+
+    def test_human_eval_new_requirement_does_not_mark_original_incomplete(self):
+        human_eval = load_human_eval()
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp = Path(tmp_dir)
+            feature_path = tmp / "feature_list.json"
+            runs_dir = tmp / "runs"
+            runs_dir.mkdir()
+            feature_path.write_text(json.dumps({"features": [{
+                "id": "F039", "title": "feature", "description": "desc", "acceptance": ["works"],
+                "passes": True, "status": "done", "attempts": 1, "last_error": ""
+            }]}))
+            with mock.patch.object(human_eval, "FEATURES_PATH", feature_path), mock.patch.object(human_eval, "RUNS_DIR", runs_dir), mock.patch.object(sys, "argv", ["human-eval.py", "F039", "--result", "fail", "--classification", "new_requirement", "--feedback", "add OAuth"]):
+                self.assertEqual(human_eval.main(), 0)
+            feature = json.loads(feature_path.read_text())["features"][0]
+            self.assertTrue(feature["passes"])
+            self.assertEqual(feature["status"], "done")
+            self.assertFalse(feature["human_acceptance"]["reopen_pending"])
+
+    def test_human_eval_batch_routes_mixed_outcomes_without_appending_features(self):
+        human_eval = load_human_eval()
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp = Path(tmp_dir)
+            feature_path = tmp / "feature_list.json"
+            runs_dir = tmp / "runs"
+            runs_dir.mkdir()
+            feature_path.write_text(json.dumps({"features": [
+                {"id": "F039", "title": "first", "description": "desc", "acceptance": ["works"], "passes": True, "status": "done", "attempts": 3, "last_error": ""},
+                {"id": "F040", "title": "second", "description": "desc", "acceptance": ["works"], "passes": True, "status": "done", "attempts": 1, "last_error": ""}
+            ]}))
+            batch = tmp / "human-eval.json"
+            batch.write_text(json.dumps([
+                {"feature_id": "F039", "result": "fail", "classification": "current_feature", "feedback": "original flow incomplete"},
+                {"feature_id": "F040", "result": "fail", "classification": "new_requirement", "feedback": "add exports"}
+            ]))
+            with mock.patch.object(human_eval, "FEATURES_PATH", feature_path), mock.patch.object(human_eval, "RUNS_DIR", runs_dir), mock.patch.object(sys, "argv", ["human-eval.py", "--batch-file", str(batch)]):
+                self.assertEqual(human_eval.main(), 0)
+            features = json.loads(feature_path.read_text())["features"]
+            self.assertFalse(features[0]["passes"])
+            self.assertEqual(features[0]["status"], "todo")
+            self.assertTrue(features[1]["passes"])
+            self.assertEqual(features[1]["status"], "done")
+            self.assertEqual(len(features), 2)
+            self.assertEqual(len(list(runs_dir.glob("*-batch.md"))), 1)
+
+    def test_human_eval_batch_records_pass_without_reopening(self):
+        human_eval = load_human_eval()
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp = Path(tmp_dir)
+            feature_path = tmp / "feature_list.json"
+            runs_dir = tmp / "runs"
+            runs_dir.mkdir()
+            feature_path.write_text(json.dumps({"features": [{
+                "id": "F039", "title": "feature", "description": "desc", "acceptance": ["works"],
+                "passes": True, "status": "done", "attempts": 1, "last_error": ""
+            }]}))
+            batch = tmp / "human-eval.json"
+            batch.write_text(json.dumps([{"feature_id": "F039", "result": "pass", "classification": "current_feature", "feedback": "accepted"}]))
+            with mock.patch.object(human_eval, "FEATURES_PATH", feature_path), mock.patch.object(human_eval, "RUNS_DIR", runs_dir), mock.patch.object(sys, "argv", ["human-eval.py", "--batch-file", str(batch)]):
+                self.assertEqual(human_eval.main(), 0)
+            feature = json.loads(feature_path.read_text())["features"][0]
+            self.assertTrue(feature["passes"])
+            self.assertEqual(feature["status"], "done")
     def test_validate_state_accepts_current_feature_list(self):
         result = run_command([sys.executable, "scripts/validate-state.py"])
         self.assertEqual(result.returncode, 0, result.stderr)
@@ -480,6 +580,15 @@ class ScriptUnitTests(unittest.TestCase):
                 passed, reason = orchestrator.fast_coding_evidence_result("F123")
                 self.assertFalse(passed)
                 self.assertIn("must not contain evaluator pass evidence", reason)
+
+    def test_orchestrator_fast_evidence_ignores_verdict_examples_in_other_run_records(self):
+        orchestrator = load_orchestrator()
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            runs_dir = Path(tmp_dir)
+            (runs_dir / "coding.md").write_text("FAST_CODING_EVIDENCE: F123\nCODING_PASS: F123\n")
+            (runs_dir / "evaluation.md").write_text("- Logs: coding evidence must not contain `EVAL_PASS: F123`\n")
+            with mock.patch.object(orchestrator, "RUNS_DIR", runs_dir):
+                self.assertEqual(orchestrator.fast_coding_evidence_result("F123"), (True, ""))
 
     def test_orchestrator_work_fast_starts_without_coding_adapter(self):
         orchestrator = load_orchestrator()

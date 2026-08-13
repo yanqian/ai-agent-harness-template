@@ -59,10 +59,20 @@
           "priority": {
             "type": "string",
             "enum": ["P0", "P1", "P2"]
+          },
+          "human_acceptance": {
+            "type": "object",
+            "additionalProperties": true,
+            "properties": {
+              "status": {"type": "string", "enum": ["unreviewed", "accepted", "rejected", "new_requirement"]},
+              "reopen_pending": {"type": "boolean"},
+              "last_feedback": {"type": "string"},
+              "last_recorded_at": {"type": "string"},
+              "history": {"type": "array"}
+            }
           }
         }
       }
     }
   }
 }
-

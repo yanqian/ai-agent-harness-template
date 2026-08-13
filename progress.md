@@ -55,7 +55,7 @@ Implemented components:
 
 ## Last Completed Feature
 
-`F038` - Add installed harness upgrade workflow.
+`F041` - Synchronize Human Eval lifecycle into the distributable skill.
 
 ## Next Feature
 
@@ -83,3 +83,10 @@ Implemented components:
 - F038 was planned after a real hidden-layout project repair showed a lifecycle gap: the global skill had `work-fast`, but the installed project-local `.agent-harness` remained on an older template without the target. The planned fix adds an explicit upgrade workflow and reduces nested template vendoring in installed projects.
 - F038 completed through work-fast provider-native implementation. The initializer now has explicit `upgrade` mode, hidden-layout harness runtime files are upgradeable without overwriting root project recovery entrypoints, obsolete nested template assets are removed during upgrade, and the template version was bumped to 0.3.7. Coding evidence is recorded in `runs/20260709T061705Z-F038-work-fast-coding.md`, evaluator approval is recorded as `EVAL_PASS: F038` in `runs/20260709T062151Z-F038-evaluation.md`, and final `./init.sh` plus `scripts/validate-feature.sh F038` passed.
 - A follow-up 0.3.8 repair fixed installed-project contract tests so hidden-layout installs no longer require the removed nested `skills/ai-agent-harness/assets/template` tree.
+- F039/F040 planning adds an optional Human Eval layer that can happen after multiple Features are automatically complete. Unmet original scope must reopen the original Feature; genuinely new requirements remain planning inputs and are not auto-appended. F040 depends on F039.
+- F039 coding added optional Human Eval recording, current-scope reopen behavior, non-blocking new-requirement recording, orchestrator reopen selection, evidence-parser hardening, contract coverage, and bundled template synchronization. Coding evidence is recorded in `runs/20260811T081020Z-F039-work-fast-coding.md`; evaluator approval is recorded in `runs/20260811T082002Z-F039-evaluation.md`.
+- F039 had two evaluator-gated failures before passing: missing contract coverage and a work-fast evidence-parser false positive. Both are recorded in `runs/` and fixed with regression coverage. F040 remains the next independent feature for deferred batch Human Eval.
+- F040 coding added JSON batch Human Eval input, mixed-outcome routing, batch run evidence, Make targets, tests, and bundled template synchronization. Coding evidence is recorded in `runs/20260811T092000Z-F040-work-fast-coding.md`; F040 remains incomplete until a separate Evaluator Agent records `EVAL_PASS: F040`.
+- F040 evaluator feedback identified missing smoke coverage; subprocess smoke coverage and explicit batch pass tests now pass. Rerun the separate Evaluator Agent for F040.
+- F040 passed after adding the required subprocess smoke coverage. Evaluator approval is recorded in `runs/20260811T092600Z-F040-evaluation.md`.
+- F041 synchronized Human Eval lifecycle rules into the distributable skill and bundled template, with contract parity coverage. Coding evidence is recorded in `runs/20260811T093600Z-F041-work-fast-coding.md`; evaluator approval is recorded in `runs/20260811T093820Z-F041-evaluation.md`. F011 remains the next unfinished feature.

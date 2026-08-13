@@ -302,7 +302,47 @@ Skill documentation must distinguish installed skill usage from manual script us
 
 Skill installation documentation must avoid machine-specific absolute paths. It should use portable paths such as `~/.codex/skills`, `~/.claude/skills`, project `.claude/skills`, and Cursor project rules under `.cursor/rules`, and explain which entry point applies to Codex, Claude Code, Cursor, and manual fallback use.
 
+### Human Evaluation Lifecycle and Deferred Acceptance
+
+Goal: make Human Product Evaluation a durable, optional acceptance layer that can be performed per Feature or after a batch of Features, while ensuring feedback about an unmet original commitment returns to that same Feature instead of becoming an automatic repair Feature.
+
+Included scope: record human evaluation outcomes and feedback in durable run artifacts; keep machine Evaluator completion independent from human acceptance timing; reopen the original Feature when human feedback says its original acceptance criteria are not met; preserve attempts and history while allowing a human-reopened Feature to be selected again after it was blocked by an automatic retry limit; support batch evaluation over multiple completed Features; and classify feedback as either unmet current Feature scope or an independent new requirement before any new Feature is planned.
+
+Excluded scope: requiring Human Eval before downstream Features can start; automatically creating or appending new Feature entries from free-form human feedback; changing the meaning of `EVAL_PASS`; treating a new requirement as evidence that the original Feature failed; resetting Feature history or attempts during reopen; or replacing SPEC normalization and Planning Agent decomposition.
+
+Core flows: a project completes several Features through automatic evaluator gating and continues development without waiting for Human Eval; a human records a single or batch evaluation with per-Feature feedback; feedback classified as `current_feature` sets the original Feature back to non-done, records a reopen marker, and lets the orchestrator continue that Feature; feedback classified as `new_requirement` leaves the original Feature complete and creates a durable planning input without mutating `feature_list.json`; Planning Agent later normalizes the new requirement and appends a separately verifiable Feature; human acceptance can be recorded after implementation without blocking unrelated work.
+
+Constraints: Human Eval state must be separate from machine Feature `status` and `passes`; batch evaluation must be attributable to a batch and individual Feature IDs; reopen must preserve unknown fields, feature ordering, attempts, and prior run history; a reopened Feature must not be permanently excluded merely because it previously reached the automatic attempt limit; invalid or ambiguous classifications must fail closed and ask for explicit triage; and all changes must work in visible template layout and generated hidden-layout installs.
+
+Ambiguities or assumptions: the human or coordinating agent is responsible for deciding whether feedback contradicts the original acceptance criteria or requests independent new value; the harness records that decision but does not infer it from prose; a human pass is advisory product acceptance and does not replace the Evaluator Agent evidence required for machine completion; a batch may contain mixed outcomes and mixed classifications; a batch record is evidence and planning input, not a feature generator.
+
+Required capabilities: a human-evaluation recording command or equivalent script with single and batch input; durable per-Feature and batch run records; Feature metadata for human-evaluation history and reopen intent; orchestrator selection logic for reopened Features; schema, validation, prompt, documentation, and contract-test coverage; and bundled template synchronization for installed projects.
+
+Implementation paths: `scripts/`, `orchestrator.py`, `feature_list.json`, `schemas/feature_list.schema.json`, `runs/`, `Makefile`, `AGENTS.md`, `SPEC.md`, `README.md`, `docs/agent-workflow.md`, `prompts/continue.md`, `prompts/evaluate.md`, `prompts/plan.md`, `test/unit/`, `test/contract/`, and `skills/ai-agent-harness/assets/template/`.
+
+Verification surface: unit tests for single and batch feedback routing, reopen behavior after `blocked`, preservation of attempts and unknown fields, and non-blocking acceptance; contract tests for the human/machine state boundary, explicit current-vs-new classification, Planning Agent handoff, and bundled template consistency; smoke tests for the recording command; `./init.sh`; and `scripts/validate-feature.sh` for each implemented Feature.
+
 ### Layered Verification
+
+### Human Evaluation Rules in the Distributable Skill
+
+Goal: ensure every installed copy of the AI Agent Harness skill teaches the same Human Evaluation lifecycle already implemented by the repository runtime.
+
+Included scope: update the distributable `SKILL.md` and workflow reference with optional and deferred Human Eval guidance; document single and batch recording commands; require durable Feature metadata and run evidence; explain current-scope reopen versus new-requirement planning; and keep the bundled template copies and contract tests synchronized.
+
+Excluded scope: changing the global skill installation automatically, making Human Eval a prerequisite for downstream work, replacing automatic Evaluator evidence, or inferring triage classifications from free-form feedback.
+
+Core flows: an agent reads the installed skill and learns that automatic Evaluator completion may proceed without waiting for Human Eval; an operator records `make human-eval` or `make human-eval-batch`; current-scope feedback returns to the original Feature; independent new value becomes a Planning Agent input; and the run record plus `human_acceptance` metadata preserve the evidence chain.
+
+Constraints: the repository-local distributable skill is the source artifact for future installs; root and bundled template guidance must agree; documentation must preserve the distinction between machine `EVAL_PASS` and human acceptance; tests must detect drift in the two skill documentation surfaces; and global user directories are not modified implicitly by repository work.
+
+Ambiguities or assumptions: synchronizing the repository skill means updating the checked-in distributable skill and its bundled template, while updating a user's global `~/.codex/skills` copy remains an explicit installer or upgrade action; the runtime behavior is covered by F039/F040 and this Feature covers the instructional contract.
+
+Required capabilities: synchronized skill documentation, workflow reference guidance, contract assertions for the lifecycle rules and bundled copies, and version/update guidance that points installed projects to the explicit skill-upgrade flow.
+
+Implementation paths: `skills/ai-agent-harness/SKILL.md`, `skills/ai-agent-harness/references/workflows.md`, `skills/ai-agent-harness/assets/template/skills/ai-agent-harness/`, `test/contract/test_repository_contract.py`, the bundled contract test, `README.md`, `SPEC.md`, `feature_list.json`, and `progress.md`.
+
+Verification surface: contract tests for both skill documentation surfaces and template parity; JSON/state validation; `./init.sh`; and `scripts/validate-feature.sh F041` after Evaluator evidence is recorded.
 
 The template keeps automated checks in explicit layers:
 

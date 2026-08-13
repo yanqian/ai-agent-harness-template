@@ -66,6 +66,8 @@ Evaluation rejects project-level features that pass only by repurposing default 
 
 Evaluation rejects project-level completion when accepted minspec work only verifies the harness and leaves root `./init.sh` without dependency setup, service startup, and a real smoke test.
 
+Human Product Evaluation is optional and can be deferred until several Features are complete. Use `make human-eval` for one Feature or `make human-eval-batch BATCH_FILE=...` for a JSON batch manifest. Classify feedback that means the original acceptance criteria are unmet as `current_feature`; the original Feature is reopened and must continue. Classify independent new value as `new_requirement`; leave the original Feature complete and send the requirement through Planning Agent normalization. Human Eval does not block unrelated Feature work or replace automatic Evaluator evidence.
+
 ## Continuation
 
 Use `prompts/continue.md` after interruptions.

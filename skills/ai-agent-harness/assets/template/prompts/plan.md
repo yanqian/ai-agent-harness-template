@@ -16,6 +16,7 @@ You must:
 10. Use `docs/project-recovery-init.md` when the requirement initializes a fresh project, accepts a minspec, or changes root `./init.sh`.
 11. Identify required capabilities such as tools, permissions, generators, dependencies, services, credentials, runtime settings, CI resources, and verification fixtures.
 12. Identify project-owned implementation and verification paths; use `examples/` only when the requirement explicitly targets example maintenance.
+13. When a requirement comes from Human Eval, first classify it as unmet current Feature scope or independent new value. Do not append a new Feature for a repair to an unmet original commitment.
 13. Append one or more new features to `feature_list.json`, including explicit capability features when the requirement depends on missing or unclear capabilities.
 14. Preserve existing feature IDs, ordering, `passes`, `status`, `attempts`, `last_error`, and unknown fields.
 15. Validate JSON and uniqueness with `./init.sh`.
