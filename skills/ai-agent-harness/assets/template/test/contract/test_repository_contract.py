@@ -1107,6 +1107,30 @@ class RepositoryContractTests(unittest.TestCase):
         self.assertIn("CLASSIFICATION=current_feature", readme)
         self.assertIn("human-eval-batch", readme)
 
+    def test_distributable_skill_documents_human_eval_lifecycle(self):
+        skill = (ROOT / "skills" / "ai-agent-harness" / "SKILL.md").read_text()
+        workflows = (ROOT / "skills" / "ai-agent-harness" / "references" / "workflows.md").read_text()
+        template_skill = template_file("skills", "ai-agent-harness", "SKILL.md").read_text()
+        template_workflows = template_file("skills", "ai-agent-harness", "references", "workflows.md").read_text()
+        for text in [skill, workflows, template_skill, template_workflows]:
+            for phrase in [
+                "optional",
+                "deferred",
+                "must not block unrelated Feature work",
+                "make human-eval",
+                "make human-eval-batch",
+                "human_acceptance",
+                "current_feature",
+                "reopen that same Feature",
+                "new_requirement",
+                "SPEC normalization",
+                "does not replace",
+                "EVAL_PASS: Fxxx",
+            ]:
+                self.assertIn(phrase, text)
+        self.assertEqual(skill, template_skill)
+        self.assertEqual(workflows, template_workflows)
+
 
 if __name__ == "__main__":
     unittest.main()
