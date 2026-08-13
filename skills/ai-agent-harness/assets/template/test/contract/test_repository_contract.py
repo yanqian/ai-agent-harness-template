@@ -20,12 +20,14 @@ def bundled_template_available() -> bool:
 class RepositoryContractTests(unittest.TestCase):
     def test_template_version_sources_are_consistent(self):
         manifest_version = json.loads((ROOT / ".agent-harness-template.json").read_text())["template_version"]
+        bundled_manifest_version = json.loads(template_file(".agent-harness-template.json").read_text())["template_version"]
         expected = f'TEMPLATE_VERSION = "{manifest_version}"'
         initializer = (ROOT / "skills" / "ai-agent-harness" / "scripts" / "init_harness.py").read_text()
         bundled_initializer = template_file("skills", "ai-agent-harness", "scripts", "init_harness.py").read_text()
         harness_tests = (ROOT / "test" / "harness" / "test_skill_initializer.py").read_text()
         bundled_harness_tests = template_file("test", "harness", "test_skill_initializer.py").read_text()
 
+        self.assertEqual(bundled_manifest_version, manifest_version)
         self.assertIn(expected, initializer)
         self.assertIn(expected, bundled_initializer)
         self.assertEqual(initializer, bundled_initializer)

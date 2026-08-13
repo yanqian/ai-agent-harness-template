@@ -807,7 +807,21 @@
       "priority": "P0",
       "depends_on": [
         "F042"
-      ]
+      ],
+      "human_acceptance": {
+        "status": "rejected",
+        "history": [
+          {
+            "at": "2026-08-13T15:26:49.869051+00:00",
+            "result": "fail",
+            "classification": "current_feature",
+            "feedback": "Bundled skill template manifest still reports 0.3.8 while the root manifest and initializer report 0.3.9, so installed skill checks detect version drift."
+          }
+        ],
+        "last_feedback": "Bundled skill template manifest still reports 0.3.8 while the root manifest and initializer report 0.3.9, so installed skill checks detect version drift.",
+        "last_recorded_at": "2026-08-13T15:26:49.869051+00:00",
+        "reopen_pending": true
+      }
     }
   ]
 }
