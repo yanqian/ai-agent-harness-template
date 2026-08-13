@@ -9,6 +9,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 INIT_SCRIPT = ROOT / "skills" / "ai-agent-harness" / "scripts" / "init_harness.py"
+TEMPLATE_VERSION = json.loads((ROOT / ".agent-harness-template.json").read_text())["template_version"]
 
 
 def run_initializer(project: Path, mode: str, *extra: str):
@@ -99,7 +100,7 @@ class SkillInitializerHarnessTests(unittest.TestCase):
             data = json.loads((project / ".agent-harness" / "feature_list.json").read_text())
             self.assertEqual(data, {"features": []})
             manifest = json.loads((project / ".agent-harness" / "manifest.json").read_text())
-            self.assertEqual(manifest["template_version"], "0.3.8")
+            self.assertEqual(manifest["template_version"], TEMPLATE_VERSION)
             self.assertEqual(manifest["layout"], "hidden")
             self.assertIn("category", manifest["files"][".agent-harness/scripts/validate-state.py"])
             self.assertTrue((project / "AGENTS.md").exists())
@@ -135,8 +136,8 @@ class SkillInitializerHarnessTests(unittest.TestCase):
             check = run_initializer(project, "check")
             self.assertEqual(check.returncode, 0, check.stdout + check.stderr)
             self.assertIn("layout=hidden", check.stdout)
-            self.assertIn("template_version=0.3.8", check.stdout)
-            self.assertIn("installed_version=0.3.8", check.stdout)
+            self.assertIn(f"template_version={TEMPLATE_VERSION}", check.stdout)
+            self.assertIn(f"installed_version={TEMPLATE_VERSION}", check.stdout)
             self.assertIn("state_valid=true", check.stdout)
             self.assertIn("runnable_harness=true", check.stdout)
             self.assertIn("project_state_changed=", check.stdout)
@@ -313,7 +314,7 @@ class SkillInitializerHarnessTests(unittest.TestCase):
             self.assertEqual((project / "init.sh").read_text(), custom_init)
             self.assertFalse((project / ".agent-harness" / "skills" / "ai-agent-harness" / "assets").exists())
             upgraded_manifest = json.loads(manifest_path.read_text())
-            self.assertEqual(upgraded_manifest["template_version"], "0.3.8")
+            self.assertEqual(upgraded_manifest["template_version"], TEMPLATE_VERSION)
             self.assertEqual(upgraded_manifest["mode"], "upgrade")
             contracts = run_installed_contract_tests(project)
             self.assertEqual(contracts.returncode, 0, contracts.stdout + contracts.stderr)
@@ -335,7 +336,7 @@ class SkillInitializerHarnessTests(unittest.TestCase):
             self.assertEqual(check.returncode, 1)
             for phrase in [
                 "mode=check",
-                "template_version=0.3.8",
+                f"template_version={TEMPLATE_VERSION}",
                 "installed_version=0.0.0",
                 "state_valid=false",
                 "runnable_harness=false",

@@ -18,6 +18,20 @@ def bundled_template_available() -> bool:
 
 
 class RepositoryContractTests(unittest.TestCase):
+    def test_template_version_sources_are_consistent(self):
+        manifest_version = json.loads((ROOT / ".agent-harness-template.json").read_text())["template_version"]
+        expected = f'TEMPLATE_VERSION = "{manifest_version}"'
+        initializer = (ROOT / "skills" / "ai-agent-harness" / "scripts" / "init_harness.py").read_text()
+        bundled_initializer = template_file("skills", "ai-agent-harness", "scripts", "init_harness.py").read_text()
+        harness_tests = (ROOT / "test" / "harness" / "test_skill_initializer.py").read_text()
+        bundled_harness_tests = template_file("test", "harness", "test_skill_initializer.py").read_text()
+
+        self.assertIn(expected, initializer)
+        self.assertIn(expected, bundled_initializer)
+        self.assertEqual(initializer, bundled_initializer)
+        self.assertIn("TEMPLATE_VERSION = json.loads", harness_tests)
+        self.assertEqual(harness_tests, bundled_harness_tests)
+
     def test_readme_records_reference_sources(self):
         text = (ROOT / "README.md").read_text()
         for phrase in [
@@ -191,7 +205,7 @@ class RepositoryContractTests(unittest.TestCase):
             init: ["docs/capability-gaps.md"],
             skill: ["docs/capability-gaps.md", "local-only workarounds"],
             workflows: ["Identify required capabilities", "Check `docs/capability-gaps.md`"],
-            initializer: ["docs/capability-gaps.md", "Capability Gap Handling", "TEMPLATE_VERSION = \"0.3.8\""],
+            initializer: ["docs/capability-gaps.md", "Capability Gap Handling", "TEMPLATE_VERSION = \"0.3.9\""],
         }
         for text, phrases in checks.items():
             for phrase in phrases:
@@ -326,7 +340,7 @@ class RepositoryContractTests(unittest.TestCase):
             init: ["docs/feature-decomposition.md"],
             skill: ["docs/feature-decomposition.md", "Split independently verifiable behavior"],
             workflows: ["Use `docs/feature-decomposition.md`", "reject over-bundled features"],
-            initializer: ["docs/feature-decomposition.md", "TEMPLATE_VERSION = \"0.3.8\""],
+            initializer: ["docs/feature-decomposition.md", "TEMPLATE_VERSION = \"0.3.9\""],
         }
         if not bundled_template_available():
             checks.pop(spec, None)
@@ -542,7 +556,7 @@ class RepositoryContractTests(unittest.TestCase):
             init: ["docs/commit-messages.md"],
             skill: ["docs/commit-messages.md", "Fxxx <Action> <concise summary>"],
             workflows: ["Read `docs/commit-messages.md`", "starts with the feature ID", "Verify every feature ID referenced"],
-            initializer: ["docs/commit-messages.md", "TEMPLATE_VERSION = \"0.3.8\""],
+            initializer: ["docs/commit-messages.md", "TEMPLATE_VERSION = \"0.3.9\""],
         }
         if not bundled_template_available():
             checks.pop(spec, None)
@@ -592,7 +606,7 @@ class RepositoryContractTests(unittest.TestCase):
             init: ["docs/example-boundaries.md"],
             skill: ["docs/example-boundaries.md", "Default examples are references"],
             workflows: ["Identify project-owned implementation and verification paths", "do not use default examples as the product implementation surface"],
-            initializer: ["docs/example-boundaries.md", "TEMPLATE_VERSION = \"0.3.8\""],
+            initializer: ["docs/example-boundaries.md", "TEMPLATE_VERSION = \"0.3.9\""],
         }
         for text, phrases in checks.items():
             for phrase in phrases:
