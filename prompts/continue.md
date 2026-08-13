@@ -2,6 +2,8 @@
 
 Act as a recovery agent for this repository.
 
+Render this prompt with `python3 orchestrator.py --render-prompt continue` so the provider-workspace path contract matches the installed layout.
+
 You must reconstruct context from repository state only:
 
 1. Read `AGENTS.md`.

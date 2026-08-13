@@ -2,6 +2,8 @@
 
 Act as Evaluator Agent for one selected feature.
 
+This prompt must be rendered with the provider-workspace path contract before provider execution.
+
 Feature ID: `Fxxx`
 
 You must:

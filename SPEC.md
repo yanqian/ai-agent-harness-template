@@ -324,6 +324,48 @@ Verification surface: unit tests for single and batch feedback routing, reopen b
 
 ### Layered Verification
 
+### Layout-Aware Provider Workspace Contract
+
+Goal: allow provider child agents in hidden-layout projects to run from the project root and modify project-owned source while resolving every harness workflow path to the canonical `.agent-harness/` tree instead of stale or conflicting root-level files.
+
+Included scope: define provider `cwd` as the vendor-neutral workspace switch; define harness and project paths relative to that provider workspace; render a shared layout-aware path contract into Planning, Coding, Evaluator, Continue, and Work-fast prompts; preserve visible-layout root-relative behavior; document that provider-specific directory flags such as Codex `--cd` must not overlap with `cwd`; synchronize generated hidden-layout instructions, the distributable skill, bundled template, and initializer install/repair/upgrade behavior; and add regression coverage with conflicting root and canonical sentinels.
+
+Excluded scope: changing the orchestrator's own canonical working directory inside `.agent-harness/`; automatically deleting legacy root workflow files; inventing provider-specific command shapes for Claude Code, Cursor Agent, or custom providers; making environment variables an additional source of path truth; changing root `./init.sh` from the project recovery entry point; or weakening evaluator evidence requirements.
+
+Core flows: `make -C .agent-harness work` starts the orchestrator inside the harness; the adapter resolves `cwd: ".."` relative to the harness directory and runs both runtime preflight and the real provider command from the project root; every role prompt states that paths are relative to the provider workspace, maps canonical workflow state, docs, scripts, prompts, tests, and runs to `.agent-harness/`, and keeps project-owned source, root `AGENTS.md`, and root `./init.sh` at project root; visible layout renders the same contract with root-relative harness paths; Work-fast prints an equivalent handoff for the current provider-native session.
+
+Constraints: the adapter contract remains vendor-neutral and commands continue to run without a shell; `cwd` has one documented resolution base and is shared by preflight and real execution; prompt rendering has one layout source of truth rather than hand-maintained per-provider path guesses; hidden-layout legacy root files must remain unchanged during regression tests; generated and upgraded projects must receive the contract without overwriting project-owned state or merge-sensitive root recovery files; and feature completion still requires separate Evaluator evidence.
+
+Ambiguities or assumptions: provider workspace means the effective cwd supplied by the adapter before the provider command starts; `cwd` is resolved relative to the harness directory containing `agent-provider.json`; hidden layout normally uses `cwd: ".."`, while visible layout normally uses `cwd: "."`; providers that change directory internally after adapter launch are outside the portable contract and must remove that overlapping behavior; Planning and Continue prompts are static/manual surfaces rather than current orchestrator child roles, but they must use the same renderer or explicit shared contract so their path semantics do not drift.
+
+Required capabilities: deterministic layout detection from installed/template metadata or an equivalent single source; shared prompt-contract rendering; provider cwd normalization and validation; fake-provider fixtures that capture cwd and prompt content without relying on model behavior; hidden/visible initializer and upgrade fixtures; and contract, unit, harness, and smoke verification where appropriate.
+
+Implementation paths: `orchestrator.py`, `scripts/run-agent-provider.py`, `agent-provider.example.json`, `prompts/`, `AGENTS.md`, `docs/agent-provider-configuration.md`, `docs/agent-workflow.md`, `skills/ai-agent-harness/SKILL.md`, `skills/ai-agent-harness/references/workflows.md`, `skills/ai-agent-harness/scripts/init_harness.py`, `skills/ai-agent-harness/assets/template/`, `test/unit/`, `test/contract/`, `test/harness/`, `feature_list.json`, `progress.md`, and `runs/`.
+
+Verification surface: unit tests for layout detection, prompt rendering, and identical preflight/execution cwd; regression tests with stale root sentinels and canonical `.agent-harness` sentinels covering Coding, Evaluator, Planning or Continue, Work-fast, and run-evidence paths; visible-layout regression coverage; initializer hidden install/check/repair/upgrade tests; `./init.sh`; and `scripts/validate-feature.sh F042` after independent Evaluator evidence is recorded.
+
+This remains one Feature because provider workspace selection and canonical prompt paths form one inseparable safety contract: either both agree or the child agent can still split state. Documentation, distribution synchronization, and regression fixtures directly verify that same behavior rather than delivering independent value.
+
+### Template Version Source Consistency
+
+Goal: make the template version reported by the manifest, initializer, bundled initializer, and tests consistent so install, check, repair, and upgrade decisions use one release value.
+
+Included scope: align the current `0.3.9` template version across checked-in version sources and add a contract assertion that rejects future divergence.
+
+Excluded scope: introducing a new release automation system, changing semantic versioning policy, or combining version synchronization with the behavioral acceptance decision for F042.
+
+Core flows: initializer tests create and inspect manifests using the same version declared by `.agent-harness-template.json`; bundled initializer behavior matches the distributable initializer; contract verification fails if version sources drift.
+
+Constraints: preserve existing installed-project state and upgrade semantics; do not edit the user's untracked provider configuration; keep the change independently verifiable from provider workspace behavior.
+
+Ambiguities or assumptions: `0.3.9` is the intended current template version because it is already declared in the template manifest at HEAD; this Feature synchronizes existing sources rather than choosing a new release number.
+
+Required capabilities: deterministic version-parity assertions and existing initializer test fixtures.
+
+Implementation paths: `.agent-harness-template.json`, `skills/ai-agent-harness/scripts/init_harness.py`, the bundled initializer and tests under `skills/ai-agent-harness/assets/template/`, `test/harness/test_skill_initializer.py`, `test/contract/test_repository_contract.py`, `feature_list.json`, `progress.md`, and `runs/`.
+
+Verification surface: initializer tests, version-parity contract tests, `./init.sh`, and `scripts/validate-feature.sh F043` after independent Evaluator evidence is recorded.
+
 ### Human Evaluation Rules in the Distributable Skill
 
 Goal: ensure every installed copy of the AI Agent Harness skill teaches the same Human Evaluation lifecycle already implemented by the repository runtime.

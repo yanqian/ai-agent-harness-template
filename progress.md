@@ -55,7 +55,7 @@ Implemented components:
 
 ## Last Completed Feature
 
-`F041` - Synchronize Human Eval lifecycle into the distributable skill.
+`F043` - Synchronize template version sources.
 
 ## Next Feature
 
@@ -67,6 +67,7 @@ Implemented components:
 - `agent-provider.json` is intentionally absent by default; copy `agent-provider.example.json` and select an explicit provider before real `make work` execution.
 - `F011` remains a P2 backlog item and should not preempt the new P0 orchestrator-first work.
 - `F036` is a P0 A/B workflow experiment: keep `make work` as the two-child-process baseline and add `make work-fast` with provider-native coding plus mandatory cold-start evaluator child gating.
+- The former `0.3.8`/`0.3.9` template-version source inconsistency was resolved independently in F043.
 
 ## Recovery Notes
 
@@ -90,3 +91,7 @@ Implemented components:
 - F040 evaluator feedback identified missing smoke coverage; subprocess smoke coverage and explicit batch pass tests now pass. Rerun the separate Evaluator Agent for F040.
 - F040 passed after adding the required subprocess smoke coverage. Evaluator approval is recorded in `runs/20260811T092600Z-F040-evaluation.md`.
 - F041 synchronized Human Eval lifecycle rules into the distributable skill and bundled template, with contract parity coverage. Coding evidence is recorded in `runs/20260811T093600Z-F041-work-fast-coding.md`; evaluator approval is recorded in `runs/20260811T093820Z-F041-evaluation.md`. F011 remains the next unfinished feature.
+- F042 planning defined provider paths relative to the adapter-selected provider workspace and split template-version parity into F043. Work-fast coding added layout-aware prompt rendering for Planning, Coding, Evaluator, Continue, and Work-fast; resolved provider `cwd` relative to `agent-provider.json` for both preflight and real execution; generated hidden examples with `cwd: ".."`; synchronized the distributable/bundled template surfaces; and added fake-provider plus stale-root-sentinel regressions. The coding phase correctly left F042 incomplete pending independent evaluation.
+- F042 passed independent evaluation. Evaluator approval is recorded in `runs/20260813T145836Z-F042-evaluation.md`; the evaluator reran unit, contract, harness, full init, and selected-feature validation before the orchestrator marked F042 done.
+- F043 coding aligned the distributable and bundled initializer with manifest version `0.3.9`, changed initializer fixtures to derive their expected version from `.agent-harness-template.json`, and added a contract test that rejects drift between manifest, initializer, bundled initializer, and bundled tests. The coding phase correctly left F043 incomplete pending independent evaluation.
+- F043 passed independent evaluation. Evaluator approval is recorded in `runs/20260813T150520Z-F043-evaluation.md`; the orchestrator marked the Feature done only after the durable pass record existed.

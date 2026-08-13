@@ -185,6 +185,10 @@ Before planning, coding, evaluating, or resuming work:
 Full harness rules live in `.agent-harness/AGENTS.md`.
 Project-specific implementation should live in project-owned source and test paths, not in `.agent-harness/` unless the selected feature explicitly changes the harness.
 
+Provider child agents run from the project root. Configure `.agent-harness/agent-provider.json` with provider `cwd` set to `..`, resolved relative to the `.agent-harness/` directory. Do not also use provider-specific directory flags such as Codex `--cd`; runtime preflight and real role execution must share the adapter `cwd`.
+
+Canonical workflow state, docs, scripts, prompts, tests, and run evidence remain under `.agent-harness/`. Legacy root files with the same names are non-canonical and must not be read or modified.
+
 For orchestrator work, the harness Makefile is inside `.agent-harness/`. From the project root, run:
 
 ```bash
@@ -232,9 +236,19 @@ def install_items(template_root: Path, layout: str):
         category = category_for(rel)
         if layout == "hidden" and category == "merge-sensitive":
             category = "harness-owned static"
+        hidden_provider_example = layout == "hidden" and rel.as_posix() == "agent-provider.example.json"
+        content = None
+        source = template_root / rel
+        if hidden_provider_example:
+            provider_example = json.loads(source.read_text())
+            for settings in provider_example.get("providers", {}).values():
+                if isinstance(settings, dict):
+                    settings["cwd"] = ".."
+            content = json.dumps(provider_example, indent=2) + "\n"
+            source = None
         yield {
-            "source": template_root / rel,
-            "content": None,
+            "source": source,
+            "content": content,
             "logical": rel,
             "target": target,
             "category": category,

@@ -22,6 +22,8 @@ Installed projects record `.agent-harness/manifest.json`. The template records `
 
 In hidden layout, root `AGENTS.md` and root `init.sh` are project merge-sensitive entry points. Do not overwrite them during upgrade unless the user explicitly approves `--force`, especially after a minspec has turned root `./init.sh` into the project recovery contract. The project-local `.agent-harness/` runtime files are harness-owned and should be updated by `upgrade`.
 
+Hidden-layout provider children should use `cwd: ".."` relative to `.agent-harness/agent-provider.json`. The adapter uses the same resolved project-root workspace for runtime preflight and real execution. Do not combine this with provider-specific directory flags. Rendered role prompts map logical harness paths to `.agent-harness/` and must ignore stale same-named root workflow files.
+
 `hidden` layout is the default for user projects: root keeps thin `AGENTS.md` and `init.sh` entry points while the harness body lives under `.agent-harness/`. `visible` layout is for harness development and direct template inspection.
 
 A project is an installed harness when `./init.sh` succeeds, the installed layout's `feature_list.json` is valid, `progress.md` contains recovery sections, `AGENTS.md` contains the startup and safety rules, prompts and scripts are present, run templates are available, and `check` reports `runnable_harness=true`.
@@ -41,7 +43,7 @@ Classify every result explicitly. `current_feature` means the original Feature p
 Use when the user describes new work before implementation.
 
 1. Follow the repository startup protocol.
-2. Read `AGENTS.md`, `SPEC.md`, `feature_list.json`, and `progress.md`.
+2. Read `AGENTS.md`, `SPEC.md`, `feature_list.json`, and `progress.md`. For direct prompt use, render the Planning role with `python3 orchestrator.py --render-prompt plan` so hidden-layout paths resolve under `.agent-harness/`.
 3. Use `docs/spec-normalization.md` to append a normalized SPEC entry with goal, included scope, excluded scope, core flows, constraints, ambiguities or assumptions, required capabilities, implementation paths, and verification surface.
 4. Reject vague requirements instead of turning them directly into feature entries; ask for clarification, record assumptions, or create capability, blocker, or follow-up work when needed.
 5. Use `docs/feature-decomposition.md` to split broad requirements into independently verifiable feature entries.

@@ -302,7 +302,89 @@ Skill documentation must distinguish installed skill usage from manual script us
 
 Skill installation documentation must avoid machine-specific absolute paths. It should use portable paths such as `~/.codex/skills`, `~/.claude/skills`, project `.claude/skills`, and Cursor project rules under `.cursor/rules`, and explain which entry point applies to Codex, Claude Code, Cursor, and manual fallback use.
 
+### Human Evaluation Lifecycle and Deferred Acceptance
+
+Goal: make Human Product Evaluation a durable, optional acceptance layer that can be performed per Feature or after a batch of Features, while ensuring feedback about an unmet original commitment returns to that same Feature instead of becoming an automatic repair Feature.
+
+Included scope: record human evaluation outcomes and feedback in durable run artifacts; keep machine Evaluator completion independent from human acceptance timing; reopen the original Feature when human feedback says its original acceptance criteria are not met; preserve attempts and history while allowing a human-reopened Feature to be selected again after it was blocked by an automatic retry limit; support batch evaluation over multiple completed Features; and classify feedback as either unmet current Feature scope or an independent new requirement before any new Feature is planned.
+
+Excluded scope: requiring Human Eval before downstream Features can start; automatically creating or appending new Feature entries from free-form human feedback; changing the meaning of `EVAL_PASS`; treating a new requirement as evidence that the original Feature failed; resetting Feature history or attempts during reopen; or replacing SPEC normalization and Planning Agent decomposition.
+
+Core flows: a project completes several Features through automatic evaluator gating and continues development without waiting for Human Eval; a human records a single or batch evaluation with per-Feature feedback; feedback classified as `current_feature` sets the original Feature back to non-done, records a reopen marker, and lets the orchestrator continue that Feature; feedback classified as `new_requirement` leaves the original Feature complete and creates a durable planning input without mutating `feature_list.json`; Planning Agent later normalizes the new requirement and appends a separately verifiable Feature; human acceptance can be recorded after implementation without blocking unrelated work.
+
+Constraints: Human Eval state must be separate from machine Feature `status` and `passes`; batch evaluation must be attributable to a batch and individual Feature IDs; reopen must preserve unknown fields, feature ordering, attempts, and prior run history; a reopened Feature must not be permanently excluded merely because it previously reached the automatic attempt limit; invalid or ambiguous classifications must fail closed and ask for explicit triage; and all changes must work in visible template layout and generated hidden-layout installs.
+
+Ambiguities or assumptions: the human or coordinating agent is responsible for deciding whether feedback contradicts the original acceptance criteria or requests independent new value; the harness records that decision but does not infer it from prose; a human pass is advisory product acceptance and does not replace the Evaluator Agent evidence required for machine completion; a batch may contain mixed outcomes and mixed classifications; a batch record is evidence and planning input, not a feature generator.
+
+Required capabilities: a human-evaluation recording command or equivalent script with single and batch input; durable per-Feature and batch run records; Feature metadata for human-evaluation history and reopen intent; orchestrator selection logic for reopened Features; schema, validation, prompt, documentation, and contract-test coverage; and bundled template synchronization for installed projects.
+
+Implementation paths: `scripts/`, `orchestrator.py`, `feature_list.json`, `schemas/feature_list.schema.json`, `runs/`, `Makefile`, `AGENTS.md`, `SPEC.md`, `README.md`, `docs/agent-workflow.md`, `prompts/continue.md`, `prompts/evaluate.md`, `prompts/plan.md`, `test/unit/`, `test/contract/`, and `skills/ai-agent-harness/assets/template/`.
+
+Verification surface: unit tests for single and batch feedback routing, reopen behavior after `blocked`, preservation of attempts and unknown fields, and non-blocking acceptance; contract tests for the human/machine state boundary, explicit current-vs-new classification, Planning Agent handoff, and bundled template consistency; smoke tests for the recording command; `./init.sh`; and `scripts/validate-feature.sh` for each implemented Feature.
+
 ### Layered Verification
+
+### Layout-Aware Provider Workspace Contract
+
+Goal: allow provider child agents in hidden-layout projects to run from the project root and modify project-owned source while resolving every harness workflow path to the canonical `.agent-harness/` tree instead of stale or conflicting root-level files.
+
+Included scope: define provider `cwd` as the vendor-neutral workspace switch; define harness and project paths relative to that provider workspace; render a shared layout-aware path contract into Planning, Coding, Evaluator, Continue, and Work-fast prompts; preserve visible-layout root-relative behavior; document that provider-specific directory flags such as Codex `--cd` must not overlap with `cwd`; synchronize generated hidden-layout instructions, the distributable skill, bundled template, and initializer install/repair/upgrade behavior; and add regression coverage with conflicting root and canonical sentinels.
+
+Excluded scope: changing the orchestrator's own canonical working directory inside `.agent-harness/`; automatically deleting legacy root workflow files; inventing provider-specific command shapes for Claude Code, Cursor Agent, or custom providers; making environment variables an additional source of path truth; changing root `./init.sh` from the project recovery entry point; or weakening evaluator evidence requirements.
+
+Core flows: `make -C .agent-harness work` starts the orchestrator inside the harness; the adapter resolves `cwd: ".."` relative to the harness directory and runs both runtime preflight and the real provider command from the project root; every role prompt states that paths are relative to the provider workspace, maps canonical workflow state, docs, scripts, prompts, tests, and runs to `.agent-harness/`, and keeps project-owned source, root `AGENTS.md`, and root `./init.sh` at project root; visible layout renders the same contract with root-relative harness paths; Work-fast prints an equivalent handoff for the current provider-native session.
+
+Constraints: the adapter contract remains vendor-neutral and commands continue to run without a shell; `cwd` has one documented resolution base and is shared by preflight and real execution; prompt rendering has one layout source of truth rather than hand-maintained per-provider path guesses; hidden-layout legacy root files must remain unchanged during regression tests; generated and upgraded projects must receive the contract without overwriting project-owned state or merge-sensitive root recovery files; and feature completion still requires separate Evaluator evidence.
+
+Ambiguities or assumptions: provider workspace means the effective cwd supplied by the adapter before the provider command starts; `cwd` is resolved relative to the harness directory containing `agent-provider.json`; hidden layout normally uses `cwd: ".."`, while visible layout normally uses `cwd: "."`; providers that change directory internally after adapter launch are outside the portable contract and must remove that overlapping behavior; Planning and Continue prompts are static/manual surfaces rather than current orchestrator child roles, but they must use the same renderer or explicit shared contract so their path semantics do not drift.
+
+Required capabilities: deterministic layout detection from installed/template metadata or an equivalent single source; shared prompt-contract rendering; provider cwd normalization and validation; fake-provider fixtures that capture cwd and prompt content without relying on model behavior; hidden/visible initializer and upgrade fixtures; and contract, unit, harness, and smoke verification where appropriate.
+
+Implementation paths: `orchestrator.py`, `scripts/run-agent-provider.py`, `agent-provider.example.json`, `prompts/`, `AGENTS.md`, `docs/agent-provider-configuration.md`, `docs/agent-workflow.md`, `skills/ai-agent-harness/SKILL.md`, `skills/ai-agent-harness/references/workflows.md`, `skills/ai-agent-harness/scripts/init_harness.py`, `skills/ai-agent-harness/assets/template/`, `test/unit/`, `test/contract/`, `test/harness/`, `feature_list.json`, `progress.md`, and `runs/`.
+
+Verification surface: unit tests for layout detection, prompt rendering, and identical preflight/execution cwd; regression tests with stale root sentinels and canonical `.agent-harness` sentinels covering Coding, Evaluator, Planning or Continue, Work-fast, and run-evidence paths; visible-layout regression coverage; initializer hidden install/check/repair/upgrade tests; `./init.sh`; and `scripts/validate-feature.sh F042` after independent Evaluator evidence is recorded.
+
+This remains one Feature because provider workspace selection and canonical prompt paths form one inseparable safety contract: either both agree or the child agent can still split state. Documentation, distribution synchronization, and regression fixtures directly verify that same behavior rather than delivering independent value.
+
+### Template Version Source Consistency
+
+Goal: make the template version reported by the manifest, initializer, bundled initializer, and tests consistent so install, check, repair, and upgrade decisions use one release value.
+
+Included scope: align the current `0.3.9` template version across checked-in version sources and add a contract assertion that rejects future divergence.
+
+Excluded scope: introducing a new release automation system, changing semantic versioning policy, or combining version synchronization with the behavioral acceptance decision for F042.
+
+Core flows: initializer tests create and inspect manifests using the same version declared by `.agent-harness-template.json`; bundled initializer behavior matches the distributable initializer; contract verification fails if version sources drift.
+
+Constraints: preserve existing installed-project state and upgrade semantics; do not edit the user's untracked provider configuration; keep the change independently verifiable from provider workspace behavior.
+
+Ambiguities or assumptions: `0.3.9` is the intended current template version because it is already declared in the template manifest at HEAD; this Feature synchronizes existing sources rather than choosing a new release number.
+
+Required capabilities: deterministic version-parity assertions and existing initializer test fixtures.
+
+Implementation paths: `.agent-harness-template.json`, `skills/ai-agent-harness/scripts/init_harness.py`, the bundled initializer and tests under `skills/ai-agent-harness/assets/template/`, `test/harness/test_skill_initializer.py`, `test/contract/test_repository_contract.py`, `feature_list.json`, `progress.md`, and `runs/`.
+
+Verification surface: initializer tests, version-parity contract tests, `./init.sh`, and `scripts/validate-feature.sh F043` after independent Evaluator evidence is recorded.
+
+### Human Evaluation Rules in the Distributable Skill
+
+Goal: ensure every installed copy of the AI Agent Harness skill teaches the same Human Evaluation lifecycle already implemented by the repository runtime.
+
+Included scope: update the distributable `SKILL.md` and workflow reference with optional and deferred Human Eval guidance; document single and batch recording commands; require durable Feature metadata and run evidence; explain current-scope reopen versus new-requirement planning; and keep the bundled template copies and contract tests synchronized.
+
+Excluded scope: changing the global skill installation automatically, making Human Eval a prerequisite for downstream work, replacing automatic Evaluator evidence, or inferring triage classifications from free-form feedback.
+
+Core flows: an agent reads the installed skill and learns that automatic Evaluator completion may proceed without waiting for Human Eval; an operator records `make human-eval` or `make human-eval-batch`; current-scope feedback returns to the original Feature; independent new value becomes a Planning Agent input; and the run record plus `human_acceptance` metadata preserve the evidence chain.
+
+Constraints: the repository-local distributable skill is the source artifact for future installs; root and bundled template guidance must agree; documentation must preserve the distinction between machine `EVAL_PASS` and human acceptance; tests must detect drift in the two skill documentation surfaces; and global user directories are not modified implicitly by repository work.
+
+Ambiguities or assumptions: synchronizing the repository skill means updating the checked-in distributable skill and its bundled template, while updating a user's global `~/.codex/skills` copy remains an explicit installer or upgrade action; the runtime behavior is covered by F039/F040 and this Feature covers the instructional contract.
+
+Required capabilities: synchronized skill documentation, workflow reference guidance, contract assertions for the lifecycle rules and bundled copies, and version/update guidance that points installed projects to the explicit skill-upgrade flow.
+
+Implementation paths: `skills/ai-agent-harness/SKILL.md`, `skills/ai-agent-harness/references/workflows.md`, `skills/ai-agent-harness/assets/template/skills/ai-agent-harness/`, `test/contract/test_repository_contract.py`, the bundled contract test, `README.md`, `SPEC.md`, `feature_list.json`, and `progress.md`.
+
+Verification surface: contract tests for both skill documentation surfaces and template parity; JSON/state validation; `./init.sh`; and `scripts/validate-feature.sh F041` after Evaluator evidence is recorded.
 
 The template keeps automated checks in explicit layers:
 

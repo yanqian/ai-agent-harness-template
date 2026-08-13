@@ -494,6 +494,103 @@ class ScriptUnitTests(unittest.TestCase):
             self.assertEqual(evaluator.returncode, 0, evaluator.stderr)
             self.assertEqual(evaluator_marker.read_text(), "evaluator")
 
+    def test_agent_provider_uses_same_config_relative_cwd_for_preflight_and_execution(self):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            project = Path(tmp_dir) / "project"
+            harness = project / ".agent-harness"
+            harness.mkdir(parents=True)
+            (project / "feature_list.json").write_text("stale-root-feature-state")
+            (project / "progress.md").write_text("stale-root-progress")
+            (harness / "feature_list.json").write_text("canonical-feature-state")
+            (harness / "progress.md").write_text("canonical-progress")
+            provider = harness / "fake_provider.py"
+            provider.write_text(
+                "import os, sys\n"
+                "from pathlib import Path\n"
+                "prompt = sys.stdin.read()\n"
+                "name = 'preflight.cwd' if 'PROVIDER_CHECK_OK' in prompt else 'execution.cwd'\n"
+                "Path(name).write_text(os.getcwd())\n"
+            )
+            config = harness / "agent-provider.json"
+            config.write_text(json.dumps({
+                "provider": "custom",
+                "providers": {
+                    "custom": {
+                        "cwd": "..",
+                        "command": [sys.executable, str(provider)],
+                        "runtime_check_command": [sys.executable, str(provider)],
+                    }
+                }
+            }))
+            env = {"HARNESS_AGENT_PROVIDER_CONFIG": str(config)}
+
+            check = run_command([sys.executable, "scripts/run-agent-provider.py", "--role", "coding", "--check"], env=env)
+            self.assertEqual(check.returncode, 0, check.stderr)
+            execute = run_command(
+                [sys.executable, "scripts/run-agent-provider.py", "--role", "coding"],
+                env=env,
+                input_text="coding prompt",
+            )
+            self.assertEqual(execute.returncode, 0, execute.stderr)
+            self.assertEqual((project / "preflight.cwd").read_text(), str(project.resolve()))
+            self.assertEqual((project / "execution.cwd").read_text(), str(project.resolve()))
+            self.assertEqual((project / "feature_list.json").read_text(), "stale-root-feature-state")
+            self.assertEqual((project / "progress.md").read_text(), "stale-root-progress")
+            self.assertEqual((harness / "feature_list.json").read_text(), "canonical-feature-state")
+            self.assertEqual((harness / "progress.md").read_text(), "canonical-progress")
+
+    def test_orchestrator_renders_layout_aware_contract_for_every_role_surface(self):
+        orchestrator = load_orchestrator()
+        role_prompts = ["plan.md", "work.md", "evaluate.md", "continue.md", "work-fast.md"]
+        hidden = [orchestrator.prompt_template(name, layout="hidden") for name in role_prompts]
+        for prompt in hidden:
+            self.assertIn("Harness layout: `hidden`", prompt)
+            self.assertIn("`feature_list.json` -> `.agent-harness/feature_list.json`", prompt)
+            self.assertIn("`progress.md` -> `.agent-harness/progress.md`", prompt)
+            self.assertIn("`runs/` -> `.agent-harness/runs/`", prompt)
+            self.assertIn("legacy/non-canonical", prompt)
+            self.assertIn("root `./init.sh` remain relative to the provider workspace", prompt)
+
+        visible = orchestrator.prompt_template("work.md", layout="visible")
+        self.assertIn("Harness layout: `visible`", visible)
+        self.assertIn("`feature_list.json` -> `feature_list.json`", visible)
+        self.assertNotIn("`.agent-harness/feature_list.json`", visible)
+
+    def test_hidden_manifest_selects_canonical_paths_without_touching_stale_root_state(self):
+        orchestrator = load_orchestrator()
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            project = Path(tmp_dir) / "project"
+            harness = project / ".agent-harness"
+            harness.mkdir(parents=True)
+            stale_feature = project / "feature_list.json"
+            stale_progress = project / "progress.md"
+            canonical_feature = harness / "feature_list.json"
+            canonical_progress = harness / "progress.md"
+            stale_feature.write_text("stale-root-feature-sentinel")
+            stale_progress.write_text("stale-root-progress-sentinel")
+            canonical_feature.write_text("canonical-feature-sentinel")
+            canonical_progress.write_text("canonical-progress-sentinel")
+            (harness / "manifest.json").write_text(json.dumps({"layout": "hidden"}))
+
+            previous = Path.cwd()
+            try:
+                os.chdir(harness)
+                with (
+                    mock.patch.object(orchestrator, "INSTALL_MANIFEST_PATH", Path("manifest.json")),
+                    mock.patch.object(orchestrator, "PROMPTS_DIR", ROOT / "prompts"),
+                ):
+                    prompt = orchestrator.prompt_template("evaluate.md")
+            finally:
+                os.chdir(previous)
+
+            self.assertIn("Harness layout: `hidden`", prompt)
+            self.assertIn("`feature_list.json` -> `.agent-harness/feature_list.json`", prompt)
+            self.assertIn("`runs/` -> `.agent-harness/runs/`", prompt)
+            self.assertEqual(stale_feature.read_text(), "stale-root-feature-sentinel")
+            self.assertEqual(stale_progress.read_text(), "stale-root-progress-sentinel")
+            self.assertEqual(canonical_feature.read_text(), "canonical-feature-sentinel")
+            self.assertEqual(canonical_progress.read_text(), "canonical-progress-sentinel")
+
     def test_orchestrator_evaluator_result_uses_final_matching_verdict(self):
         orchestrator = load_orchestrator()
         result = subprocess.CompletedProcess(

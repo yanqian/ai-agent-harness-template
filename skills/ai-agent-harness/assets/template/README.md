@@ -214,15 +214,14 @@ Expected result:
 
 ## Make Targets
 
-- `make human-eval FEATURE=F039 RESULT=fail CLASSIFICATION=current_feature FEEDBACK="..."` records optional Human Eval feedback; unmet original scope reopens the same Feature, while independent new value goes to Planning.
-- `make human-eval-batch BATCH_FILE=human-eval.json` records deferred mixed Human Eval outcomes for multiple Features without blocking intervening work or auto-appending Features.
-
 - `make init` runs `./init.sh`.
 - `make validate FEATURE=Fxxx` validates one feature.
 - `make unit`, `make contract`, and `make smoke` run individual test layers.
 - `make go-example` runs the Go server example tests.
 - `make work` runs one orchestrator round for the next unfinished feature in visible layout or from inside `.agent-harness/`.
 - `make work-fast` runs the evaluator-gated fast A/B flow without invoking the Coding Agent role adapter.
+- `make human-eval FEATURE=F039 RESULT=fail CLASSIFICATION=current_feature FEEDBACK="..."` records optional Human Eval feedback; unmet original scope reopens the same Feature, while independent new value goes to Planning.
+- `make human-eval-batch BATCH_FILE=human-eval.json` records deferred mixed Human Eval outcomes for multiple Features without blocking intervening work or auto-appending Features.
 - `make dry-run` previews the next orchestrator round.
 - `make summarize` prints progress and run summaries.
 - `make clean` resets project-specific state after copying the template.
@@ -243,6 +242,8 @@ make -C .agent-harness work
 ```
 
 or change into `.agent-harness/` and run `make work`. A missing root `Makefile` in hidden layout does not mean orchestrator work is unavailable.
+
+Hidden-layout provider children should run from the project root with `cwd: ".."` in `.agent-harness/agent-provider.json`. The adapter resolves that path relative to `.agent-harness/` for both preflight and real execution, while rendered role prompts map canonical workflow paths back under `.agent-harness/`. Do not also add a provider-specific directory flag such as Codex `--cd`.
 
 `make work` runs `python3 orchestrator.py --max-rounds 1`. The orchestrator selects one unfinished feature, marks it in progress, increments attempts, dispatches Coding Agent and Evaluator Agent role prompts, and marks the feature done only after evaluator pass.
 

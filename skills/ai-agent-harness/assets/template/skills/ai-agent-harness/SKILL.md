@@ -94,6 +94,8 @@ Use `make work-fast` only as the evaluator-gated fast A/B alternative to `make w
 
 When `make work` needs real agent execution, configure the target repository's provider contract from `agent-provider.example.json` using `docs/agent-provider-configuration.md`. Do not guess between Codex, Claude Code, Cursor Agent, or custom providers; missing or ambiguous provider setup is a capability gap.
 
+In hidden layout, configure the project-local provider with `cwd: ".."` relative to `.agent-harness/agent-provider.json`. Runtime preflight and real execution must share that adapter cwd; do not add overlapping provider-specific directory flags. Use the orchestrator's rendered prompts so canonical workflow state, docs, scripts, tests, and runs resolve under `.agent-harness/` while project-owned source and root recovery entry points remain at the provider workspace root.
+
 ## Commit Boundary
 
 Only commit after the user explicitly says they are satisfied or asks to commit.

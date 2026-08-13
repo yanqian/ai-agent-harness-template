@@ -2,6 +2,8 @@
 
 Act as the provider-native coding phase for one selected feature.
 
+This handoff must be rendered with the provider-workspace path contract before the current provider-native session acts on it.
+
 Feature ID: `Fxxx`
 
 This prompt is emitted by `make work-fast`, the fast A/B alternative to the baseline `make work` flow. In this mode the orchestrator does not invoke the Coding Agent role adapter. The current provider surface performs the implementation, records durable coding evidence, and leaves completion to a separate cold-start Evaluator Agent child process.

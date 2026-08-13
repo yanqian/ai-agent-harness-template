@@ -11,6 +11,7 @@ Copy `agent-provider.example.json` to `agent-provider.json` and set one provider
   "provider": "codex",
   "providers": {
     "codex": {
+      "cwd": ".",
       "command": ["codex", "exec", "--model", "gpt-5.4", "-"],
       "runtime_check_command": ["codex", "exec", "--model", "gpt-5.4", "--ephemeral", "-"],
       "verified": "2026-07-13: Codex CLI reads the harness-supplied prompt from stdin when - is used. The project-local model override prevents an unavailable global model setting from breaking provider startup."
@@ -28,7 +29,9 @@ Rules:
 - Optional `coding_command` and `evaluator_command` may override `command` for one role.
 - Optional `runtime_check_command` verifies that the configured provider can actually start before the orchestrator mutates feature state.
 - Optional `coding_runtime_check_command` and `evaluator_runtime_check_command` may override `runtime_check_command` for one role.
-- Optional `cwd` sets the provider working directory.
+- Optional `cwd` sets the provider workspace. It is resolved relative to the directory containing `agent-provider.json`, not relative to the caller's shell directory.
+- Runtime preflight and real role execution always use the same resolved `cwd`.
+- Do not combine adapter `cwd` with a provider-specific directory switch such as Codex `--cd`; overlapping workspace controls are outside the portable contract.
 - Optional `env` adds string environment variables.
 - Commands run without a shell; shell snippets, pipes, and implicit expansion are not part of the contract.
 
@@ -106,6 +109,15 @@ make work
 ```
 
 From a hidden-layout project root, use `make -C .agent-harness work` because the provider config and harness Makefile live under `.agent-harness/`.
+
+For a hidden-layout install, set `cwd` to `".."` in `.agent-harness/agent-provider.json`. The adapter resolves it from `.agent-harness/`, so the provider runs at the project root while rendered role prompts map canonical harness state to `.agent-harness/feature_list.json`, `.agent-harness/progress.md`, `.agent-harness/runs/`, and the other harness-owned paths. Root files with those names are legacy/non-canonical. Visible-layout repositories use `cwd: "."` and keep canonical harness paths at the repository root.
+
+Render Planning or Continue prompts explicitly when using those manual role surfaces:
+
+```bash
+python3 orchestrator.py --render-prompt plan
+python3 orchestrator.py --render-prompt continue
+```
 
 Preview without requiring a provider:
 

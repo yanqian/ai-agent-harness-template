@@ -40,3 +40,5 @@ When adding a feature:
 2. Add contract tests for durable behavior boundaries.
 3. Add harness tests for multi-step workflows.
 4. Add smoke tests for stable top-level commands.
+
+Provider-workspace regressions must use fake providers rather than model behavior. Cover identical preflight/execution cwd, hidden and visible rendered prompts, conflicting stale root state versus canonical `.agent-harness` state, and canonical run-evidence paths.

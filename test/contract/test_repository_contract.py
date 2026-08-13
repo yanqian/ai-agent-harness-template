@@ -251,6 +251,37 @@ class RepositoryContractTests(unittest.TestCase):
             for phrase in phrases:
                 self.assertIn(phrase, text)
 
+    def test_layout_aware_provider_workspace_contract_is_synchronized(self):
+        orchestrator = (ROOT / "orchestrator.py").read_text()
+        provider = (ROOT / "scripts" / "run-agent-provider.py").read_text()
+        provider_doc = (ROOT / "docs" / "agent-provider-configuration.md").read_text()
+        workflow = (ROOT / "docs" / "agent-workflow.md").read_text()
+        initializer = (ROOT / "skills" / "ai-agent-harness" / "scripts" / "init_harness.py").read_text()
+        skill = (ROOT / "skills" / "ai-agent-harness" / "SKILL.md").read_text()
+        workflows = (ROOT / "skills" / "ai-agent-harness" / "references" / "workflows.md").read_text()
+
+        self.assertIn("def provider_workspace_path_contract", orchestrator)
+        self.assertIn('choices=["plan", "work", "evaluate", "continue", "work-fast"]', orchestrator)
+        self.assertIn('resolved = (path.resolve().parent / cwd).resolve()', provider)
+        self.assertIn("Runtime preflight and real role execution always use the same resolved `cwd`", provider_doc)
+        self.assertIn('Use `cwd: "."` in visible layout and `cwd: ".."` in hidden layout', workflow)
+        self.assertIn('settings["cwd"] = ".."', initializer)
+        self.assertIn('cwd: ".."', skill)
+        self.assertIn("must ignore stale same-named root workflow files", workflows)
+
+        for rel in [
+            "orchestrator.py",
+            "scripts/run-agent-provider.py",
+            "docs/agent-provider-configuration.md",
+            "docs/agent-workflow.md",
+            "prompts/plan.md",
+            "prompts/work.md",
+            "prompts/evaluate.md",
+            "prompts/continue.md",
+            "prompts/work-fast.md",
+        ]:
+            self.assertEqual((ROOT / rel).read_text(), template_file(*rel.split("/")).read_text())
+
     def test_feature_decomposition_governance_is_documented_and_enforced(self):
         agents = (ROOT / "AGENTS.md").read_text()
         spec = (ROOT / "SPEC.md").read_text()

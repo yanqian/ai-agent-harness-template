@@ -33,7 +33,107 @@ def load_orchestrator():
     return module
 
 
+def load_human_eval():
+    spec = importlib.util.spec_from_file_location("human_eval", ROOT / "scripts" / "human-eval.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
 class ScriptUnitTests(unittest.TestCase):
+    def test_human_eval_reopens_same_feature_and_preserves_state(self):
+        human_eval = load_human_eval()
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp = Path(tmp_dir)
+            feature_path = tmp / "feature_list.json"
+            runs_dir = tmp / "runs"
+            runs_dir.mkdir()
+            feature_path.write_text(json.dumps({"features": [{
+                "id": "F039", "title": "feature", "description": "desc", "acceptance": ["works"],
+                "passes": True, "status": "done", "attempts": 3, "last_error": "",
+                "custom_field": "preserve"
+            }]}))
+            with mock.patch.object(human_eval, "FEATURES_PATH", feature_path), mock.patch.object(human_eval, "RUNS_DIR", runs_dir), mock.patch.object(sys, "argv", ["human-eval.py", "F039", "--result", "fail", "--classification", "current_feature", "--feedback", "flow is incomplete"]):
+                self.assertEqual(human_eval.main(), 0)
+            feature = json.loads(feature_path.read_text())["features"][0]
+            self.assertFalse(feature["passes"])
+            self.assertEqual(feature["status"], "todo")
+            self.assertEqual(feature["attempts"], 3)
+            self.assertEqual(feature["custom_field"], "preserve")
+            self.assertTrue(feature["human_acceptance"]["reopen_pending"])
+            self.assertEqual(len(list(runs_dir.glob("*human-eval.md"))), 1)
+
+    def test_orchestrator_selects_human_reopened_feature_after_attempt_limit(self):
+        orchestrator = load_orchestrator()
+        data = {"features": [{
+            "id": "F039", "title": "feature", "description": "desc", "acceptance": ["works"],
+            "passes": False, "status": "todo", "attempts": 3, "last_error": "",
+            "human_acceptance": {"reopen_pending": True}
+        }]}
+        self.assertEqual(orchestrator.pick_feature(data, 3)["id"], "F039")
+
+    def test_human_eval_new_requirement_does_not_mark_original_incomplete(self):
+        human_eval = load_human_eval()
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp = Path(tmp_dir)
+            feature_path = tmp / "feature_list.json"
+            runs_dir = tmp / "runs"
+            runs_dir.mkdir()
+            feature_path.write_text(json.dumps({"features": [{
+                "id": "F039", "title": "feature", "description": "desc", "acceptance": ["works"],
+                "passes": True, "status": "done", "attempts": 1, "last_error": ""
+            }]}))
+            with mock.patch.object(human_eval, "FEATURES_PATH", feature_path), mock.patch.object(human_eval, "RUNS_DIR", runs_dir), mock.patch.object(sys, "argv", ["human-eval.py", "F039", "--result", "fail", "--classification", "new_requirement", "--feedback", "add OAuth"]):
+                self.assertEqual(human_eval.main(), 0)
+            feature = json.loads(feature_path.read_text())["features"][0]
+            self.assertTrue(feature["passes"])
+            self.assertEqual(feature["status"], "done")
+            self.assertFalse(feature["human_acceptance"]["reopen_pending"])
+
+    def test_human_eval_batch_routes_mixed_outcomes_without_appending_features(self):
+        human_eval = load_human_eval()
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp = Path(tmp_dir)
+            feature_path = tmp / "feature_list.json"
+            runs_dir = tmp / "runs"
+            runs_dir.mkdir()
+            feature_path.write_text(json.dumps({"features": [
+                {"id": "F039", "title": "first", "description": "desc", "acceptance": ["works"], "passes": True, "status": "done", "attempts": 3, "last_error": ""},
+                {"id": "F040", "title": "second", "description": "desc", "acceptance": ["works"], "passes": True, "status": "done", "attempts": 1, "last_error": ""}
+            ]}))
+            batch = tmp / "human-eval.json"
+            batch.write_text(json.dumps([
+                {"feature_id": "F039", "result": "fail", "classification": "current_feature", "feedback": "original flow incomplete"},
+                {"feature_id": "F040", "result": "fail", "classification": "new_requirement", "feedback": "add exports"}
+            ]))
+            with mock.patch.object(human_eval, "FEATURES_PATH", feature_path), mock.patch.object(human_eval, "RUNS_DIR", runs_dir), mock.patch.object(sys, "argv", ["human-eval.py", "--batch-file", str(batch)]):
+                self.assertEqual(human_eval.main(), 0)
+            features = json.loads(feature_path.read_text())["features"]
+            self.assertFalse(features[0]["passes"])
+            self.assertEqual(features[0]["status"], "todo")
+            self.assertTrue(features[1]["passes"])
+            self.assertEqual(features[1]["status"], "done")
+            self.assertEqual(len(features), 2)
+            self.assertEqual(len(list(runs_dir.glob("*-batch.md"))), 1)
+
+    def test_human_eval_batch_records_pass_without_reopening(self):
+        human_eval = load_human_eval()
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp = Path(tmp_dir)
+            feature_path = tmp / "feature_list.json"
+            runs_dir = tmp / "runs"
+            runs_dir.mkdir()
+            feature_path.write_text(json.dumps({"features": [{
+                "id": "F039", "title": "feature", "description": "desc", "acceptance": ["works"],
+                "passes": True, "status": "done", "attempts": 1, "last_error": ""
+            }]}))
+            batch = tmp / "human-eval.json"
+            batch.write_text(json.dumps([{"feature_id": "F039", "result": "pass", "classification": "current_feature", "feedback": "accepted"}]))
+            with mock.patch.object(human_eval, "FEATURES_PATH", feature_path), mock.patch.object(human_eval, "RUNS_DIR", runs_dir), mock.patch.object(sys, "argv", ["human-eval.py", "--batch-file", str(batch)]):
+                self.assertEqual(human_eval.main(), 0)
+            feature = json.loads(feature_path.read_text())["features"][0]
+            self.assertTrue(feature["passes"])
+            self.assertEqual(feature["status"], "done")
     def test_validate_state_accepts_current_feature_list(self):
         result = run_command([sys.executable, "scripts/validate-state.py"])
         self.assertEqual(result.returncode, 0, result.stderr)
@@ -394,6 +494,103 @@ class ScriptUnitTests(unittest.TestCase):
             self.assertEqual(evaluator.returncode, 0, evaluator.stderr)
             self.assertEqual(evaluator_marker.read_text(), "evaluator")
 
+    def test_agent_provider_uses_same_config_relative_cwd_for_preflight_and_execution(self):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            project = Path(tmp_dir) / "project"
+            harness = project / ".agent-harness"
+            harness.mkdir(parents=True)
+            (project / "feature_list.json").write_text("stale-root-feature-state")
+            (project / "progress.md").write_text("stale-root-progress")
+            (harness / "feature_list.json").write_text("canonical-feature-state")
+            (harness / "progress.md").write_text("canonical-progress")
+            provider = harness / "fake_provider.py"
+            provider.write_text(
+                "import os, sys\n"
+                "from pathlib import Path\n"
+                "prompt = sys.stdin.read()\n"
+                "name = 'preflight.cwd' if 'PROVIDER_CHECK_OK' in prompt else 'execution.cwd'\n"
+                "Path(name).write_text(os.getcwd())\n"
+            )
+            config = harness / "agent-provider.json"
+            config.write_text(json.dumps({
+                "provider": "custom",
+                "providers": {
+                    "custom": {
+                        "cwd": "..",
+                        "command": [sys.executable, str(provider)],
+                        "runtime_check_command": [sys.executable, str(provider)],
+                    }
+                }
+            }))
+            env = {"HARNESS_AGENT_PROVIDER_CONFIG": str(config)}
+
+            check = run_command([sys.executable, "scripts/run-agent-provider.py", "--role", "coding", "--check"], env=env)
+            self.assertEqual(check.returncode, 0, check.stderr)
+            execute = run_command(
+                [sys.executable, "scripts/run-agent-provider.py", "--role", "coding"],
+                env=env,
+                input_text="coding prompt",
+            )
+            self.assertEqual(execute.returncode, 0, execute.stderr)
+            self.assertEqual((project / "preflight.cwd").read_text(), str(project.resolve()))
+            self.assertEqual((project / "execution.cwd").read_text(), str(project.resolve()))
+            self.assertEqual((project / "feature_list.json").read_text(), "stale-root-feature-state")
+            self.assertEqual((project / "progress.md").read_text(), "stale-root-progress")
+            self.assertEqual((harness / "feature_list.json").read_text(), "canonical-feature-state")
+            self.assertEqual((harness / "progress.md").read_text(), "canonical-progress")
+
+    def test_orchestrator_renders_layout_aware_contract_for_every_role_surface(self):
+        orchestrator = load_orchestrator()
+        role_prompts = ["plan.md", "work.md", "evaluate.md", "continue.md", "work-fast.md"]
+        hidden = [orchestrator.prompt_template(name, layout="hidden") for name in role_prompts]
+        for prompt in hidden:
+            self.assertIn("Harness layout: `hidden`", prompt)
+            self.assertIn("`feature_list.json` -> `.agent-harness/feature_list.json`", prompt)
+            self.assertIn("`progress.md` -> `.agent-harness/progress.md`", prompt)
+            self.assertIn("`runs/` -> `.agent-harness/runs/`", prompt)
+            self.assertIn("legacy/non-canonical", prompt)
+            self.assertIn("root `./init.sh` remain relative to the provider workspace", prompt)
+
+        visible = orchestrator.prompt_template("work.md", layout="visible")
+        self.assertIn("Harness layout: `visible`", visible)
+        self.assertIn("`feature_list.json` -> `feature_list.json`", visible)
+        self.assertNotIn("`.agent-harness/feature_list.json`", visible)
+
+    def test_hidden_manifest_selects_canonical_paths_without_touching_stale_root_state(self):
+        orchestrator = load_orchestrator()
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            project = Path(tmp_dir) / "project"
+            harness = project / ".agent-harness"
+            harness.mkdir(parents=True)
+            stale_feature = project / "feature_list.json"
+            stale_progress = project / "progress.md"
+            canonical_feature = harness / "feature_list.json"
+            canonical_progress = harness / "progress.md"
+            stale_feature.write_text("stale-root-feature-sentinel")
+            stale_progress.write_text("stale-root-progress-sentinel")
+            canonical_feature.write_text("canonical-feature-sentinel")
+            canonical_progress.write_text("canonical-progress-sentinel")
+            (harness / "manifest.json").write_text(json.dumps({"layout": "hidden"}))
+
+            previous = Path.cwd()
+            try:
+                os.chdir(harness)
+                with (
+                    mock.patch.object(orchestrator, "INSTALL_MANIFEST_PATH", Path("manifest.json")),
+                    mock.patch.object(orchestrator, "PROMPTS_DIR", ROOT / "prompts"),
+                ):
+                    prompt = orchestrator.prompt_template("evaluate.md")
+            finally:
+                os.chdir(previous)
+
+            self.assertIn("Harness layout: `hidden`", prompt)
+            self.assertIn("`feature_list.json` -> `.agent-harness/feature_list.json`", prompt)
+            self.assertIn("`runs/` -> `.agent-harness/runs/`", prompt)
+            self.assertEqual(stale_feature.read_text(), "stale-root-feature-sentinel")
+            self.assertEqual(stale_progress.read_text(), "stale-root-progress-sentinel")
+            self.assertEqual(canonical_feature.read_text(), "canonical-feature-sentinel")
+            self.assertEqual(canonical_progress.read_text(), "canonical-progress-sentinel")
+
     def test_orchestrator_evaluator_result_uses_final_matching_verdict(self):
         orchestrator = load_orchestrator()
         result = subprocess.CompletedProcess(
@@ -455,6 +652,15 @@ class ScriptUnitTests(unittest.TestCase):
             with mock.patch.object(orchestrator, "RUNS_DIR", runs_dir):
                 self.assertEqual(orchestrator.fast_coding_evidence_result("F123"), (None, ""))
 
+                (runs_dir / "handoff.md").write_text(
+                    "# Run Record\n\n"
+                    "FAST_CODING_HANDOFF: F123\n"
+                    "FAST_CODING_EVIDENCE: F123\n"
+                    "CODING_PASS: F123\n"
+                    "EVAL_PASS: F123\n"
+                )
+                self.assertEqual(orchestrator.fast_coding_evidence_result("F123"), (None, ""))
+
                 (runs_dir / "valid.md").write_text(
                     "# Run Record\n\n"
                     "FAST_CODING_EVIDENCE: F123\n"
@@ -471,6 +677,15 @@ class ScriptUnitTests(unittest.TestCase):
                 passed, reason = orchestrator.fast_coding_evidence_result("F123")
                 self.assertFalse(passed)
                 self.assertIn("must not contain evaluator pass evidence", reason)
+
+    def test_orchestrator_fast_evidence_ignores_verdict_examples_in_other_run_records(self):
+        orchestrator = load_orchestrator()
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            runs_dir = Path(tmp_dir)
+            (runs_dir / "coding.md").write_text("FAST_CODING_EVIDENCE: F123\nCODING_PASS: F123\n")
+            (runs_dir / "evaluation.md").write_text("- Logs: coding evidence must not contain `EVAL_PASS: F123`\n")
+            with mock.patch.object(orchestrator, "RUNS_DIR", runs_dir):
+                self.assertEqual(orchestrator.fast_coding_evidence_result("F123"), (True, ""))
 
     def test_orchestrator_work_fast_starts_without_coding_adapter(self):
         orchestrator = load_orchestrator()

@@ -15,6 +15,7 @@ PROMPTS_DIR = Path("prompts")
 RUNS_DIR = Path("runs")
 CODING_AGENT_ADAPTER = Path("scripts/run-coding-agent.sh")
 EVALUATOR_AGENT_ADAPTER = Path("scripts/run-evaluator-agent.sh")
+INSTALL_MANIFEST_PATH = Path("manifest.json")
 MAX_ROUNDS = 1
 MAX_ATTEMPTS = 3
 FAST_CODING_EVIDENCE_PREFIX = "FAST_CODING_EVIDENCE:"
@@ -189,11 +190,64 @@ def startup_protocol() -> None:
     sh(["./init.sh"])
 
 
-def prompt_template(name: str) -> str:
+def harness_layout() -> str:
+    if INSTALL_MANIFEST_PATH.exists():
+        try:
+            manifest = json.loads(INSTALL_MANIFEST_PATH.read_text())
+        except json.JSONDecodeError:
+            manifest = {}
+        if manifest.get("layout") in {"hidden", "visible"}:
+            return str(manifest["layout"])
+    if Path.cwd().name == ".agent-harness":
+        return "hidden"
+    return "visible"
+
+
+def provider_workspace_path_contract(layout: Optional[str] = None) -> str:
+    selected_layout = layout or harness_layout()
+    if selected_layout not in {"hidden", "visible"}:
+        raise OrchestratorError(f"Unsupported harness layout: {selected_layout}")
+    prefix = ".agent-harness/" if selected_layout == "hidden" else ""
+    mappings = [
+        ("SPEC.md", f"{prefix}SPEC.md"),
+        ("feature_list.json", f"{prefix}feature_list.json"),
+        ("progress.md", f"{prefix}progress.md"),
+        ("QUALITY.md", f"{prefix}QUALITY.md"),
+        ("test_plan.md", f"{prefix}test_plan.md"),
+        ("runs/", f"{prefix}runs/"),
+        ("docs/", f"{prefix}docs/"),
+        ("prompts/", f"{prefix}prompts/"),
+        ("scripts/", f"{prefix}scripts/"),
+        ("test/", f"{prefix}test/"),
+    ]
+    lines = [
+        "# Provider Workspace Path Contract",
+        "",
+        f"Harness layout: `{selected_layout}`.",
+        "All paths below are relative to the provider workspace selected by `agent-provider.json` `cwd`.",
+    ]
+    if selected_layout == "hidden":
+        lines.extend([
+            "The provider workspace is the project root; provider `cwd` is normally `..` relative to `.agent-harness/`.",
+            "Root files with the same names as harness state are legacy/non-canonical and must not be read or modified.",
+        ])
+    else:
+        lines.append("The provider workspace and harness root are the repository root; provider `cwd` is normally `.`.")
+    lines.extend(["", "Canonical harness paths:"])
+    lines.extend(f"- `{logical}` -> `{canonical}`" for logical, canonical in mappings)
+    lines.extend([
+        "",
+        "Project-owned source, root `AGENTS.md`, and root `./init.sh` remain relative to the provider workspace.",
+        "Treat later bare harness paths in this role prompt as logical names resolved through this mapping.",
+    ])
+    return "\n".join(lines)
+
+
+def prompt_template(name: str, layout: Optional[str] = None) -> str:
     path = PROMPTS_DIR / name
     if not path.exists():
         raise OrchestratorError(f"Missing prompt template: {path}")
-    return path.read_text()
+    return f"{provider_workspace_path_contract(layout)}\n\n{path.read_text()}"
 
 
 def coding_prompt(feature_id: str) -> str:
@@ -468,6 +522,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--max-attempts", type=int, default=MAX_ATTEMPTS)
     parser.add_argument("--eval-only", metavar="FEATURE_ID|all")
     parser.add_argument("--work-fast", action="store_true", help="run evaluator-gated fast work mode")
+    parser.add_argument(
+        "--render-prompt",
+        choices=["plan", "work", "evaluate", "continue", "work-fast"],
+        help="render one role prompt with the detected provider-workspace path contract",
+    )
     parser.add_argument("--dry-run", action="store_true")
     return parser.parse_args()
 
@@ -475,6 +534,17 @@ def parse_args() -> argparse.Namespace:
 def main() -> int:
     args = parse_args()
     startup_protocol()
+
+    if args.render_prompt:
+        prompt_names = {
+            "plan": "plan.md",
+            "work": "work.md",
+            "evaluate": "evaluate.md",
+            "continue": "continue.md",
+            "work-fast": "work-fast.md",
+        }
+        print(prompt_template(prompt_names[args.render_prompt]))
+        return 0
 
     if args.eval_only:
         results = [evaluate_feature(feature_id, args.dry_run) for feature_id in feature_ids_for_eval(args.eval_only)]

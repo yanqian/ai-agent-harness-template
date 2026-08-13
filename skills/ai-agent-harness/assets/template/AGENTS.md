@@ -179,6 +179,8 @@ If either role adapter is missing, not executable, or still the template adapter
 
 Default adapters delegate to `scripts/run-agent-provider.py`. Configure them by copying `agent-provider.example.json` to `agent-provider.json` and selecting an explicit provider. Do not guess between Codex, Claude Code, Cursor Agent, or custom providers; missing, ambiguous, or unavailable provider setup is a capability gap.
 
+Provider `cwd` is resolved relative to the directory containing `agent-provider.json` and is shared by runtime preflight and real role execution. Visible layout normally uses `cwd: "."`; hidden layout normally uses `cwd: ".."` so child agents can modify project source from the project root. Do not combine it with provider-specific directory flags. Rendered role prompts provide the canonical layout-aware harness path mapping.
+
 ## State Files
 
 ### Human Evaluation

@@ -243,6 +243,8 @@ make -C .agent-harness work
 
 or change into `.agent-harness/` and run `make work`. A missing root `Makefile` in hidden layout does not mean orchestrator work is unavailable.
 
+Hidden-layout provider children should run from the project root with `cwd: ".."` in `.agent-harness/agent-provider.json`. The adapter resolves that path relative to `.agent-harness/` for both preflight and real execution, while rendered role prompts map canonical workflow paths back under `.agent-harness/`. Do not also add a provider-specific directory flag such as Codex `--cd`.
+
 `make work` runs `python3 orchestrator.py --max-rounds 1`. The orchestrator selects one unfinished feature, marks it in progress, increments attempts, dispatches Coding Agent and Evaluator Agent role prompts, and marks the feature done only after evaluator pass.
 
 The fast A/B entrypoint is:

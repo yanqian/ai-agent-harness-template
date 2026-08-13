@@ -38,6 +38,8 @@ Fast coding evidence must not contain `EVAL_PASS: Fxxx`, must not mark the featu
 
 Before real provider execution, configure `agent-provider.json` from `agent-provider.example.json` using `docs/agent-provider-configuration.md`. Missing, ambiguous, or unavailable provider setup is a capability gap and must fail closed before completion.
 
+Provider `cwd` is resolved relative to the directory containing `agent-provider.json` and is used unchanged for runtime preflight and real execution. Use `cwd: "."` in visible layout and `cwd: ".."` in hidden layout so the provider workspace is the project root. Do not combine it with provider-specific directory switches. The orchestrator renders every role prompt with a layout-aware mapping; use `python3 orchestrator.py --render-prompt plan` or `--render-prompt continue` for those direct/manual role surfaces.
+
 Use `prompts/work.md` manually only as an explicit fallback when role adapters are not configured, unavailable, or the user asks for interactive work.
 
 Manual fallback still follows the Coding Agent contract: run `./init.sh` before and after changes, update only the selected feature state, record progress, and note that manual work was a fallback in `progress.md` or `runs/`.

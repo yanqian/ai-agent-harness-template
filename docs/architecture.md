@@ -23,6 +23,7 @@ The template is a repository-local harness, not a hosted service.
 
 - The orchestrator owns unattended state transitions.
 - Role adapters own vendor-specific agent invocation.
+- The provider adapter owns the provider workspace; the orchestrator prompt renderer owns layout-aware canonical harness paths relative to that workspace.
 - Contract tests own harness invariants.
 - Downstream projects own product-specific implementation and verification.
 - Default examples under `examples/` are demonstration fixtures, not the default location for downstream product features.

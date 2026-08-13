@@ -55,7 +55,7 @@ Implemented components:
 
 ## Last Completed Feature
 
-`F038` - Add installed harness upgrade workflow.
+`F043` - Synchronize template version sources.
 
 ## Next Feature
 
@@ -67,6 +67,7 @@ Implemented components:
 - `agent-provider.json` is intentionally absent by default; copy `agent-provider.example.json` and select an explicit provider before real `make work` execution.
 - `F011` remains a P2 backlog item and should not preempt the new P0 orchestrator-first work.
 - `F036` is a P0 A/B workflow experiment: keep `make work` as the two-child-process baseline and add `make work-fast` with provider-native coding plus mandatory cold-start evaluator child gating.
+- The former `0.3.8`/`0.3.9` template-version source inconsistency was resolved independently in F043.
 
 ## Recovery Notes
 
@@ -83,3 +84,14 @@ Implemented components:
 - F038 was planned after a real hidden-layout project repair showed a lifecycle gap: the global skill had `work-fast`, but the installed project-local `.agent-harness` remained on an older template without the target. The planned fix adds an explicit upgrade workflow and reduces nested template vendoring in installed projects.
 - F038 completed through work-fast provider-native implementation. The initializer now has explicit `upgrade` mode, hidden-layout harness runtime files are upgradeable without overwriting root project recovery entrypoints, obsolete nested template assets are removed during upgrade, and the template version was bumped to 0.3.7. Coding evidence is recorded in `runs/20260709T061705Z-F038-work-fast-coding.md`, evaluator approval is recorded as `EVAL_PASS: F038` in `runs/20260709T062151Z-F038-evaluation.md`, and final `./init.sh` plus `scripts/validate-feature.sh F038` passed.
 - A follow-up 0.3.8 repair fixed installed-project contract tests so hidden-layout installs no longer require the removed nested `skills/ai-agent-harness/assets/template` tree.
+- F039/F040 planning adds an optional Human Eval layer that can happen after multiple Features are automatically complete. Unmet original scope must reopen the original Feature; genuinely new requirements remain planning inputs and are not auto-appended. F040 depends on F039.
+- F039 coding added optional Human Eval recording, current-scope reopen behavior, non-blocking new-requirement recording, orchestrator reopen selection, evidence-parser hardening, contract coverage, and bundled template synchronization. Coding evidence is recorded in `runs/20260811T081020Z-F039-work-fast-coding.md`; evaluator approval is recorded in `runs/20260811T082002Z-F039-evaluation.md`.
+- F039 had two evaluator-gated failures before passing: missing contract coverage and a work-fast evidence-parser false positive. Both are recorded in `runs/` and fixed with regression coverage. F040 remains the next independent feature for deferred batch Human Eval.
+- F040 coding added JSON batch Human Eval input, mixed-outcome routing, batch run evidence, Make targets, tests, and bundled template synchronization. Coding evidence is recorded in `runs/20260811T092000Z-F040-work-fast-coding.md`; F040 remains incomplete until a separate Evaluator Agent records `EVAL_PASS: F040`.
+- F040 evaluator feedback identified missing smoke coverage; subprocess smoke coverage and explicit batch pass tests now pass. Rerun the separate Evaluator Agent for F040.
+- F040 passed after adding the required subprocess smoke coverage. Evaluator approval is recorded in `runs/20260811T092600Z-F040-evaluation.md`.
+- F041 synchronized Human Eval lifecycle rules into the distributable skill and bundled template, with contract parity coverage. Coding evidence is recorded in `runs/20260811T093600Z-F041-work-fast-coding.md`; evaluator approval is recorded in `runs/20260811T093820Z-F041-evaluation.md`. F011 remains the next unfinished feature.
+- F042 planning defined provider paths relative to the adapter-selected provider workspace and split template-version parity into F043. Work-fast coding added layout-aware prompt rendering for Planning, Coding, Evaluator, Continue, and Work-fast; resolved provider `cwd` relative to `agent-provider.json` for both preflight and real execution; generated hidden examples with `cwd: ".."`; synchronized the distributable/bundled template surfaces; and added fake-provider plus stale-root-sentinel regressions. The coding phase correctly left F042 incomplete pending independent evaluation.
+- F042 passed independent evaluation. Evaluator approval is recorded in `runs/20260813T145836Z-F042-evaluation.md`; the evaluator reran unit, contract, harness, full init, and selected-feature validation before the orchestrator marked F042 done.
+- F043 coding aligned the distributable and bundled initializer with manifest version `0.3.9`, changed initializer fixtures to derive their expected version from `.agent-harness-template.json`, and added a contract test that rejects drift between manifest, initializer, bundled initializer, and bundled tests. The coding phase correctly left F043 incomplete pending independent evaluation.
+- F043 passed independent evaluation. Evaluator approval is recorded in `runs/20260813T150520Z-F043-evaluation.md`; the orchestrator marked the Feature done only after the durable pass record existed.

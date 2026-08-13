@@ -128,12 +128,18 @@ def provider_env(config: dict) -> dict[str, str]:
     return env
 
 
-def provider_cwd(config: dict) -> str:
+def provider_cwd(config: dict, path: Path) -> str:
     _, settings = provider_settings(config)
     cwd = settings.get("cwd", ".")
     if not isinstance(cwd, str) or not cwd:
         raise ValueError("provider cwd must be a non-empty string when set.")
-    return cwd
+    resolved = (path.resolve().parent / cwd).resolve()
+    if not resolved.is_dir():
+        raise ValueError(
+            f"provider cwd does not resolve to a directory: {cwd!r} "
+            f"(relative to {path.resolve().parent})"
+        )
+    return str(resolved)
 
 
 def looks_like_permission_error(output: str) -> bool:
@@ -180,7 +186,7 @@ def main() -> int:
         command = command_for_role(config, args.role)
         runtime_check_command = runtime_check_command_for_role(config, args.role)
         env = provider_env(config)
-        cwd = provider_cwd(config)
+        cwd = provider_cwd(config, path)
     except ValueError as exc:
         return fail(str(exc))
 

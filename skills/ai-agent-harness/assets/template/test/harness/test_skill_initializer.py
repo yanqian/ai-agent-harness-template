@@ -92,6 +92,9 @@ class SkillInitializerHarnessTests(unittest.TestCase):
             self.assertIn("state_valid=true", result.stdout)
             self.assertIn("runnable_harness=true", result.stdout)
             self.assertIn("state_reset=.agent-harness/feature_list.json,.agent-harness/progress.md", result.stdout)
+            provider_example = json.loads((project / ".agent-harness" / "agent-provider.example.json").read_text())
+            self.assertEqual(provider_example["providers"]["codex"]["cwd"], "..")
+            self.assertIn("provider `cwd` set to `..`", (project / "AGENTS.md").read_text())
 
             data = json.loads((project / ".agent-harness" / "feature_list.json").read_text())
             self.assertEqual(data, {"features": []})

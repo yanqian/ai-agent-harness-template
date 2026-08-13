@@ -766,6 +766,48 @@
         "F039",
         "F040"
       ]
+    },
+    {
+      "id": "F042",
+      "title": "Add layout-aware provider workspace paths",
+      "description": "Define one vendor-neutral provider workspace and prompt path contract so hidden-layout child agents run from the project root while reading and writing canonical workflow state under .agent-harness, with visible-layout behavior unchanged.",
+      "acceptance": [
+        "Provider `cwd` is documented and tested as relative to the harness directory, is shared by runtime preflight and real role execution, and replaces overlapping provider-specific directory flags such as Codex `--cd`",
+        "Planning, Coding, Evaluator, Continue, and Work-fast prompts use one layout-aware contract that maps hidden workflow state, docs, scripts, prompts, tests, and runs to `.agent-harness/` while keeping project-owned source, root `AGENTS.md`, and root `./init.sh` relative to the provider workspace; visible layout remains root-relative",
+        "Regression tests with stale root sentinels and canonical `.agent-harness` sentinels cover Coding, Evaluator, Planning or Continue, Work-fast, and run-evidence paths without modifying the stale root files",
+        "Generated hidden-layout instructions, provider docs, the distributable skill, bundled template, and initializer install/check/repair/upgrade behavior remain synchronized and preserve project-owned state",
+        "`./init.sh` and `scripts/validate-feature.sh F042` pass after a separate Evaluator Agent records `EVAL_PASS: F042`"
+      ],
+      "passes": true,
+      "status": "done",
+      "attempts": 1,
+      "last_error": "",
+      "priority": "P0",
+      "depends_on": [
+        "F031",
+        "F035",
+        "F036",
+        "F038"
+      ]
+    },
+    {
+      "id": "F043",
+      "title": "Synchronize template version sources",
+      "description": "Align the template manifest, distributable and bundled initializer constants, and version-sensitive tests on the intended current template version, with a regression contract that prevents future drift.",
+      "acceptance": [
+        "The template manifest, distributable initializer, bundled initializer, initializer fixtures, and version-sensitive contract tests use the same template version",
+        "A deterministic contract test fails when checked-in template version sources diverge",
+        "Install, check, repair, and upgrade tests pass without changing project-owned state or the user's local provider configuration",
+        "`./init.sh` and `scripts/validate-feature.sh F043` pass after a separate Evaluator Agent records `EVAL_PASS: F043`"
+      ],
+      "passes": true,
+      "status": "done",
+      "attempts": 1,
+      "last_error": "",
+      "priority": "P0",
+      "depends_on": [
+        "F042"
+      ]
     }
   ]
 }
