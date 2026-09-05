@@ -822,6 +822,23 @@
         "last_recorded_at": "2026-08-13T15:26:49.869051+00:00",
         "reopen_pending": true
       }
+    },
+    {
+      "id": "F044",
+      "title": "Isolate fresh project SPEC and feature state",
+      "description": "Install a structured project-owned SPEC with shared-rule references while preventing template requirements, numbering, and history from becoming project state. Preserve existing project state across lifecycle operations.",
+      "acceptance": [
+        "Fresh new/adopt installs in hidden and visible layouts receive a project SPEC scaffold with normalization sections and working shared-rule links, empty feature state, fresh progress, and no template run history.",
+        "Planning guidance starts an empty canonical feature list at F001 using only project feature IDs; existing IDs and evidence remain unchanged.",
+        "Existing project SPEC, feature state, progress, and run evidence survive repeat installation, repair, and upgrade; missing state is restored from fresh scaffolds instead of template development history, and dry-run does not write.",
+        "Distributable skill, bundled template, and lifecycle documentation agree, with regression coverage for fresh installation and preservation boundaries.",
+        "./init.sh and scripts/validate-feature.sh F044 pass and a separate Evaluator Agent records EVAL_PASS: F044 before completion."
+      ],
+      "passes": true,
+      "status": "done",
+      "attempts": 1,
+      "last_error": "",
+      "priority": "P0"
     }
   ]
 }

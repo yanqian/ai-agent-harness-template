@@ -55,7 +55,7 @@ Implemented components:
 
 ## Last Completed Feature
 
-`F043` - Synchronize template version sources.
+`F044` - Isolate fresh project SPEC and feature state.
 
 ## Next Feature
 
@@ -96,3 +96,13 @@ Implemented components:
 - F043 coding aligned the distributable and bundled initializer with manifest version `0.3.9`, changed initializer fixtures to derive their expected version from `.agent-harness-template.json`, and added a contract test that rejects drift between manifest, initializer, bundled initializer, and bundled tests. The coding phase correctly left F043 incomplete pending independent evaluation.
 - F043 passed independent evaluation. Evaluator approval is recorded in `runs/20260813T150520Z-F043-evaluation.md`; the orchestrator marked the Feature done only after the durable pass record existed.
 - F043 was reopened after global skill installation exposed a stale bundled `.agent-harness-template.json` at `0.3.8`. The cold-start evaluator rejected the old implementation and required the bundled manifest plus version-parity contract coverage to be repaired before reevaluation.
+
+- F044 planned from downstream F044 numbering contamination: initializer resets feature/progress state but copies the template product SPEC. Failure domain: agent_workflow_gap. The durable fix is fresh project scaffolding and preservation regressions; existing downstream IDs will not be rewritten.
+
+- F044 uses adapter-unavailable manual fallback after normal and escalated work-fast runtime preflights failed before dispatch. See runs/20260905T033800Z-F044-manual-fallback.md. Attempts=1; separate cold-start evaluation is required.
+
+- F044 coding completed: fresh SPEC scaffolds, project-local numbering guidance, preservation across lifecycle modes, dry-run safety, and bundled regression coverage. Full ./init.sh passed (30 unit, 32 contract, 11 harness, 2 smoke); independent evaluator approval is pending. See runs/20260905T034300Z-F044-coding.md.
+
+- F044 passed independent cold-start evaluation in runs/20260905T034449Z-F044-evaluation.md, including full init, selected-feature validation, all-mode dry-run probes, and bundle parity. Manual fallback completion is backed by this evaluator evidence. Existing downstream projects and the globally installed skill were not modified.
+
+- F044 final post-completion ./init.sh passed with evaluator evidence present; all 43 pre-existing feature entries were verified unchanged. The evaluator run metadata labels were corrected to the check-failure-domains contract before final verification. No commit performed.

@@ -83,6 +83,89 @@ class SkillInitializerHarnessTests(unittest.TestCase):
         ".agent-harness/scripts/validate-feature.sh",
     ]
 
+    def test_fresh_project_handoff_in_both_layouts(self):
+        import re
+        for mode in ("new", "adopt"):
+            for layout in ("hidden", "visible"):
+                with self.subTest(mode=mode, layout=layout), tempfile.TemporaryDirectory() as tmp:
+                    project = Path(tmp)
+                    (project / "product-notes.md").write_text("Existing product requirements\n")
+                    result = run_initializer(project, mode, "--layout", layout)
+                    self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                    harness = project / ".agent-harness" if layout == "hidden" else project
+                    spec = (harness / "SPEC.md").read_text()
+                    self.assertTrue(spec.startswith("# Project SPEC\n"))
+                    for heading in ("Goal", "Scope included", "Scope excluded", "Core flows", "Constraints",
+                                    "Ambiguities or assumptions", "Required capabilities", "Implementation paths",
+                                    "Verification surface", "Feature decomposition"):
+                        self.assertIn("## " + heading, spec)
+                    for link in re.findall(r"\]\(([^)]+)\)", spec):
+                        self.assertTrue((harness / link).is_file(), link)
+                    self.assertNotIn("Synchronize template version", spec)
+                    self.assertNotIn("F043", spec)
+                    self.assertIn("not been accepted yet", spec)
+                    self.assertEqual(json.loads((harness / "feature_list.json").read_text()), {"features": []})
+                    self.assertIn("F001", (harness / "progress.md").read_text())
+                    self.assertEqual({p.name for p in (harness / "runs").iterdir()}, {"RUN_TEMPLATE.md", ".gitkeep"})
+                    self.assertEqual((project / "product-notes.md").read_text(), "Existing product requirements\n")
+                    self.assertIn("start at F001", (harness / "prompts/plan.md").read_text())
+                    contracts = subprocess.run([sys.executable, "-m", "unittest", "discover", "-s", "test/contract"],
+                                               cwd=harness, capture_output=True, text=True)
+                    self.assertEqual(contracts.returncode, 0, contracts.stdout + contracts.stderr)
+
+    def test_existing_project_state_survives_all_lifecycle_modes(self):
+        for layout in ("hidden", "visible"):
+            with self.subTest(layout=layout), tempfile.TemporaryDirectory() as tmp:
+                project = Path(tmp)
+                harness = project / ".agent-harness" if layout == "hidden" else project
+                harness.mkdir(exist_ok=True)
+                # Preserve existing requirements even before an installation manifest exists.
+                (harness / "SPEC.md").write_text("# Existing project SPEC\nUser-owned scope.\n")
+                result = run_initializer(project, "adopt", "--layout", layout)
+                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                self.assertEqual((harness / "SPEC.md").read_text(), "# Existing project SPEC\nUser-owned scope.\n")
+                state = {"features": [{"id": "F044", "title": "Existing", "description": "Keep",
+                         "acceptance": ["Keep"], "passes": False, "status": "todo", "attempts": 2,
+                         "last_error": "keep", "custom": {"history": [1, 2]}}], "custom": True}
+                (harness / "feature_list.json").write_text(json.dumps(state))
+                (harness / "progress.md").write_text("# Progress\n## Current System Status\nExisting\n## Next Feature\nF044\n## Known Issues\nNone\n")
+                (harness / "runs" / "existing.txt").write_text("Existing evidence\n")
+                paths = [harness / p for p in ("SPEC.md", "feature_list.json", "progress.md", "runs/existing.txt")]
+                before = {p: p.read_bytes() for p in paths}
+                for mode in ("new", "adopt", "repair", "upgrade"):
+                    for flags in ((), ("--force",)):
+                        result = run_initializer(project, mode, "--layout", layout, *flags)
+                        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                        self.assertEqual({p: p.read_bytes() for p in paths}, before)
+
+    def test_repair_missing_state_uses_fresh_scaffolds(self):
+        for layout in ("hidden", "visible"):
+            with self.subTest(layout=layout), tempfile.TemporaryDirectory() as tmp:
+                project = Path(tmp)
+                self.assertEqual(run_initializer(project, "new", "--layout", layout).returncode, 0)
+                harness = project / ".agent-harness" if layout == "hidden" else project
+                for rel in ("SPEC.md", "feature_list.json", "progress.md"):
+                    (harness / rel).unlink()
+                repaired = run_initializer(project, "repair", "--layout", layout)
+                self.assertEqual(repaired.returncode, 0, repaired.stdout + repaired.stderr)
+                self.assertTrue((harness / "SPEC.md").read_text().startswith("# Project SPEC"))
+                self.assertEqual(json.loads((harness / "feature_list.json").read_text()), {"features": []})
+                self.assertIn("F001", (harness / "progress.md").read_text())
+
+    def test_dry_run_does_not_create_target_or_execute_project_init(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            project = Path(tmp) / "absent"
+            result = run_initializer(project, "new", "--dry-run")
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertFalse(project.exists())
+            self.assertEqual(run_initializer(project, "new").returncode, 0)
+            (project / "init.sh").write_text("#!/bin/sh\ntouch must-not-exist\n")
+            before = {str(p.relative_to(project)): p.read_bytes() for p in project.rglob("*") if p.is_file()}
+            result = run_initializer(project, "adopt", "--dry-run")
+            after = {str(p.relative_to(project)): p.read_bytes() for p in project.rglob("*") if p.is_file()}
+            self.assertEqual(after, before)
+            self.assertFalse((project / "must-not-exist").exists())
+
     def test_new_mode_creates_runnable_harness_and_clean_check(self):
         with tempfile.TemporaryDirectory() as tmp_dir:
             project = Path(tmp_dir)

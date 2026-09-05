@@ -37,3 +37,9 @@ After the SPEC entry is clear, use `docs/feature-decomposition.md` to split work
 ## Evaluation
 
 Evaluators must reject planned or implemented work when the accepted feature depends on ambiguous SPEC content that should have been normalized first. Use `requirement_gap` when missing goal, scope, flow, constraint, ambiguity, capability, implementation path, or verification detail is the primary problem.
+
+## Project requirements and numbering
+
+When the canonical `feature_list.json` is empty, start at F001. Otherwise allocate after the largest existing project feature ID. Never derive numbering from template SPEC, Harness documentation, examples, or another repository. Preserve all existing IDs, state, and evidence.
+
+For first installation, fill the project SPEC scaffold using user requirements and existing project documentation. Shared development rules remain in AGENTS.md, docs/, and QUALITY.md; reference them instead of importing Harness product requirements. An unfilled scaffold is not an accepted minspec.

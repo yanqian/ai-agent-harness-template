@@ -437,3 +437,25 @@ make ci
 ```
 
 Run `python3 orchestrator.py --dry-run` and `scripts/validate-feature.sh F001` outside `./init.sh`; both commands call `./init.sh` and should not be nested inside tests run by `./init.sh`.
+
+## Fresh project SPEC handoff (F044)
+
+Goal: initialize independent projects without inheriting the Harness product requirements or feature numbering.
+
+Included scope: generate a structured project SPEC with links to shared Harness rules when project SPEC is missing; initialize empty feature state and fresh progress on first new/adopt installation; make planning start an empty list at F001; retain run templates but exclude template run history; preserve existing project requirements, state, and evidence during repeat initialization, repair, and upgrade. Synchronize distributed and bundled skill behavior and documentation.
+
+Excluded scope: renumbering or rewriting existing downstream projects (including obsidian-mind-map), changing product source, automatic global skill installation, and changing evaluator runtime semantics.
+
+Core flows: install new/adopt into a fresh target; create a project-owned SPEC skeleton; normalize user requirements and existing project documentation into it; append F001 to an empty canonical feature list. Existing project SPEC remains an input and must not be overwritten. Repair missing state with fresh scaffolds; upgrade preserves project state.
+
+Constraints: support hidden and visible layouts, dry-run and conflict protection; do not import template feature IDs as project history; never silently reset an already installed project's state. Shared rules stay in AGENTS.md, docs, and QUALITY.md with relative references from SPEC.
+
+Ambiguities or assumptions: SPEC scaffolding declares requirements unaccepted until planning; an empty feature list has no inherited numbering. Existing numbered projects keep their IDs and evidence. A legacy template-contaminated SPEC needs a separately scoped migration.
+
+Required capabilities: existing Python initializer, file classification and manifest machinery, subprocess installation tests, and configured independent evaluator adapter.
+
+Implementation paths: skills/ai-agent-harness/scripts/init_harness.py, skill workflow references, prompts/plan.md, docs/spec-normalization.md, initializer and contract tests, bundled template equivalents.
+
+Verification surface: new/adopt hidden/visible installations, first-feature planning guidance, existing SPEC and state preservation, repair/upgrade and dry-run regression tests, run-history exclusion, ./init.sh and independent F044 evaluation.
+
+Decomposition: one feature, F044, owns the project-state handoff contract. SPEC scaffolding, numbering guidance, state preservation, and installation regression tests jointly verify this single boundary; none requires a separate product capability.

@@ -68,7 +68,7 @@ FRESH_PROGRESS = """# Progress
 
 ## Current System Status
 
-Harness state has been reset for a new project.
+Harness is installed. Project requirements have not been accepted yet.
 
 ## Last Completed Feature
 
@@ -76,12 +76,82 @@ None.
 
 ## Next Feature
 
-Add the first feature to `feature_list.json`.
+Normalize project requirements in `SPEC.md`, then add F001 to the empty `feature_list.json`.
 
 ## Known Issues
 
 - Project-specific requirements and verification are not defined yet.
 """
+
+
+FRESH_SPEC = """# Project SPEC
+
+## Development agreement
+
+This project uses AI Agent Harness. Follow [agent rules](AGENTS.md),
+[quality criteria](QUALITY.md), and [spec normalization](docs/spec-normalization.md).
+This document defines only this project's requirements and acceptance criteria.
+Harness product requirements and template feature IDs are not project history.
+
+## Planning status
+
+Project requirements have not been accepted yet. Use the user's requirements and
+existing project documentation as inputs; preserve those sources. Complete the
+sections below before decomposing executable features. Do not treat this scaffold
+as an accepted minspec or as proof that project behavior is runnable.
+
+## Goal
+
+Describe the project outcome and intended users.
+
+## Scope included
+
+Define the behaviors and surfaces to deliver.
+
+## Scope excluded
+
+Record explicit boundaries.
+
+## Core flows
+
+Describe the user and system flows to verify.
+
+## Constraints
+
+Record platform, compatibility, data, security, and runtime constraints.
+
+## Ambiguities or assumptions
+
+Record open questions and explicit assumptions before implementation.
+
+## Required capabilities
+
+Identify required tools, dependencies, services, and verification fixtures.
+
+## Implementation paths
+
+Identify project-owned source, setup, and test paths.
+
+## Verification surface
+
+Define acceptance criteria, tests, and the root project recovery contract.
+See [project recovery](docs/project-recovery-init.md).
+
+## Feature decomposition
+
+Follow [feature decomposition](docs/feature-decomposition.md). When the canonical
+`feature_list.json` is empty, start at F001. Otherwise allocate after the largest
+existing project feature ID, preserving all existing IDs, state, and evidence.
+Never derive numbering from Harness documentation, template SPEC, or examples.
+"""
+
+
+def fresh_project_state() -> dict[str, str]:
+    return {
+        "feature_list.json": json.dumps(FRESH_FEATURE_LIST, indent=2) + "\n",
+        "progress.md": FRESH_PROGRESS,
+        "SPEC.md": FRESH_SPEC,
+    }
 
 
 class HarnessInitError(Exception):
@@ -239,7 +309,10 @@ def install_items(template_root: Path, layout: str):
         hidden_provider_example = layout == "hidden" and rel.as_posix() == "agent-provider.example.json"
         content = None
         source = template_root / rel
-        if hidden_provider_example:
+        if rel.as_posix() in PROJECT_OWNED_STATE:
+            content = fresh_project_state()[rel.as_posix()]
+            source = None
+        elif hidden_provider_example:
             provider_example = json.loads(source.read_text())
             for settings in provider_example.get("providers", {}).values():
                 if isinstance(settings, dict):
@@ -328,7 +401,7 @@ def build_template_manifest(template_root: Path) -> dict:
         "default_layout": DEFAULT_LAYOUT,
         "file_categories": {
             "harness-owned static": "Copied and drift-checked by content hash.",
-            "project-owned state": "Copied or reset during initialization, then validated semantically instead of byte-compared.",
+            "project-owned state": "Fresh scaffolds for missing files; existing project state is preserved and validated semantically.",
             "merge-sensitive": "Never overwritten by default because the target project may already own this file.",
             "optional integration": "Copied when missing and reported when changed, but not required for core harness validity.",
             "template manifest": "Template metadata used for future drift checks.",
@@ -360,20 +433,6 @@ def copy_file(src: Path, dst: Path, dry_run: bool) -> None:
         shutil.copy2(src, dst)
 
 
-def reset_project_state(root: Path, layout: str, dry_run: bool) -> list[str]:
-    changed = []
-    harness_root = layout_harness_root(root, layout)
-    feature_path = harness_root / "feature_list.json"
-    progress_path = harness_root / "progress.md"
-    if not dry_run:
-        harness_root.mkdir(parents=True, exist_ok=True)
-        feature_path.write_text(json.dumps(FRESH_FEATURE_LIST, indent=2) + "\n")
-        progress_path.write_text(FRESH_PROGRESS)
-    prefix = "" if layout == "visible" else ".agent-harness/"
-    changed.extend([f"{prefix}feature_list.json", f"{prefix}progress.md"])
-    return changed
-
-
 def validate_feature_list(path: Path) -> tuple[bool, str]:
     data = read_json(path)
     if data is None:
@@ -403,7 +462,7 @@ def validate_feature_list(path: Path) -> tuple[bool, str]:
     return True, "ok"
 
 
-def semantic_validation(root: Path, layout: str) -> dict:
+def semantic_validation(root: Path, layout: str, *, verify_runtime: bool = True) -> dict:
     harness_root = layout_harness_root(root, layout)
     required = [
         "AGENTS.md",
@@ -466,13 +525,13 @@ def semantic_validation(root: Path, layout: str) -> dict:
     if layout == "hidden" and (root / "init.sh").exists() and not is_executable(root / "init.sh"):
         checks.append("init.sh is not executable")
 
-    init_ok = run_quick_init(root)
+    init_ok = run_quick_init(root) if verify_runtime else True
     if not init_ok:
         checks.append("HARNESS_SKIP_TEST_LAYERS=1 ./init.sh failed")
 
     return {
         "state_valid": "false" if checks else "true",
-        "runnable_harness": "false" if checks else "true",
+        "runnable_harness": ("false" if checks else "true") if verify_runtime else "not_checked",
         "state_errors": checks,
     }
 
@@ -615,7 +674,8 @@ def initialize(args: argparse.Namespace) -> int:
     target_root = Path(args.root).resolve()
     template_root = find_template_root(args.template_root)
     layout = resolve_layout(args.layout, target_root)
-    target_root.mkdir(parents=True, exist_ok=True)
+    if not args.dry_run:
+        target_root.mkdir(parents=True, exist_ok=True)
 
     classification = classify_files(template_root, target_root, layout)
     missing = classification["missing"]
@@ -623,7 +683,7 @@ def initialize(args: argparse.Namespace) -> int:
     drift = classification["drift"]
 
     installed = installed_manifest(target_root)
-    semantic = semantic_validation(target_root, layout)
+    semantic = semantic_validation(target_root, layout, verify_runtime=not args.dry_run)
     if args.mode == "check":
         print_summary(args.mode, layout, template_root, target_root, classification, semantic, installed, [], [], [], [])
         return 0 if check_is_clean(classification, semantic, installed) else 1
@@ -648,13 +708,12 @@ def initialize(args: argparse.Namespace) -> int:
         write_item(item, target_root, args.dry_run)
         overwritten.append(item)
 
-    if args.mode in {"new", "adopt"}:
-        reset = reset_project_state(target_root, layout, args.dry_run)
-    elif args.mode == "repair":
-        for rel in sorted(PROJECT_OWNED_STATE):
-            prefix = "" if layout == "visible" else ".agent-harness/"
-            if rel in {item["logical"].as_posix() for item in missing}:
-                reset.append(f"{prefix}{rel}")
+    # Only missing project-owned files are scaffolded. Even --force never resets
+    # an existing project's requirements, IDs, progress, or evidence. Upgrade
+    # deliberately leaves missing state for an explicit repair operation.
+    created_logical = {item["logical"].as_posix() for item in created}
+    prefix = "" if layout == "visible" else ".agent-harness/"
+    reset = [prefix + rel for rel in fresh_project_state() if rel in created_logical]
 
     removed = remove_obsolete_paths(target_root, layout, args.dry_run) if args.mode == "upgrade" else []
     ensure_runs_gitkeep(target_root, layout, args.dry_run)

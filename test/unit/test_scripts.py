@@ -307,7 +307,7 @@ class ScriptUnitTests(unittest.TestCase):
             data = json.loads((project / ".agent-harness" / "feature_list.json").read_text())
             self.assertEqual(data, {"features": []})
             progress = (project / ".agent-harness" / "progress.md").read_text()
-            self.assertIn("Harness state has been reset for a new project.", progress)
+            self.assertIn("Project requirements have not been accepted yet.", progress)
             self.assertTrue((project / "AGENTS.md").exists())
             self.assertTrue((project / ".agent-harness" / "skills" / "ai-agent-harness" / "SKILL.md").exists())
             self.assertFalse((project / ".agent-harness" / "skills" / "ai-agent-harness" / "assets" / "template" / "AGENTS.md").exists())

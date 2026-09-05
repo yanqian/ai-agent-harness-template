@@ -18,6 +18,16 @@ def bundled_template_available() -> bool:
 
 
 class RepositoryContractTests(unittest.TestCase):
+    def test_project_spec_handoff_rules_and_bundle_parity(self):
+        for rel in ("prompts/plan.md", "docs/spec-normalization.md",
+                    "skills/ai-agent-harness/SKILL.md", "skills/ai-agent-harness/references/workflows.md"):
+            text = (ROOT / rel).read_text()
+            self.assertIn("start at F001", text)
+            self.assertIn("existing project feature ID", text)
+            self.assertEqual(text, template_file(*rel.split("/")).read_text())
+        rel = "skills/ai-agent-harness/scripts/init_harness.py"
+        self.assertEqual((ROOT / rel).read_text(), template_file(*rel.split("/")).read_text())
+
     def test_template_version_sources_are_consistent(self):
         manifest_version = json.loads((ROOT / ".agent-harness-template.json").read_text())["template_version"]
         bundled_manifest_version = json.loads(template_file(".agent-harness-template.json").read_text())["template_version"]

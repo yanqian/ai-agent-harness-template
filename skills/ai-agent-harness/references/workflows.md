@@ -16,7 +16,7 @@ Use when the target project lacks harness files or the user asks to install, ado
 6. Do not use `--force` unless the user explicitly approved overwriting conflicts.
 7. After initialization, repair, or upgrade, run `<project>/init.sh` if present.
 
-`new` and `adopt` reset project feature state to an empty `feature_list.json` and fresh `progress.md`. `repair` preserves existing project state and restores missing files. `upgrade` preserves project-owned state while updating harness-owned static files, installed runtime files, prompts, docs, template metadata, and the installation manifest.
+`new` and `adopt` scaffold only missing project state: a structured project `SPEC.md` referencing shared rules, an empty `feature_list.json`, and fresh `progress.md`. Existing project state is preserved, including on repeated calls and with `--force`. Template product requirements and run history are not imported. `repair` preserves existing project state and restores missing state from fresh scaffolds. `upgrade` leaves missing state for explicit repair. `upgrade` preserves project-owned state while updating harness-owned static files, installed runtime files, prompts, docs, template metadata, and the installation manifest.
 
 Installed projects record `.agent-harness/manifest.json`. The template records `.agent-harness-template.json`. Use `check` before repair or upgrade decisions: it reports installed layout, installed version, template version, missing files, merge-sensitive conflicts, harness-owned drift, project-owned state changes, semantic validity, runnable status, and next action guidance.
 
@@ -37,6 +37,12 @@ From the evaluator-evidence baseline onward, `./init.sh` also verifies that comp
 Human Eval is optional and may be deferred until several Features are complete. It is product acceptance evidence, not an orchestration gate, and must not block unrelated Feature work. Record one result with `make human-eval` or a mixed batch with `make human-eval-batch`; both write durable run evidence and update the Feature's `human_acceptance` history.
 
 Classify every result explicitly. `current_feature` means the original Feature promise is still unmet: reopen that same Feature and continue its lifecycle, preserving attempts, history, and unknown fields. `new_requirement` means independent new value: leave the original Feature complete and create a Planning Agent handoff. Planning must perform SPEC normalization in `SPEC.md` and decompose the request before appending a new Feature. Human Eval evidence does not replace the automatic Evaluator `EVAL_PASS: Fxxx` evidence.
+
+## Project SPEC handoff
+
+When the canonical `feature_list.json` is empty, start at F001. Otherwise allocate after the largest existing project feature ID. Never derive numbering from template SPEC, Harness documentation, examples, or another repository. Preserve all existing IDs, state, and evidence.
+
+The template repository retains its own SPEC and feature history. Installed project SPEC reuses the normalization structure and links to AGENTS.md, docs/, and QUALITY.md, then describes only the target product. Preserve existing source documents as planning inputs; do not replace an existing project SPEC automatically. Legacy contaminated projects require a separate reviewed migration, not renumbering during upgrade.
 
 ## Plan Requirement
 

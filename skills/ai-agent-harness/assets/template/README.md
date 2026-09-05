@@ -150,6 +150,8 @@ python3 skills/ai-agent-harness/scripts/init_harness.py --root /path/to/project 
 
 Manual `python3 skills/ai-agent-harness/scripts/init_harness.py` commands are repository-checkout or vendor-neutral fallback usage, not the primary installed-skill experience.
 
+Fresh skill installations generate a structured project SPEC with shared-rule references, an empty feature list starting at F001 during planning, and fresh progress. Existing project state survives repeated initialization, repair, and upgrade. Template product requirements and run history remain separate.
+
 The initializer supports `new`, `adopt`, `repair`, `upgrade`, and `check` modes. It does not overwrite conflicting files unless `--force` is used after explicit approval.
 
 The initializer also supports layout profiles:

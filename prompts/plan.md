@@ -51,3 +51,9 @@ Return:
 - Decomposition decisions and any intentionally merged broad work.
 - Validation commands run.
 - Remaining planning risks.
+
+## Project requirements and numbering
+
+When the canonical `feature_list.json` is empty, start at F001. Otherwise allocate after the largest existing project feature ID. Never derive numbering from template SPEC, Harness documentation, examples, or another repository. Preserve all existing IDs, state, and evidence.
+
+For first installation, fill the project SPEC scaffold using user requirements and existing project documentation. Shared development rules remain in AGENTS.md, docs/, and QUALITY.md; reference them instead of importing Harness product requirements. An unfilled scaffold is not an accepted minspec.
