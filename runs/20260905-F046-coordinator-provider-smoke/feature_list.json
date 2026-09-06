@@ -1,0 +1,18 @@
+{
+  "features": [
+    {
+      "id": "F001",
+      "title": "Smoke recovery",
+      "description": "Verify the existing fixture marker through init.sh.",
+      "acceptance": [
+        "Project-root ./init.sh exits zero and prints FIXTURE_OK by verifying marker.txt equals ready."
+      ],
+      "passes": true,
+      "status": "done",
+      "attempts": 1,
+      "last_error": "",
+      "active_run": "3071ac1cfa4c4571b8701b20182fb85c",
+      "completion_receipt": "runs/3071ac1cfa4c4571b8701b20182fb85c/receipt.json"
+    }
+  ]
+}

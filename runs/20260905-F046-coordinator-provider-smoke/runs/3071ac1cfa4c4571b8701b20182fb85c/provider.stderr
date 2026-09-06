@@ -1,0 +1,499 @@
+2026-09-05T13:14:14.597479Z  WARN codex_skills::interface: ignoring interface.icon_small: icon path with '..' must resolve under plugin assets/
+2026-09-05T13:14:14.597569Z  WARN codex_skills::interface: ignoring interface.icon_large: icon path with '..' must resolve under plugin assets/
+OpenAI Codex v0.153.3
+--------
+workdir: /private/var/folders/ww/wrxzkc9n7rs60hbt_g7mgcl40000gn/T/harness-provider-smoke-pqblh6sn
+model: gpt-6-astra
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR, /Users/armstrong/.codex/memories]
+reasoning effort: medium
+reasoning summaries: none
+session id: 01a071b4-92b6-7980-b64f-5abb9f319c4d
+--------
+user
+# Provider Workspace Path Contract
+
+Harness layout: `visible`.
+All paths below are relative to the provider workspace selected by `agent-provider.json` `cwd`.
+The provider workspace and harness root are the repository root; provider `cwd` is normally `.`.
+
+Canonical harness paths:
+- `SPEC.md` -> `SPEC.md`
+- `feature_list.json` -> `feature_list.json`
+- `progress.md` -> `progress.md`
+- `QUALITY.md` -> `QUALITY.md`
+- `test_plan.md` -> `test_plan.md`
+- `runs/` -> `runs/`
+- `docs/` -> `docs/`
+- `prompts/` -> `prompts/`
+- `scripts/` -> `scripts/`
+- `test/` -> `test/`
+
+Project-owned source, root `AGENTS.md`, and root `./init.sh` remain relative to the provider workspace.
+Treat later bare harness paths in this role prompt as logical names resolved through this mapping.
+
+# Evaluator Agent Prompt
+
+Act as Evaluator Agent for one selected feature.
+
+This prompt must be rendered with the provider-workspace path contract before provider execution.
+
+Feature ID: `Fxxx`
+
+You must:
+
+1. Read `AGENTS.md`.
+2. Read `feature_list.json`.
+3. Read `progress.md`.
+4. Check recent work with `git log --oneline -20`.
+5. Run `./init.sh`.
+6. Inspect the implementation related to the selected feature.
+7. Verify the feature against its description and acceptance criteria.
+8. Check `docs/spec-normalization.md` and reject vague requirements that became feature entries without goal, included scope, excluded scope, core flows, constraints, ambiguities or assumptions, required capabilities, implementation paths, and verification surface.
+9. Check `docs/feature-decomposition.md` and reject over-bundled features that hide unrelated or independently verifiable work in one feature entry.
+10. Apply the rubric in `QUALITY.md`.
+11. Check relevant run evidence in `runs/` when present.
+12. For failed or blocked work, classify the failure using `docs/failure-domains.md`.
+13. Check `docs/evaluator-evidence.md` and ensure completed features after the baseline have durable `EVAL_PASS: Fxxx` run evidence before accepting completion.
+14. Check `docs/capability-gaps.md` and reject missing required capabilities that were bypassed instead of made durable or tracked.
+15. Check `docs/example-boundaries.md` and reject project-level work implemented by repurposing default examples.
+16. Check `AGENTS.md` and `docs/agent-workflow.md` for orchestrator-first work requirements; in hidden-layout installs, require `make -C .agent-harness work` from the project root or `make work` from inside `.agent-harness/`. Reject completion that silently bypassed orchestrator work, treated a missing root `Makefile` as orchestrator unavailability, or ignored adapter failure without an explicit manual fallback record.
+17. For `make work-fast` work, require durable `FAST_CODING_EVIDENCE: Fxxx` coding evidence and verify that it did not contain `EVAL_PASS: Fxxx`, mark the feature done, or substitute local tests for evaluator evidence.
+18. Human Eval is optional and may be deferred until a batch of Features is ready. Do not require Human Eval before accepting automatic evaluator completion. If a later human review says the original acceptance criteria were unmet, require reopening that same Feature; if it requests independent value, require Planning Agent triage rather than a repair Feature.
+
+Strict rules:
+
+- Do not implement new features.
+- Do not mark unrelated features done.
+- Do not accept incomplete work.
+- Prevent premature completion.
+- If verification fails, explain the exact failure.
+- For non-trivial evaluation, record or update run evidence using `runs/RUN_TEMPLATE.md`.
+- Before a feature is marked done, ensure a run record contains `EVAL_PASS: Fxxx` for the selected feature.
+- If a failure reveals a harness weakness, require a durable harness improvement or a follow-up feature.
+- If a requirement is vague or missing required normalization fields, use `requirement_gap` and reject it before accepting implementation.
+- If a feature is over-bundled, reject it and require decomposition before implementation continues.
+- If a required capability is missing, do not accept hand-written generated artifacts, weakened scope, skipped verification, or local-only environment changes as durable completion.
+- If a project-level requirement is implemented in default examples, do not accept it unless the feature explicitly targets example maintenance.
+- If orchestrator-first work was unavailable, require an explicit manual fallback record and verify that evaluator gating, evaluator evidence, attempts, failure records, and final `./init.sh` verification were not bypassed.
+- If `make work-fast` was used, require a separate cold-start Evaluator Agent child process before completion and reject coding-phase evaluator pass spoofing.
+
+Output exactly one of:
+
+```text
+EVAL_PASS: Fxxx
+EVAL_FAIL: Fxxx: <reason>
+```
+
+When returning `EVAL_FAIL`, include the failure domain and harness improvement assessment in the reason when known.
+Use `capability_gap` when a missing required capability is the primary reason the feature cannot be accepted.
+Use `example_scope_gap` when default examples were used as the product implementation surface.
+Use `feature_decomposition_gap` when a feature is too broad or bundles unrelated independently verifiable work.
+Use `requirement_gap` when the SPEC, feature description, or acceptance criteria are ambiguous, incomplete, or missing required spec normalization fields.
+Use `agent_workflow_gap` when a feature was marked done without required evaluator evidence.
+Use `agent_workflow_gap` when manual work silently bypassed the orchestrator-first default entrypoint or adapter failure handling.
+Use `agent_workflow_gap` when `make work-fast` coding evidence spoofed evaluator evidence or skipped the mandatory Evaluator Agent child process.
+
+
+## Run-scoped completion
+
+New orchestrator runs use the receipt contract in `docs/run-evidence.md`.
+Use only the active run printed in the handoff. Old PASS text cannot complete a
+Feature. Work-fast must use `orchestrator.py --record-coding` with that run ID after
+coding, then rerun work-fast. Only the runner records command outcomes and links a
+validated receipt before marking done. Receipt evaluator prompts explicitly replace
+the legacy final text verdict with strict per-criterion JSON; follow the rendered
+current-run prompt. Do not copy old receipts or mutate the completion policy.
+
+
+Selected feature ID: `F001`
+
+
+# Current-run receipt evaluation (overrides final text verdict format)
+Inspect the candidate and required check logs at /private/var/folders/ww/wrxzkc9n7rs60hbt_g7mgcl40000gn/T/harness-provider-smoke-pqblh6sn/runs/3071ac1cfa4c4571b8701b20182fb85c.
+Do not modify source, lifecycle state, or contracts. Return ONLY one JSON object, no Markdown or PASS lines. Use this exact binding and assess every zero-based acceptance index with pass/fail, a concrete reason and evidence. A sample shape follows; replace the placeholder assessments:
+{"binding": {"run_id": "3071ac1cfa4c4571b8701b20182fb85c", "feature_id": "F001", "attempt": 1, "criteria_sha256": "b35e2f20d75e208b100ed2ca3f1a7a404159902c676b7d41a70abef9489fc895", "snapshot_sha256": "ab9fa229a50118c5e8e47a8f4589166fa6890c06a4173800b8593af09352f6e6"}, "criteria": [{"index": 0, "status": "pass", "reason": "<your assessment>", "evidence": ["<actual evidence>"]}]}
+Frozen acceptance criteria:
+["Project-root ./init.sh exits zero and prints FIXTURE_OK by verifying marker.txt equals ready."]
+
+warning: Under-development features enabled: chronicle. Under-development features are incomplete and may behave unpredictably. To suppress this warning, set `suppress_unstable_features_warning = true` in /Users/armstrong/.codex/config.toml.
+2026-09-05T13:14:15.587869Z  WARN codex_skills::interface: ignoring interface.icon_small: icon path with '..' must resolve under plugin assets/
+2026-09-05T13:14:15.587890Z  WARN codex_skills::interface: ignoring interface.icon_large: icon path with '..' must resolve under plugin assets/
+codex
+I’m using the ai-agent-harness skill to check the candidate and active-run evidence without changing files.
+exec
+/bin/zsh -lc 'cat /Users/armstrong/.codex/skills/ai-agent-harness/SKILL.md' in /private/var/folders/ww/wrxzkc9n7rs60hbt_g7mgcl40000gn/T/harness-provider-smoke-pqblh6sn
+ succeeded in 0ms:
+---
+name: ai-agent-harness
+description: Use when initializing, adopting, repairing, or operating an AI Agent Harness repository; when the user mentions AGENTS.md, feature_list.json, progress.md, resumable AI coding, Planning Agent, Coding Agent, Evaluator Agent, harness workflow, or committing approved harness work. Supports project initialization, new requirement planning, one-feature implementation, evaluation, and explicit finalize-and-commit workflows while keeping repository files as the durable source of truth.
+metadata:
+  short-description: Initialize and operate an AI agent harness
+---
+
+# AI Agent Harness
+
+Use this skill as the convenience layer for the repository-local AI Agent Harness protocol.
+
+The repository remains the source of durable state. Do not store durable project state in the skill, in chat history, or in hidden local memory.
+
+When this skill is installed, prefer natural invocation such as `Use $ai-agent-harness to initialize this project.` Codex installs skills under `~/.codex/skills`, Claude Code supports personal `~/.claude/skills/` and project `.claude/skills/` locations, and Cursor can use `.cursor/rules` as a project-level rule entry point. Manual `python3 .../init_harness.py` commands are for repository checkouts, direct script testing, or agent tools without a skill loader.
+
+## Core Rule
+
+Before planning, coding, evaluating, continuing, or committing harness work in a repository that already has `AGENTS.md`, follow that repository's startup protocol. For this harness, that means:
+
+1. Read `progress.md`.
+2. Read `feature_list.json`.
+3. Run `git log --oneline -20`.
+4. Run `./init.sh`.
+
+If the repository does not have the harness yet, use the initializer script below.
+
+## Initialize Or Repair
+
+Use `scripts/init_harness.py` from this skill.
+
+Modes:
+
+- `new`: install the harness into a new or empty project and scaffold missing project state.
+- `adopt`: install missing harness files and scaffold missing project state while preserving existing requirements and history; default mode.
+- `repair`: add missing harness files but preserve existing `feature_list.json` and `progress.md`.
+- `upgrade`: update an already installed harness to the current template version after the global skill has been updated; preserve project-owned state and root project recovery files unless `--force` is explicitly approved.
+- `check`: report missing files, merge-sensitive conflicts, harness-owned drift, project state changes, installed/template versions, semantic validity, runnable status, and next action guidance without writing.
+
+Layouts:
+
+- `hidden`: default for installed projects; root keeps thin `AGENTS.md` and `init.sh` entry points while harness files live under `.agent-harness/`.
+- `visible`: template-maintenance layout with harness files at repository root.
+
+Default behavior never overwrites conflicting files. Use `--force` only after the user explicitly approves overwriting conflicts.
+
+The initializer writes `.agent-harness/manifest.json` into installed projects and reads `.agent-harness-template.json` from the template. File categories matter:
+
+- harness-owned static files are hash checked;
+- project-owned state is validated semantically after initialization;
+- merge-sensitive files are not overwritten by default;
+- optional integrations are reported separately from core harness validity.
+
+Examples:
+
+```bash
+python3 /path/to/skill/scripts/init_harness.py --root /path/to/project --mode adopt
+python3 /path/to/skill/scripts/init_harness.py --root /path/to/project --mode check
+python3 /path/to/skill/scripts/init_harness.py --root /path/to/project --mode repair
+python3 /path/to/skill/scripts/init_harness.py --root /path/to/project --mode upgrade
+```
+
+After updating the global skill, run `check` in existing projects. If `installed_version` is older than `template_version`, run `upgrade` to refresh harness-owned files, installed runtime scripts, prompts, docs, and manifest metadata. Do not use `--force` unless the user explicitly approves overwriting merge-sensitive project files such as root `AGENTS.md` or root `init.sh`.
+
+Fresh installations receive a structured project SPEC with shared-rule references, an empty feature list, and fresh progress. Existing project state is preserved even on repeated new/adopt runs. When the canonical `feature_list.json` is empty, start at F001. Otherwise allocate after the largest existing project feature ID. Never derive numbering from template SPEC, Harness documentation, examples, or another repository. Preserve all existing IDs, state, and evidence.
+
+## Workflows
+
+For planning, one-feature work, evaluation, continuation, and final commit rules, read `references/workflows.md`.
+
+Use the workflow names as intent detectors:
+
+- Initialize Harness
+- Plan Requirement
+- Work One Feature
+- Evaluate Feature
+- Continue Harness Work
+- Finalize And Commit
+
+When an installed harness reports a missing tool, permission, generator, dependency, service, credential, runtime setting, CI resource, or verification fixture, follow the target repository's `docs/capability-gaps.md`. Do not treat local-only workarounds as durable completion.
+
+When planning new requirements, follow the target repository's `docs/spec-normalization.md` before feature decomposition. Normalize vague user input into explicit goal, included scope, excluded scope, core flows, constraints, ambiguities or assumptions, required capabilities, implementation paths, and verification surface. Do not turn vague requirements directly into feature entries.
+
+When planning broad requirements, follow the target repository's `docs/feature-decomposition.md`. Split independently verifiable behavior, capability, implementation-boundary, risk-domain, and verification-surface work into separate features.
+
+When a project has just been initialized or a minspec has just been accepted, follow the target repository's `docs/project-recovery-init.md`. Treat `.agent-harness/scripts/init.sh` as harness verification and root `./init.sh` as the project recovery entry point. Before a minspec exists, root `./init.sh` may only prove the harness is runnable. After minspec acceptance, plan a runnable-skeleton feature that installs dependencies, starts required services, runs a real endpoint or core-function smoke test, emits clear logs, and exits non-zero on failure.
+
+When completing or evaluating a feature, follow the target repository's `docs/evaluator-evidence.md`. From the enforcement baseline onward, a feature should not be marked done unless `runs/` contains `EVAL_PASS: Fxxx` for that feature.
+
+Human Product Evaluation is an optional, deferred acceptance layer. It may happen after one Feature or after a batch of Features and must not block unrelated Feature work. Record it with `make human-eval` or `make human-eval-batch`; the result belongs in both durable `runs/` evidence and the Feature's `human_acceptance` history. If the original acceptance promise is unmet, classify it as `current_feature` and reopen that same Feature. If it is genuinely new value, classify it as `new_requirement` and hand it to Planning for SPEC normalization and decomposition; do not auto-append a repair Feature. Human Eval does not replace the separate automatic Evaluator `EVAL_PASS` evidence.
+
+When project work touches `examples/`, follow the target repository's `docs/example-boundaries.md`. Default examples are references, not the default place for product requirements.
+
+For one-feature implementation and evaluation, default to the repository's orchestrator-first entrypoint, normally `make work`. In hidden-layout installs, run `make -C .agent-harness work` from the project root, or `make work` from inside `.agent-harness/`; a missing root `Makefile` is not an orchestrator-unavailable condition. Manual or interactive Coding Agent work is an explicit fallback only when role adapters are unavailable or the user asks for manual work; it must not bypass evaluator gating, evaluator evidence, or final `./init.sh` verification.
+
+Use `make work-fast` only as the evaluator-gated fast A/B alternative to `make work`: provider-native coding must record `FAST_CODING_EVIDENCE: Fxxx` and `CODING_PASS: Fxxx`, must not write `EVAL_PASS: Fxxx`, and must rerun the orchestrator so a separate cold-start Evaluator Agent child process gates completion.
+
+When `make work` needs real agent execution, configure the target repository's provider contract from `agent-provider.example.json` using `docs/agent-provider-configuration.md`. Do not guess between Codex, Claude Code, Cursor Agent, or custom providers; missing or ambiguous provider setup is a capability gap.
+
+In hidden layout, configure the project-local provider with `cwd: ".."` relative to `.agent-harness/agent-provider.json`. Runtime preflight and real execution must share that adapter cwd; do not add overlapping provider-specific directory flags. Use the orchestrator's rendered prompts so canonical workflow state, docs, scripts, tests, and runs resolve under `.agent-harness/` while project-owned source and root recovery entry points remain at the provider workspace root.
+
+## Commit Boundary
+
+Only commit after the user explicitly says they are satisfied or asks to commit.
+
+Before committing:
+
+1. Run the harness startup protocol.
+2. Run the relevant verification command, normally `./init.sh`.
+3. Inspect `git status --short`.
+4. Stage only files related to the approved work.
+5. Stop and ask if unrelated changes are present.
+6. Commit with a subject that follows `docs/commit-messages.md`, normally `Fxxx <Action> <concise summary>`.
+
+Default to commit only. Push or pull request creation requires a separate explicit request.
+
+exec
+/bin/zsh -lc "pwd; rg --files -g '"'!'"\\.git' -g 'AGENTS.md' -g 'feature_list.json' -g 'progress.md' -g 'QUALITY.md' -g 'init.sh' -g 'marker.txt' -g 'SPEC.md' -g 'docs/**' -g 'runs/**'" in /private/var/folders/ww/wrxzkc9n7rs60hbt_g7mgcl40000gn/T/harness-provider-smoke-pqblh6sn
+ succeeded in 0ms:
+/private/var/folders/ww/wrxzkc9n7rs60hbt_g7mgcl40000gn/T/harness-provider-smoke-pqblh6sn
+runs/coding.md
+runs/3071ac1cfa4c4571b8701b20182fb85c/provider.stdout
+runs/3071ac1cfa4c4571b8701b20182fb85c/run.json
+runs/3071ac1cfa4c4571b8701b20182fb85c/check-0.stdout
+runs/3071ac1cfa4c4571b8701b20182fb85c/coding.json
+runs/3071ac1cfa4c4571b8701b20182fb85c/coding-prompt.txt
+runs/3071ac1cfa4c4571b8701b20182fb85c/check-0.stderr
+runs/3071ac1cfa4c4571b8701b20182fb85c/provider.stderr
+runs/3071ac1cfa4c4571b8701b20182fb85c/evaluator-prompt.txt
+runs/3071ac1cfa4c4571b8701b20182fb85c/evaluator-0.stderr
+runs/3071ac1cfa4c4571b8701b20182fb85c/evaluator-0.stdout
+runs/3071ac1cfa4c4571b8701b20182fb85c/check-0.json
+runs/3071ac1cfa4c4571b8701b20182fb85c/handoff.json
+AGENTS.md
+marker.txt
+scripts/init.sh
+progress.md
+init.sh
+feature_list.json
+
+exec
+/bin/zsh -lc 'cat AGENTS.md feature_list.json progress.md init.sh marker.txt; git log --oneline -20; git status --short; cat runs/3071ac1cfa4c4571b8701b20182fb85c/{run.json,handoff.json,coding.json,check-0.json,check-0.stdout,check-0.stderr}; cat /Users/armstrong/.codex/skills/ai-agent-harness/references/workflows.md' in /private/var/folders/ww/wrxzkc9n7rs60hbt_g7mgcl40000gn/T/harness-provider-smoke-pqblh6sn
+ succeeded in 0ms:
+Read progress.md and feature_list.json; run ./init.sh. Do not edit files during evaluation. Return only the requested assessment JSON.
+{
+  "features": [
+    {
+      "id": "F001",
+      "title": "Smoke recovery",
+      "description": "Verify the existing fixture marker through init.sh.",
+      "acceptance": [
+        "Project-root ./init.sh exits zero and prints FIXTURE_OK by verifying marker.txt equals ready."
+      ],
+      "passes": false,
+      "status": "in_progress",
+      "attempts": 1,
+      "last_error": "",
+      "active_run": "3071ac1cfa4c4571b8701b20182fb85c"
+    }
+  ]
+}
+Current System Status: provider smoke fixture. Next Feature: F001. Known Issues: none.
+#!/bin/sh
+set -eu
+test "$(cat marker.txt)" = ready
+echo FIXTURE_OK
+ready
+1fdba3d fixture
+?? AGENTS.md
+?? agent-provider.json
+?? completion-policy.json
+?? feature_list.json
+?? init.sh
+?? marker.txt
+?? orchestrator.py
+?? progress.md
+?? prompts/
+?? runs/
+?? schemas/
+?? scripts/
+{"attempt":1,"contract":{"acceptance":["Project-root ./init.sh exits zero and prints FIXTURE_OK by verifying marker.txt equals ready."],"description":"Verify the existing fixture marker through init.sh.","id":"F001","title":"Smoke recovery"},"criteria_sha256":"b35e2f20d75e208b100ed2ca3f1a7a404159902c676b7d41a70abef9489fc895","feature_id":"F001","required_commands":[{"argv":["./init.sh"],"timeout_seconds":600}],"run_id":"3071ac1cfa4c4571b8701b20182fb85c","schema_version":1,"snapshot":{"entries":[{"index":[],"kind":"file","mode":420,"path":"AGENTS.md","sha256":"962480d0f6e4b39baea16ad1ed01693a4aad0f2693afbd56698c812f55674179"},{"index":[],"kind":"file","mode":420,"path":"agent-provider.json","sha256":"ec0de19d65dd129c284cb92642542ee25d081336a78809daf6be0ddf509cf929"},{"index":[],"kind":"file","mode":420,"path":"completion-policy.json","sha256":"22f26a7ec7033998fe6202594d8e1ec0ff4650696dd54b6057b1272cc0e907c3"},{"index":[],"kind":"file","mode":493,"path":"init.sh","sha256":"1beb1cbd4b7eeb4ec1400b8226f883f6fbf284e5ba7031f0be963bc6d93b3816"},{"index":[],"kind":"file","mode":420,"path":"marker.txt","sha256":"ed1a545bb85e55816bbf9566b028b2a0bc456b88f49f6f266c0401048824194b"},{"index":[],"kind":"file","mode":493,"path":"orchestrator.py","sha256":"04ae19f06d89f808fb70eba44917a304b3d0301a96b6871ebb3f24f83af24bcd"},{"index":[],"kind":"file","mode":420,"path":"prompts/continue.md","sha256":"2165652bc769168a3002108f34de709cd73747e6c69f625a2674ce2cb3e18392"},{"index":[],"kind":"file","mode":420,"path":"prompts/evaluate.md","sha256":"cc011977d2296fbe8a67dee626400bedc478bf3ad2b3b187c5fc01fa05077bde"},{"index":[],"kind":"file","mode":420,"path":"prompts/plan.md","sha256":"c3b9bc6a8d2da152339180e3dc7e0fe9e1ef8912c252bac1b16874f94b566315"},{"index":[],"kind":"file","mode":420,"path":"prompts/work-fast.md","sha256":"a0fce937aee8d2cba2fbd269ccada5c375cb3d0605cfa5c4d615281a98b79e51"},{"index":[],"kind":"file","mode":420,"path":"prompts/work.md","sha256":"50ed19c1ec24e9e7e488ebec8c4374a6e7e7a7ca567c146474350b753b5026f6"},{"index":[],"kind":"file","mode":420,"path":"schemas/evaluation.schema.json","sha256":"12ac1ea98fef517fa54d0dcee8b85e65460d13d83079546031b77226495ab5d9"},{"index":[],"kind":"file","mode":420,"path":"schemas/feature_list.schema.json","sha256":"dcb780908c02fd3ee1a960c2ffcd9bf3b7cc33d36d311741ada6b07626a00d41"},{"index":[],"kind":"file","mode":420,"path":"schemas/receipt.schema.json","sha256":"f3108131c7dd274ac4464ff677257514c797852cd7f32cce7e363c0b2b925e99"},{"index":[],"kind":"file","mode":420,"path":"schemas/run.schema.json","sha256":"a98b100ba192c1657f8708b84a76c7463942208ad3969dbe5d00bbf3a1eb6eca"},{"index":[],"kind":"file","mode":420,"path":"scripts/__pycache__/completion.cpython-314.pyc","sha256":"0d05d1b1fe462e3de90fed918eb701d213a5b4dba893e142b30680108bebad3a"},{"index":[],"kind":"file","mode":420,"path":"scripts/__pycache__/completion_evaluator.cpython-314.pyc","sha256":"1aac904fe99f6503b20556fee9bf5795d9306ef14dfce2d8dc2ae4d7db0c470d"},{"index":[],"kind":"file","mode":420,"path":"scripts/__pycache__/human-eval.cpython-314.pyc","sha256":"03da744e22408219c9b11c203accb914876998f939d7295dc601ddd8d6cf67b5"},{"index":[],"kind":"file","mode":420,"path":"scripts/__pycache__/run_evidence.cpython-314.pyc","sha256":"7575820a369ce8e9b5ea6dc21123564b1cfad47b78d1fb0216bc6355be847f6d"},{"index":[],"kind":"file","mode":420,"path":"scripts/__pycache__/smoke-completion-provider.cpython-314.pyc","sha256":"f411072f7ba14788e21ba7d1acbbfa3b3e404e0fc957c3472e1465d10882abeb"},{"index":[],"kind":"file","mode":493,"path":"scripts/check-evaluator-evidence.sh","sha256":"38ae5908e4472a42e395c54a4afaf09dfc12229ed8c048c8ae318584ed48b550"},{"index":[],"kind":"file","mode":493,"path":"scripts/check-failure-domains.sh","sha256":"de918bb12da4adabe816ea724c7a74bfaad843141ec28e88d7bb059760e50706"},{"index":[],"kind":"file","mode":493,"path":"scripts/clean-state.py","sha256":"1a511c3e9189dd84e856acd9f7103c0b8c7cc5894e9ac5c1166b39f4adc2fb8e"},{"index":[],"kind":"file","mode":420,"path":"scripts/completion.py","sha256":"745d2da0e7610dac8b7168ab149ae67ed2446aa115b077121bb1b813f40cf0f1"},{"index":[],"kind":"file","mode":420,"path":"scripts/completion_evaluator.py","sha256":"ee2b5545defc746111b0e6812b801ead9ff09bf52b40db9c6504b30ab0aa3b3a"},{"index":[],"kind":"file","mode":493,"path":"scripts/human-eval.py","sha256":"2154614e74565077586da7d51e8439044e8e3509de05be61f2ff7eaa043cb760"},{"index":[],"kind":"file","mode":493,"path":"scripts/init.sh","sha256":"9ddd67613deaa81e711059e0b2ef32a6db537e629844ee4f85b69d10873914d1"},{"index":[],"kind":"file","mode":493,"path":"scripts/run-agent-provider.py","sha256":"3fb4322c81027a40621a61a22af5211968ec982ddcdac97c0fab0a2919973d74"},{"index":[],"kind":"file","mode":493,"path":"scripts/run-coding-agent.sh","sha256":"386f4813de9ed141e426589b26e575b454c8e157fc2c72bb1e94596d0397fe1b"},{"index":[],"kind":"file","mode":493,"path":"scripts/run-evaluator-agent.sh","sha256":"6611a4088bb823a1c7e41947aea3859299f8e871f2865e2615da852416f6b7bc"},{"index":[],"kind":"file","mode":420,"path":"scripts/run_evidence.py","sha256":"3af1420fba57640cdd990fa4dac751b8421c756da46a67d76c6f86ec0079c7e2"},{"index":[],"kind":"file","mode":420,"path":"scripts/smoke-completion-provider.py","sha256":"acd2c1a0c52b51fb12e50cd417ea7bb7044175cb13fce4bc1a555426f4f737cf"},{"index":[],"kind":"file","mode":493,"path":"scripts/summarize-progress.sh","sha256":"9b244c5cc3c194164a71b474cfcbc202d891915b6f83341997e31eafd7725bc9"},{"index":[],"kind":"file","mode":493,"path":"scripts/summarize-runs.sh","sha256":"15e88ce08aacc040350e3abead5267c8f5694d82de819a0636dc829b00fca0fc"},{"index":[],"kind":"file","mode":493,"path":"scripts/validate-feature.sh","sha256":"e54de27390f70a1cc920181af05fd6d54bf1113eb0e9a428020bc87033860964"},{"index":[],"kind":"file","mode":493,"path":"scripts/validate-state.py","sha256":"16432c0f60025163dda0bf36a70a4da3929d09409388bab1eed68991242bfe5f"}],"layout":"visible","policy":"git-source-v1","sha256":"ab9fa229a50118c5e8e47a8f4589166fa6890c06a4173800b8593af09352f6e6"}}
+{"mode":"work-fast","run":{"attempt":1,"contract":{"acceptance":["Project-root ./init.sh exits zero and prints FIXTURE_OK by verifying marker.txt equals ready."],"description":"Verify the existing fixture marker through init.sh.","id":"F001","title":"Smoke recovery"},"criteria_sha256":"b35e2f20d75e208b100ed2ca3f1a7a404159902c676b7d41a70abef9489fc895","feature_id":"F001","required_commands":[{"argv":["./init.sh"],"timeout_seconds":600}],"run_id":"3071ac1cfa4c4571b8701b20182fb85c","schema_version":1,"snapshot":{"entries":[{"index":[],"kind":"file","mode":420,"path":"AGENTS.md","sha256":"962480d0f6e4b39baea16ad1ed01693a4aad0f2693afbd56698c812f55674179"},{"index":[],"kind":"file","mode":420,"path":"agent-provider.json","sha256":"ec0de19d65dd129c284cb92642542ee25d081336a78809daf6be0ddf509cf929"},{"index":[],"kind":"file","mode":420,"path":"completion-policy.json","sha256":"22f26a7ec7033998fe6202594d8e1ec0ff4650696dd54b6057b1272cc0e907c3"},{"index":[],"kind":"file","mode":493,"path":"init.sh","sha256":"1beb1cbd4b7eeb4ec1400b8226f883f6fbf284e5ba7031f0be963bc6d93b3816"},{"index":[],"kind":"file","mode":420,"path":"marker.txt","sha256":"ed1a545bb85e55816bbf9566b028b2a0bc456b88f49f6f266c0401048824194b"},{"index":[],"kind":"file","mode":493,"path":"orchestrator.py","sha256":"04ae19f06d89f808fb70eba44917a304b3d0301a96b6871ebb3f24f83af24bcd"},{"index":[],"kind":"file","mode":420,"path":"prompts/continue.md","sha256":"2165652bc769168a3002108f34de709cd73747e6c69f625a2674ce2cb3e18392"},{"index":[],"kind":"file","mode":420,"path":"prompts/evaluate.md","sha256":"cc011977d2296fbe8a67dee626400bedc478bf3ad2b3b187c5fc01fa05077bde"},{"index":[],"kind":"file","mode":420,"path":"prompts/plan.md","sha256":"c3b9bc6a8d2da152339180e3dc7e0fe9e1ef8912c252bac1b16874f94b566315"},{"index":[],"kind":"file","mode":420,"path":"prompts/work-fast.md","sha256":"a0fce937aee8d2cba2fbd269ccada5c375cb3d0605cfa5c4d615281a98b79e51"},{"index":[],"kind":"file","mode":420,"path":"prompts/work.md","sha256":"50ed19c1ec24e9e7e488ebec8c4374a6e7e7a7ca567c146474350b753b5026f6"},{"index":[],"kind":"file","mode":420,"path":"schemas/evaluation.schema.json","sha256":"12ac1ea98fef517fa54d0dcee8b85e65460d13d83079546031b77226495ab5d9"},{"index":[],"kind":"file","mode":420,"path":"schemas/feature_list.schema.json","sha256":"dcb780908c02fd3ee1a960c2ffcd9bf3b7cc33d36d311741ada6b07626a00d41"},{"index":[],"kind":"file","mode":420,"path":"schemas/receipt.schema.json","sha256":"f3108131c7dd274ac4464ff677257514c797852cd7f32cce7e363c0b2b925e99"},{"index":[],"kind":"file","mode":420,"path":"schemas/run.schema.json","sha256":"a98b100ba192c1657f8708b84a76c7463942208ad3969dbe5d00bbf3a1eb6eca"},{"index":[],"kind":"file","mode":420,"path":"scripts/__pycache__/completion.cpython-314.pyc","sha256":"0d05d1b1fe462e3de90fed918eb701d213a5b4dba893e142b30680108bebad3a"},{"index":[],"kind":"file","mode":420,"path":"scripts/__pycache__/completion_evaluator.cpython-314.pyc","sha256":"1aac904fe99f6503b20556fee9bf5795d9306ef14dfce2d8dc2ae4d7db0c470d"},{"index":[],"kind":"file","mode":420,"path":"scripts/__pycache__/human-eval.cpython-314.pyc","sha256":"03da744e22408219c9b11c203accb914876998f939d7295dc601ddd8d6cf67b5"},{"index":[],"kind":"file","mode":420,"path":"scripts/__pycache__/run_evidence.cpython-314.pyc","sha256":"7575820a369ce8e9b5ea6dc21123564b1cfad47b78d1fb0216bc6355be847f6d"},{"index":[],"kind":"file","mode":420,"path":"scripts/__pycache__/smoke-completion-provider.cpython-314.pyc","sha256":"f411072f7ba14788e21ba7d1acbbfa3b3e404e0fc957c3472e1465d10882abeb"},{"index":[],"kind":"file","mode":493,"path":"scripts/check-evaluator-evidence.sh","sha256":"38ae5908e4472a42e395c54a4afaf09dfc12229ed8c048c8ae318584ed48b550"},{"index":[],"kind":"file","mode":493,"path":"scripts/check-failure-domains.sh","sha256":"de918bb12da4adabe816ea724c7a74bfaad843141ec28e88d7bb059760e50706"},{"index":[],"kind":"file","mode":493,"path":"scripts/clean-state.py","sha256":"1a511c3e9189dd84e856acd9f7103c0b8c7cc5894e9ac5c1166b39f4adc2fb8e"},{"index":[],"kind":"file","mode":420,"path":"scripts/completion.py","sha256":"745d2da0e7610dac8b7168ab149ae67ed2446aa115b077121bb1b813f40cf0f1"},{"index":[],"kind":"file","mode":420,"path":"scripts/completion_evaluator.py","sha256":"ee2b5545defc746111b0e6812b801ead9ff09bf52b40db9c6504b30ab0aa3b3a"},{"index":[],"kind":"file","mode":493,"path":"scripts/human-eval.py","sha256":"2154614e74565077586da7d51e8439044e8e3509de05be61f2ff7eaa043cb760"},{"index":[],"kind":"file","mode":493,"path":"scripts/init.sh","sha256":"9ddd67613deaa81e711059e0b2ef32a6db537e629844ee4f85b69d10873914d1"},{"index":[],"kind":"file","mode":493,"path":"scripts/run-agent-provider.py","sha256":"3fb4322c81027a40621a61a22af5211968ec982ddcdac97c0fab0a2919973d74"},{"index":[],"kind":"file","mode":493,"path":"scripts/run-coding-agent.sh","sha256":"386f4813de9ed141e426589b26e575b454c8e157fc2c72bb1e94596d0397fe1b"},{"index":[],"kind":"file","mode":493,"path":"scripts/run-evaluator-agent.sh","sha256":"6611a4088bb823a1c7e41947aea3859299f8e871f2865e2615da852416f6b7bc"},{"index":[],"kind":"file","mode":420,"path":"scripts/run_evidence.py","sha256":"3af1420fba57640cdd990fa4dac751b8421c756da46a67d76c6f86ec0079c7e2"},{"index":[],"kind":"file","mode":420,"path":"scripts/smoke-completion-provider.py","sha256":"acd2c1a0c52b51fb12e50cd417ea7bb7044175cb13fce4bc1a555426f4f737cf"},{"index":[],"kind":"file","mode":493,"path":"scripts/summarize-progress.sh","sha256":"9b244c5cc3c194164a71b474cfcbc202d891915b6f83341997e31eafd7725bc9"},{"index":[],"kind":"file","mode":493,"path":"scripts/summarize-runs.sh","sha256":"15e88ce08aacc040350e3abead5267c8f5694d82de819a0636dc829b00fca0fc"},{"index":[],"kind":"file","mode":493,"path":"scripts/validate-feature.sh","sha256":"e54de27390f70a1cc920181af05fd6d54bf1113eb0e9a428020bc87033860964"},{"index":[],"kind":"file","mode":493,"path":"scripts/validate-state.py","sha256":"16432c0f60025163dda0bf36a70a4da3929d09409388bab1eed68991242bfe5f"}],"layout":"visible","policy":"git-source-v1","sha256":"ab9fa229a50118c5e8e47a8f4589166fa6890c06a4173800b8593af09352f6e6"}}}
+{"binding":{"attempt":1,"criteria_sha256":"b35e2f20d75e208b100ed2ca3f1a7a404159902c676b7d41a70abef9489fc895","feature_id":"F001","run_id":"3071ac1cfa4c4571b8701b20182fb85c","snapshot_sha256":"ab9fa229a50118c5e8e47a8f4589166fa6890c06a4173800b8593af09352f6e6"},"output":"FAST_CODING_EVIDENCE: F001\nCODING_PASS: F001\n","sha256":"3d3ec1c68b473e80bea831a2558eafd9eeb8e7fd3f8f347ee4842aaa96c7cd29","source":"provider-native-v1"}
+{"binding":{"attempt":1,"criteria_sha256":"b35e2f20d75e208b100ed2ca3f1a7a404159902c676b7d41a70abef9489fc895","feature_id":"F001","run_id":"3071ac1cfa4c4571b8701b20182fb85c","snapshot_sha256":"ab9fa229a50118c5e8e47a8f4589166fa6890c06a4173800b8593af09352f6e6"},"command":{"argv":["./init.sh"],"timeout_seconds":600},"exit_code":0,"launch_error":"","source":"runner-subprocess-v1","stderr":{"path":"check-0.stderr","sha256":"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"},"stdout":{"path":"check-0.stdout","sha256":"18b69e27a965f158900f6773fbca25ef7783699f3d9e29711bc55c213c77ebc5"},"timed_out":false}
+FIXTURE_OK
+# AI Agent Harness Workflows
+
+These workflows operate the repository-local harness. They are intentionally vendor-neutral; Codex, Claude Code, Cursor Agent, and other coding agents can follow the same file protocol.
+
+If the skill is installed in an agent surface, invoke it by name, for example `Use $ai-agent-harness to initialize this project.` Codex uses `~/.codex/skills`, Claude Code supports `~/.claude/skills` and project `.claude/skills`, and Cursor can use `.cursor/rules` for a project-level rule. Manual `python3 skills/ai-agent-harness/scripts/init_harness.py` usage is for repository checkouts and tools without a skill loader.
+
+## Initialize Harness
+
+Use when the target project lacks harness files or the user asks to install, adopt, repair, upgrade, or check the harness.
+
+1. Run `scripts/init_harness.py --mode check --root <project>` when the user only wants inspection.
+2. Run `scripts/init_harness.py --mode adopt --layout hidden --root <project>` for an existing project unless the user asks for visible layout.
+3. Run `scripts/init_harness.py --mode new --layout hidden --root <project>` for a new project unless the user asks for visible layout.
+4. Run `scripts/init_harness.py --mode repair --root <project>` for an existing harness with missing files.
+5. After updating the global skill, run `scripts/init_harness.py --mode check --root <project>` in existing installed projects; when `installed_version` is older than `template_version`, run `scripts/init_harness.py --mode upgrade --root <project>`.
+6. Do not use `--force` unless the user explicitly approved overwriting conflicts.
+7. After initialization, repair, or upgrade, run `<project>/init.sh` if present.
+
+`new` and `adopt` scaffold only missing project state: a structured project `SPEC.md` referencing shared rules, an empty `feature_list.json`, and fresh `progress.md`. Existing project state is preserved, including on repeated calls and with `--force`. Template product requirements and run history are not imported. `repair` preserves existing project state and restores missing state from fresh scaffolds. `upgrade` leaves missing state for explicit repair. `upgrade` preserves project-owned state while updating harness-owned static files, installed runtime files, prompts, docs, template metadata, and the installation manifest.
+
+Installed projects record `.agent-harness/manifest.json`. The template records `.agent-harness-template.json`. Use `check` before repair or upgrade decisions: it reports installed layout, installed version, template version, missing files, merge-sensitive conflicts, harness-owned drift, project-owned state changes, semantic validity, runnable status, and next action guidance.
+
+In hidden layout, root `AGENTS.md` and root `init.sh` are project merge-sensitive entry points. Do not overwrite them during upgrade unless the user explicitly approves `--force`, especially after a minspec has turned root `./init.sh` into the project recovery contract. The project-local `.agent-harness/` runtime files are harness-owned and should be updated by `upgrade`.
+
+Hidden-layout provider children should use `cwd: ".."` relative to `.agent-harness/agent-provider.json`. The adapter uses the same resolved project-root workspace for runtime preflight and real execution. Do not combine this with provider-specific directory flags. Rendered role prompts map logical harness paths to `.agent-harness/` and must ignore stale same-named root workflow files.
+
+`hidden` layout is the default for user projects: root keeps thin `AGENTS.md` and `init.sh` entry points while the harness body lives under `.agent-harness/`. `visible` layout is for harness development and direct template inspection.
+
+A project is an installed harness when `./init.sh` succeeds, the installed layout's `feature_list.json` is valid, `progress.md` contains recovery sections, `AGENTS.md` contains the startup and safety rules, prompts and scripts are present, run templates are available, and `check` reports `runnable_harness=true`.
+
+In hidden layout, root `./init.sh` starts as harness verification only. Before a project minspec exists, that is enough to prove a recoverable planning environment. After minspec acceptance, use `docs/project-recovery-init.md` to plan a runnable-skeleton feature that makes root `./init.sh` install dependencies, start required services, run a real endpoint or core-function smoke test, print clear logs, avoid manual steps and TODO placeholders, and exit non-zero on failure.
+
+From the evaluator-evidence baseline onward, `./init.sh` also verifies that completed features have matching `EVAL_PASS: Fxxx` run evidence.
+
+## Human Evaluation
+
+Human Eval is optional and may be deferred until several Features are complete. It is product acceptance evidence, not an orchestration gate, and must not block unrelated Feature work. Record one result with `make human-eval` or a mixed batch with `make human-eval-batch`; both write durable run evidence and update the Feature's `human_acceptance` history.
+
+Classify every result explicitly. `current_feature` means the original Feature promise is still unmet: reopen that same Feature and continue its lifecycle, preserving attempts, history, and unknown fields. `new_requirement` means independent new value: leave the original Feature complete and create a Planning Agent handoff. Planning must perform SPEC normalization in `SPEC.md` and decompose the request before appending a new Feature. Human Eval evidence does not replace the automatic Evaluator `EVAL_PASS: Fxxx` evidence.
+
+## Project SPEC handoff
+
+When the canonical `feature_list.json` is empty, start at F001. Otherwise allocate after the largest existing project feature ID. Never derive numbering from template SPEC, Harness documentation, examples, or another repository. Preserve all existing IDs, state, and evidence.
+
+The template repository retains its own SPEC and feature history. Installed project SPEC reuses the normalization structure and links to AGENTS.md, docs/, and QUALITY.md, then describes only the target product. Preserve existing source documents as planning inputs; do not replace an existing project SPEC automatically. Legacy contaminated projects require a separate reviewed migration, not renumbering during upgrade.
+
+## Plan Requirement
+
+Use when the user describes new work before implementation.
+
+1. Follow the repository startup protocol.
+2. Read `AGENTS.md`, `SPEC.md`, `feature_list.json`, and `progress.md`. For direct prompt use, render the Planning role with `python3 orchestrator.py --render-prompt plan` so hidden-layout paths resolve under `.agent-harness/`.
+3. Use `docs/spec-normalization.md` to append a normalized SPEC entry with goal, included scope, excluded scope, core flows, constraints, ambiguities or assumptions, required capabilities, implementation paths, and verification surface.
+4. Reject vague requirements instead of turning them directly into feature entries; ask for clarification, record assumptions, or create capability, blocker, or follow-up work when needed.
+5. Use `docs/feature-decomposition.md` to split broad requirements into independently verifiable feature entries.
+6. Use `docs/project-recovery-init.md` when planning a fresh project, accepted minspec, runnable skeleton, or root `./init.sh` change.
+7. Identify required capabilities, including tools, permissions, generators, dependencies, services, credentials, runtime settings, CI resources, and verification fixtures.
+8. Identify project-owned implementation and verification paths; use `examples/` only when the requirement explicitly targets example maintenance.
+9. Append new feature entries to `feature_list.json`, including explicit capability features when needed.
+10. Preserve feature IDs, ordering, status, attempts, errors, and unknown fields.
+11. Do not implement business logic during planning.
+12. Run `./init.sh`.
+
+## Work One Feature
+
+Use when the user asks to implement, continue, or work on a harness feature.
+
+1. Follow the repository startup protocol.
+2. Default to orchestrator-first work:
+
+   ```bash
+   make work
+   ```
+
+   In hidden-layout installs, run this from the project root instead:
+
+   ```bash
+   make -C .agent-harness work
+   ```
+
+   You can also `cd .agent-harness && make work`. Do not treat a missing root `Makefile` as a fail-closed adapter setup gap.
+3. Let the orchestrator select one unfinished feature, mark it `in_progress`, increment attempts, run Coding Agent and Evaluator Agent adapters, and mark done only after evaluator pass.
+4. Use `make work-fast` only as the fast A/B alternative: it skips the Coding Agent role adapter, records provider-native coding evidence with `FAST_CODING_EVIDENCE: Fxxx`, and still requires a separate cold-start Evaluator Agent child process before completion.
+5. Configure `agent-provider.json` from `agent-provider.example.json` using `docs/agent-provider-configuration.md` before real provider execution.
+6. If adapters or providers are missing, unavailable, ambiguous, or still unconfigured, treat that as a fail-closed adapter setup gap. Do not silently hand-edit feature completion.
+7. Use manual or interactive Coding Agent work only as an explicit fallback when adapters are not configured or the user asks for manual work.
+8. For manual fallback, select exactly one feature, implement only that feature, preserve unrelated working-tree changes, update `progress.md`, and update only the selected feature in `feature_list.json`.
+9. Manual fallback must record that it was a fallback in `progress.md` or `runs/` and must not bypass evaluator pass, evaluator evidence, attempts, failure records, or final `./init.sh` verification.
+10. Record a run note in `runs/` for non-trivial work, external behavior verification, failures, or evaluator handoff.
+11. When a required capability is missing, follow `docs/capability-gaps.md`; make the capability durable, block the feature, or create follow-up work instead of relying on local-only workarounds.
+12. When implementation touches `examples/`, follow `docs/example-boundaries.md`; do not use default examples as the product implementation surface.
+13. Run `./init.sh` after changes.
+14. Do not stage or commit during orchestrated Coding Agent work.
+
+## Evaluate Feature
+
+Use when the user asks whether a feature is complete or asks for evaluation.
+
+1. Follow the repository startup protocol.
+2. Inspect the selected feature's implementation.
+3. Verify acceptance criteria in `feature_list.json`.
+4. Apply `QUALITY.md`.
+5. Check relevant run evidence in `runs/`.
+6. Check `docs/evaluator-evidence.md` and record `EVAL_PASS: Fxxx` in `runs/` before completion.
+7. Check `docs/feature-decomposition.md` and reject over-bundled features that should have been split into independently verifiable entries.
+8. Check `docs/capability-gaps.md` and reject missing required capabilities that were bypassed instead of made durable or tracked.
+9. Check `docs/example-boundaries.md` and reject project-level work implemented by repurposing default examples.
+10. Do not implement new features.
+11. Output exactly `EVAL_PASS: Fxxx` or `EVAL_FAIL: Fxxx: <reason>` when acting as an Evaluator Agent.
+
+## Continue Harness Work
+
+Use after interruption or when the user asks to resume.
+
+1. Reconstruct context from repository files and git history only.
+2. Read `progress.md`, `feature_list.json`, `AGENTS.md`, and recent commits.
+3. Run `./init.sh`.
+4. Identify the next safe action from repository state.
+5. Continue implementation or evaluation through `make work` first, using `make -C .agent-harness work` from the project root in hidden-layout installs.
+6. Use manual continuation only as an explicit fallback when adapters are unavailable or the user asks for interactive/manual work.
+7. Inspect `docs/capability-gaps.md` when prior work used local-only workarounds for missing capabilities.
+8. Inspect `docs/example-boundaries.md` when prior work modified `examples/`.
+9. Stop and report exact conflicts if state is unsafe.
+
+## Finalize And Commit
+
+Use only when the user explicitly says they are satisfied or asks to commit.
+
+1. Follow the repository startup protocol.
+2. Run relevant verification, normally `./init.sh`.
+3. Inspect `git status --short`.
+4. Identify files changed by the approved work.
+5. If unrelated changes are present, ask the user before staging.
+6. Stage only approved files.
+7. Read `docs/commit-messages.md`.
+8. Commit feature work with a subject that starts with the feature ID, normally `Fxxx <Action> <concise summary>`.
+9. Verify every feature ID referenced in the commit subject exists in `feature_list.json`.
+10. Use `No-feature: <summary>` only for explicitly non-feature work.
+11. Default to no push. Push or pull request creation requires a separate explicit request.
+
+Never commit merely because implementation finished. The commit boundary is user satisfaction.
+
+exec
+/bin/zsh -lc ./init.sh in /private/var/folders/ww/wrxzkc9n7rs60hbt_g7mgcl40000gn/T/harness-provider-smoke-pqblh6sn
+ succeeded in 0ms:
+FIXTURE_OK
+
+exec
+/bin/zsh -lc "python3 -B - <<'PY'
+import pathlib,json,hashlib,stat
+root=pathlib.Path('.')
+run_dir=root/'runs/3071ac1cfa4c4571b8701b20182fb85c'
+run=json.loads((run_dir/'run.json').read_text())
+mismatch=[]
+for entry in run['snapshot']['entries']:
+ p=root/entry['path']
+ if not p.is_file() or hashlib.sha256(p.read_bytes()).hexdigest()"'!=entry['"'sha256'] or stat.S_IMODE(p.stat().st_mode)"'!=entry['"'mode']:
+  mismatch.append(entry['path'])
+print('Snapshot file mismatches:',mismatch)
+check=json.loads((run_dir/'check-0.json').read_text())
+for stream in ['stdout','stderr']:
+ p=run_dir/check[stream]['path']
+ print(stream,'hash matches:',hashlib.sha256(p.read_bytes()).hexdigest()==check[stream]['sha256'])
+print('marker.txt bytes:',repr((root/'marker.txt').read_bytes()))
+for name in ['SPEC.md','QUALITY.md','docs/spec-normalization.md','docs/feature-decomposition.md','docs/failure-domains.md','docs/evaluator-evidence.md','docs/capability-gaps.md','docs/example-boundaries.md','docs/agent-workflow.md','docs/run-evidence.md']:
+ p=root/name
+ print(name+':',p.read_text() if p.exists() else 'ABSENT')
+PY" in /private/var/folders/ww/wrxzkc9n7rs60hbt_g7mgcl40000gn/T/harness-provider-smoke-pqblh6sn
+ succeeded in 0ms:
+Snapshot file mismatches: []
+stdout hash matches: True
+stderr hash matches: True
+marker.txt bytes: b'ready\n'
+SPEC.md: ABSENT
+QUALITY.md: ABSENT
+docs/spec-normalization.md: ABSENT
+docs/feature-decomposition.md: ABSENT
+docs/failure-domains.md: ABSENT
+docs/evaluator-evidence.md: ABSENT
+docs/capability-gaps.md: ABSENT
+docs/example-boundaries.md: ABSENT
+docs/agent-workflow.md: ABSENT
+docs/run-evidence.md: ABSENT
+
+codex
+{"binding":{"run_id":"3071ac1cfa4c4571b8701b20182fb85c","feature_id":"F001","attempt":1,"criteria_sha256":"b35e2f20d75e208b100ed2ca3f1a7a404159902c676b7d41a70abef9489fc895","snapshot_sha256":"ab9fa229a50118c5e8e47a8f4589166fa6890c06a4173800b8593af09352f6e6"},"criteria":[{"index":0,"status":"pass","reason":"Project-root ./init.sh verifies marker.txt equals ready before printing FIXTURE_OK; independent execution exited zero. The frozen criterion is satisfied. Referenced general rubric and docs are absent from this fixture.","evidence":["init.sh uses set -eu and test \"$(cat marker.txt)\" = ready before echo FIXTURE_OK.","marker.txt contains ready followed by a newline.","Independent project-root ./init.sh execution returned exit code 0 and stdout FIXTURE_OK.","runs/3071ac1cfa4c4571b8701b20182fb85c/check-0.json records exit_code 0, no timeout, and no launch error; check-0.stdout contains FIXTURE_OK and check-0.stderr is empty. Both log hashes match.","All snapshot file hashes and modes match run.json."]}]}
+tokens used
+23,644

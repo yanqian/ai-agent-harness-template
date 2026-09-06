@@ -44,6 +44,16 @@ for path in \
   docs/decisions/README.md \
   runs/RUN_TEMPLATE.md \
   schemas/feature_list.schema.json \
+  schemas/run.schema.json \
+  schemas/evaluation.schema.json \
+  schemas/receipt.schema.json \
+  scripts/run_evidence.py \
+  scripts/completion.py \
+  scripts/state_store.py \
+  scripts/role_boundary.py \
+  scripts/completion_evaluator.py \
+  completion-policy.json \
+  docs/run-evidence.md \
   prompts/plan.md \
   prompts/work.md \
   prompts/continue.md \

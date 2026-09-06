@@ -1,0 +1,11 @@
+F048 编码完成：新增角色变更检查、脏路径授权、违规恢复、evaluator scope 检查及 receipt 证据绑定，已同步模板 `0.4.0`。
+
+- 验证：F048 validation（含完整 `./init.sh`）通过。
+- 文件与证据：[F048-coding.md](/Users/armstrong/Project/ai-agent-harness-template/runs/3211a673a7e04b68a8a7f7c2ad93eb0f/F048-coding.md)。
+- 剩余：独立 evaluator 与实际 provider scope 验证；生命周期未改。
+- Failure domain：`contract_gap`，已通过代码、文档和回归测试补强。无 examples 修改。
+- 建议提交：`F048 Reject unauthorized role changes before completion`
+
+CODING_PASS: F048
+
+

@@ -55,11 +55,11 @@ Implemented components:
 
 ## Last Completed Feature
 
-`F044` - Isolate fresh project SPEC and feature state.
+`F048` - Reject completion after unauthorized role changes. Accepted through the new guarded coordinator on attempt 2; receipt: runs/5770fe94333346629908d706d81e9aea/receipt.json. The authorized F045-F048 completion-hardening batch is complete at template version 0.4.0.
 
 ## Next Feature
 
-`F011` - Explore concurrent agent execution.
+No remaining work in the authorized hardening batch. `F011` remains the unchanged P2 backlog item and was not included. The user approved committing and pushing the F045-F048 batch on 2026-09-06; earlier uncommitted checkpoints below are historical. New rounds use the guarded workflow documented in docs/run-evidence.md, with explicit pre-coding dirty-path adoption only when needed.
 
 ## Known Issues
 
@@ -106,3 +106,138 @@ Implemented components:
 - F044 passed independent cold-start evaluation in runs/20260905T034449Z-F044-evaluation.md, including full init, selected-feature validation, all-mode dry-run probes, and bundle parity. Manual fallback completion is backed by this evaluator evidence. Existing downstream projects and the globally installed skill were not modified.
 
 - F044 final post-completion ./init.sh passed with evaluator evidence present; all 43 pre-existing feature entries were verified unchanged. The evaluator run metadata labels were corrected to the check-failure-domains contract before final verification. No commit performed.
+
+## Completion hardening plan — 2026-09-05
+
+- User approved planning and implementing the discussed completion and post-run hard constraints, with a pre-change tag first. Annotated tag `pre-completion-hardening-20260905` targets clean commit `7929e0f`. No implementation commits or pushes are authorized by this request.
+- Appended normalized SPEC and F045–F048 without changing existing Feature state. Each coding round must implement only its selected Feature and receive separate evaluator approval.
+- Provider preflight initially failed under the sandbox on the Codex local state database/app-server; escalated preflight reached the provider but failed with the old configured gpt-5.4. Investigating real command output before changing project-local configuration.
+- Historical F043 still has done plus rejected/reopen_pending metadata. Preserve its record; the new compatibility policy must surface the discrepancy and prevent it being accepted as current-run evidence.
+
+- Provider recovery verified: the installed desktop CLI 0.153.3 with the existing global model gpt-6-astra returned PROVIDER_OK; project-local Codex config now uses that executable/model. Evidence: runs/20260905-provider-runtime-recovery.md. No global settings changed.
+
+### F045 coding handoff (2026-09-05)
+
+- Implemented independently testable run manifests, Git source snapshots, strict
+  receipt/evaluation schemas, non-shell runner command capture and per-criterion
+  evaluator validation in `scripts/run_evidence.py`.
+- Root and bundled runtime, schemas, docs, init requirements and tests are synced.
+- This session is the selected F045 Coding Agent at attempt 1; it does not invoke
+  a nested orchestrator or write evaluator approval. F045 remains in progress.
+- Evidence and verification: `runs/20260905-F045-coding.md`. Existing planning,
+  provider configuration and recovery-note changes were preserved.
+- F046 owns actual completion-gate enrollment/migration; F047/F048 remain untouched.
+
+
+### F046 coding handoff (2026-09-05)
+
+- This is the selected baseline Coding Agent at attempt 1, not a nested orchestrator
+  run. Implemented only F046. Existing F045, planning and provider changes remain.
+- Both work modes now use UUID handoffs, snapshot-bound coding receipts, runner
+  recovery/declared checks, a configured independent JSON evaluator bridge and one
+  receipt-before-done gate. Resume, failure and frozen legacy migration are covered
+  by real Git and child-process tests. No global PASS scan completes new runs.
+- Fresh installations receive an empty completion policy; older installations freeze
+  only their own previous completions. F043's contradictory historical metadata is
+  surfaced without changing it. The distributable and bundled surfaces are synced.
+- Full init passed during implementation. Final selected-feature validation and
+  exact test counts are recorded in `runs/20260905-F046-coding.md`.
+- Capability gap: real configured Codex evaluator runtime preflight fails in this
+  Coding Agent sandbox with readonly state DB and app-server Operation not permitted.
+  The durable smoke script reproduced this; raw output is retained under
+  `runs/20260905-F046-provider-smoke/`. Do not replace it with fake-role evidence.
+- F046 remains incomplete. The coordinating process must run the documented real
+  provider smoke with its already-authorized runtime access, then dispatch a separate
+  Evaluator Agent. It must restart into the new orchestrator to enroll completion;
+  an older already-running orchestrator's plain PASS cannot create a valid receipt.
+- Failure domain: capability_gap. Harness improvement: added reproducible provider
+  smoke and retained logs; no weakened criteria or local-only provider workaround.
+  No examples, global configuration, commit, stage, or F047/F048 implementation.
+
+## Recovery checkpoint — completion hardening paused for explicit provider approval
+
+- F045 is independently accepted and done. F046 attempt 1 returned CODING_FAIL on a capability gap; the legacy coordinator kept it todo/false. F047/F048 have not started. All original 44 Feature entries remain byte-equivalent as parsed JSON to the pre-change tag.
+- The user allowed Codex/config upgrades. Project-local configuration uses the already installed verified desktop CLI 0.153.3 and gpt-6-astra; no global upgrade was needed.
+- Automatic approval review separately rejected the isolated real-provider smoke twice, even after inspecting its copied scripts/schemas/prompts/orchestrator and credential-free config. It requires explicit user permission for that source payload to the current OpenAI/Codex evaluator. The coordinating task asked this exact question via the async input tool; no reply has been received at this checkpoint. Do not retry the rejected smoke indirectly.
+- After explicit approval, run scripts/smoke-completion-provider.py with agent-provider.json and a new output directory under runs/, using approved runtime access. Then resume F046 through the NEW coordinator (prefer work-fast to record existing completed coding without rerunning implementation), record active-run coding evidence, and obtain an independent current-snapshot receipt. The old F046 parent has exited; do not use legacy PASS text to mark done.
+- Follow with one-feature F047 and F048 rounds. Keep all prior uncommitted implementation/planning changes; do not commit or push unless requested.
+- Post-failure ./init.sh passed (log /tmp/harness-F046-post-failure-init.log), git diff --check passed, tag still targets 7929e0f. F046 coding/local evidence: runs/20260905-F046-coding.md. Recovery/permission review: runs/20260905-F046-review-notes.md and runs/20260905T113237Z-F046-failure.md.
+
+- Resume authorization (2026-09-05): user replied continue to the explicit payload/destination request; automatic approval accepted the isolated configured-provider smoke. Startup verification passed at /tmp/harness-resume-approved-init.log. No feature completion inferred from authorization.
+
+- Explicit repository-context authorization confirmed: user answered 确认 to sending this repository code, docs, tests, task state and run evidence to the configured OpenAI/Codex Coding/Evaluator subprocesses for F046-F048. Automatic review accepted make work-fast. Preserve this scope through subsequent rounds; no commit or push authorization was requested.
+
+- F046 independent evaluator accepted every criterion; the new coordinator persisted the receipt then marked done. Actual provider JSON and review/check evidence are under runs/0a849903224541bb910486c1eaba3236/. No legacy PASS scan or manual done edit was used.
+
+## F047 coding handoff — run d8f37ba8e15843889367969a7e56a907
+
+- Implemented dependency graph validation/readiness in baseline and fast resume,
+  shared POSIX ownership plus short atomic compare-and-swap state writes, and
+  Human Eval evidence archival/reopen/retry lifecycle consistency. Unknown fields,
+  ordering, attempts and feedback history are preserved; frozen F043 is diagnosed
+  without rewriting its history or completion policy.
+- Runtime, schema, tests, installer requirement and bundled copies are synchronized.
+  Actual competing orchestrator/Human Eval subprocesses cover visible and hidden
+  layouts; real writer interruption and stale-writer tests cover storage behavior.
+- This is the dispatched baseline Coding Agent, not manual fallback. F047 lifecycle
+  fields remain runner-owned and unchanged by this coding session. Independent
+  evaluation/current-run receipt is still required before F047 completion.
+- The current parent loaded F046 runtime before this edit; restart the coordinator
+  for F048 so the new ownership behavior applies to that round. F048 still owns
+  arbitrary role edits/write-set enforcement and final template version sync.
+- Failure domain: contract_gap (the targeted pre-existing lifecycle/dependency gap).
+  Harness improvement: durable state API, graph checks, recovery documentation and
+  real subprocess regression coverage. No missing required capability, example
+  modification, commit, staging, global configuration change or policy mutation.
+
+- F047 coordinating review found supported Human Eval pass on a frozen legacy completion exits 0 but then fails completion history validation. Reproducer and required cases: runs/d8f37ba8e15843889367969a7e56a907/coordinator-review.md. Resolve this before coding acceptance; keep frozen policy/original state intact.
+- Final verification: scripts/validate-feature.sh F047 exited 0, including full
+  ./init.sh (59 unit tests with one existing optional skip; contract, harness and
+  smoke layers passed). Coding evidence: runs/d8f37ba8e15843889367969a7e56a907/F047-coding.md.
+
+- F047 attempt 1 was independently rejected for legacy Human Eval feedback invalidating history. Attempt 2 uses provider-native work-fast on run bf46e6a2b8014c02bc6cdaa3feda1835. Implemented strict replay of appended observational feedback over immutable frozen legacy identity and pre-publication history validation; unsupported transitions leave state/records unchanged. Added real subprocess regressions, synchronized bundle, and retained prior rejection evidence. Final validation and independent reevaluation pending.
+
+- F047 attempt 2 independently accepted all criteria after legacy feedback repair. Runner persisted receipt before done. Start F048 from a new coordinator process to activate shared ownership/state transactions; preserve all previous uncommitted work and original 44 entries.
+
+- F048 coordinating review: real Git proves diff HEAD misses pre-existing staged/unstaged cancellation. See runs/3211a673a7e04b68a8a7f7c2ad93eb0f/coordinator-review.md before coding completion; union staged and unstaged paths, add regression. Also account for old parent/new scope-protocol self-hosting.
+
+- F048 coding implements protected full Feature state and contract checks, initial
+  dirty staged/unstaged/untracked union, pre-handoff --adopt-dirty and --allow-path,
+  attributable full changes, mandatory evaluator scope relevance, receipt-hashed
+  boundary enrollment, durable violations and explicit --restart-run recovery.
+  All lifecycle fields and prior uncommitted Feature work remain runner-owned.
+  Runtime/docs/prompts/skill/tests/bundled copies and version sources now use 0.4.0.
+  Real Git/subprocess adversarial tests pass (7 groups, both modes/layouts).
+  Coordinating review's staged/worktree cancellation and missing-sidecar cases are
+  covered. The first full init overlapped continued template edits and its installer
+  check detected real template drift; rerunning after source stabilization.
+  Failure domain: test_gap (verification overlapped edits); harness improvement:
+  perform final distribution verification only after source stabilization. No
+  missing runtime capability or example-boundary changes. Final full selected
+  validation and independent evaluator are pending; old loaded parent cannot claim
+  F048 guard enrollment for its own already-started run. See coordinator-response.md
+  under runs/3211a673a7e04b68a8a7f7c2ad93eb0f for provider scope smoke handoff.
+- F048 final coding validation passed: scripts/validate-feature.sh F048 exited 0,
+  including full ./init.sh (69 unit tests with one existing optional skip, 33
+  contract, 12 installer/harness, 2 smoke tests, Python/Go examples). Coding evidence:
+  runs/3211a673a7e04b68a8a7f7c2ad93eb0f/F048-coding.md. No lifecycle fields changed;
+  separate evaluator and coordinated provider scope smoke remain pending.
+
+- F048 new-runtime real configured Codex smoke passed, including explicit scope assessment and role_boundary-hashed receipt: runs/20260905-F048-provider-smoke. Actual Feature independent evaluation is still pending.
+
+- F048 attempt 1 independent Evaluator passed all five criteria, but the pre-upgrade parent used the old exact-property schema validator and could not validate the newly optional role_boundary property at final receipt assembly ($: missing or unknown fields). No receipt/done was produced. This is the documented self-hosted runtime upgrade boundary; next action is a fresh work-fast round with the new coordinator, review existing implementation without further source changes, and fresh guarded independent evaluation. Do not reuse the old verdict as a new receipt. New-runtime real Provider scope smoke already passed.
+
+- Final explicit authorization resolved: user selected “我授权上述 F048 仓库数据发送至 OpenAI/Codex，完成最终验收”; automatic approval accepted the exact make work-fast command. Current run remains 5770fe94333346629908d706d81e9aea with unchanged source and no dirty adoption.
+
+## Completion-hardening batch accepted
+
+- F045 independently accepted primitive run evidence (runs/20260905-F045-evaluation.md).
+- F046 accepted current-run completion receipt (runs/0a849903224541bb910486c1eaba3236/receipt.json).
+- F047 accepted dependency/lifecycle transactions and legacy feedback repair (runs/bf46e6a2b8014c02bc6cdaa3feda1835/receipt.json).
+- F048 accepted protected writes and scope-bound evidence using the new coordinator (runs/5770fe94333346629908d706d81e9aea/receipt.json).
+- Template and initializer version sources are 0.4.0. Original 44 Feature entries remain unchanged. F043's frozen historical contradiction remains visible without mutation.
+- Real configured-provider smokes passed for receipt JSON and the new scope/boundary protocol. Project-local Codex configuration was repaired using the installed desktop CLI; no global upgrade was needed.
+- Pre-change annotated tag pre-completion-hardening-20260905 still targets 7929e0fe9d654dc6f0ae87d048979a4c305ce117. No staging, commit, push, reset, stash or rollback.
+- Final post-completion ./init.sh passed (exit 0); durable log: runs/20260905-completion-hardening-final-init.log. Final diff check passed; 33 changed root/bundle pairs are byte-identical; index remains unchanged.
+
+- 2026-09-06 finalize: user approved committing and pushing the F045-F048 batch. Pre-commit ./init.sh passed; log: runs/20260906-precommit-init.log. origin/main matched local HEAD before commit. Runtime lock files are excluded from staging; source, distribution and durable evaluator receipts are included.

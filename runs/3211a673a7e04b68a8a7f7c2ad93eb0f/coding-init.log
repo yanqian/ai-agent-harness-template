@@ -1,0 +1,100 @@
+== Required files ==
+== Harness state ==
+legacy metadata contradiction: F043; frozen history only
+validated 48 features
+== Failure domains ==
+failure_records=33
+domain[agent_workflow_gap]=6
+domain[capability_gap]=2
+domain[environment_gap]=4
+domain[external_behavior_gap]=1
+domain[external_behavior_gap.]=1
+domain[harness_workflow]=1
+domain[implementation_gap]=1
+domain[none]=14
+domain[test_gap]=3
+missing_failure_domain=0
+missing_harness_improvement=0
+== Evaluator evidence ==
+legacy metadata contradiction: F043; frozen history only
+legacy metadata contradiction: F043 done with rejected/reopen metadata; frozen history only
+evaluator_evidence_baseline=F027
+evaluator_evidence_checked=19
+missing_evaluator_evidence=0
+== Orchestrator syntax ==
+== Tiny example ==
+..
+----------------------------------------------------------------------
+Ran 2 tests in 0.000s
+
+OK
+== Go server example ==
+ok  	example.com/ai-agent-harness-template/examples/go-server	(cached)
+== Unit tests ==
+...legacy metadata contradiction: F043; frozen history only
+legacy metadata contradiction: F043 done with rejected/reopen metadata; frozen history only
+........................s........................................
+----------------------------------------------------------------------
+Ran 68 tests in 92.204s
+
+OK (skipped=1)
+Accepted F039; it remains complete.
+Run record: /var/folders/ww/wrxzkc9n7rs60hbt_g7mgcl40000gn/T/tmp50l2fm0d/runs/20260905T144628Z-9ae4920c1ae24d4b8ef179bb0fcd7135-human-eval-batch.md
+Reopened F039; continue the same Feature.
+Recorded a new-requirement candidate for F040; no Feature was appended.
+Run record: /var/folders/ww/wrxzkc9n7rs60hbt_g7mgcl40000gn/T/tmp213xskzi/runs/20260905T144628Z-d8eed92dbd08447699cc57b76524b33d-human-eval-batch.md
+Next: normalize the requirement in SPEC.md, then let Planning Agent append a separate Feature.
+Recorded a new-requirement candidate for F039; no Feature was appended.
+Run record: /var/folders/ww/wrxzkc9n7rs60hbt_g7mgcl40000gn/T/tmp_4jt437s/runs/20260905T144628Z-F039-dbba0ecc3c264856a39f16595154f653-human-eval.md
+Next: normalize the requirement in SPEC.md, then let Planning Agent append a separate Feature.
+Reopened F039; continue the same Feature.
+Run record: /var/folders/ww/wrxzkc9n7rs60hbt_g7mgcl40000gn/T/tmp4ilclj75/runs/20260905T144628Z-F039-bec43beb8a064b1fad32a222022874f1-human-eval.md
+== Contract tests ==
+.................................
+----------------------------------------------------------------------
+Ran 33 tests in 0.013s
+
+OK
+== Harness tests ==
+......F.....
+======================================================================
+FAIL: test_new_mode_creates_runnable_harness_and_clean_check (test_skill_initializer.SkillInitializerHarnessTests.test_new_mode_creates_runnable_harness_and_clean_check)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/armstrong/Project/ai-agent-harness-template/test/harness/test_skill_initializer.py", line 220, in test_new_mode_creates_runnable_harness_and_clean_check
+    self.assertEqual(check.returncode, 0, check.stdout + check.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 0 : mode=check
+layout=hidden
+template_root=/Users/armstrong/Project/ai-agent-harness-template
+target_root=/private/var/folders/ww/wrxzkc9n7rs60hbt_g7mgcl40000gn/T/tmpeduv5zv_
+template_version=0.4.0
+installed_version=0.4.0
+state_valid=true
+runnable_harness=true
+missing=0
+unchanged=82
+conflicts=0
+drift=8
+drift_files:
+- .agent-harness/schemas/evaluation.schema.json
+- .agent-harness/schemas/receipt.schema.json
+- .agent-harness/schemas/run.schema.json
+- .agent-harness/scripts/completion.py
+- .agent-harness/scripts/completion_evaluator.py
+- .agent-harness/scripts/role_boundary.py
+- .agent-harness/scripts/run_evidence.py
+- .agent-harness/test/unit/test_role_boundary.py
+project_state_changed=0
+optional_changed=0
+created=0
+overwritten=0
+removed=0
+state_reset=none
+next_action=run upgrade to update harness-owned drift after reviewing merge-sensitive files
+
+
+----------------------------------------------------------------------
+Ran 12 tests in 56.911s
+
+FAILED (failures=1)

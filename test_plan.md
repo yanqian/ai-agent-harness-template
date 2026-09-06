@@ -111,3 +111,44 @@ python3 orchestrator.py --dry-run
 python3 orchestrator.py --eval-only F001 --dry-run
 scripts/validate-feature.sh F001
 ```
+
+## Run-scoped evidence (F045)
+
+`test/unit/test_run_evidence.py` uses real temporary Git repositories and subprocesses
+to verify staged/worktree/deleted/untracked source, modes, unusual paths, symlink
+safety, visible/hidden metadata exclusions, strict schemas, cross-run rejection,
+required command coverage, logs, exit codes, timeouts, criterion coverage and
+historical versus current receipts. The independent provider Evaluator remains a
+separate acceptance step; fake assessment processes only verify the protocol.
+
+
+## F046 current-run completion
+
+- Real Git / subprocess tests in test/unit/test_completion.py cover both modes, hidden paths, stale evidence, failed checks, criterion coverage, source changes, receipt-before-state recovery, reopen and frozen migration.
+- Installer lifecycle tests assert empty fresh policies and byte-preserved legacy policies.
+- Explicit real-provider probe: python3 scripts/smoke-completion-provider.py --config agent-provider.json --output runs/provider-smoke (requires provider runtime access; never replaced by fake-role evidence).
+- Final ./init.sh and scripts/validate-feature.sh F046; independent evaluator acceptance remains separate.
+
+## F047 dependency and lifecycle transactions
+
+- `test/unit/test_state_store.py`: graph/type/cycle rejection, ready dependency and work-fast scheduling, real competing owners and stale writers, killed pre-replace writer, unknown-field/order preservation, reopen history and retry identity.
+- `test/unit/test_completion.py`: actual competing orchestrator/Human Eval subprocesses in visible and hidden layouts, invalid-graph CLI failure before mutation, receipt interruption and Human Eval reopen into a new run.
+- Full `./init.sh`, selected-feature validation, and separate current-run evaluator acceptance; local tests do not grant completion.
+
+F047 repair coverage: real Human Eval subprocesses exercise legacy pass, independent
+new-requirement feedback, batches and reopen; verify resulting historical validity
+and immutable policies in visible/hidden layouts. Replay rejects changed criteria,
+attempts, edited history and disguised current-scope rejection. Contradictory frozen
+metadata cannot be repaired by successful feedback; failure leaves state and records
+unpublished.
+
+
+## F048 role boundaries
+
+Real Git / subprocess tests cover baseline and fast mode in both layouts: initial
+dirty and staged paths, explicit pre-coding adoption, optional allowed paths, new
+and deleted files including newline names, relaxed contracts, unrelated Feature
+and top-level metadata, early done, removed active run links, evaluator source
+changes, mandatory scope relevance, missing boundaries, immutable authorization,
+explicit restart, and invalid declarations before lifecycle writes. Distribution
+contracts compare runtime and test copies and all template 0.4.0 version sources.

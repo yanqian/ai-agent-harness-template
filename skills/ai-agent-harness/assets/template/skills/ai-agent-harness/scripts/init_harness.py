@@ -14,7 +14,7 @@ SKILL_DIR = Path(__file__).resolve().parents[1]
 BUNDLED_TEMPLATE = SKILL_DIR / "assets" / "template"
 TEMPLATE_MANIFEST = ".agent-harness-template.json"
 INSTALL_MANIFEST = ".agent-harness/manifest.json"
-TEMPLATE_VERSION = "0.3.9"
+TEMPLATE_VERSION = "0.4.0"
 MODE_CHOICES = {"new", "adopt", "repair", "upgrade", "check"}
 LAYOUT_CHOICES = {"hidden", "visible"}
 DEFAULT_LAYOUT = "hidden"
@@ -379,7 +379,7 @@ def iter_template_files(template_root: Path):
             continue
         if rel.parts and rel.parts[0] == "runs" and rel.name not in {"RUN_TEMPLATE.md", ".gitkeep"}:
             continue
-        if rel.as_posix() == "manifest.json":
+        if rel.as_posix() in {"manifest.json", "completion-policy.json"}:
             continue
         if rel.parts[:3] == ("skills", "ai-agent-harness", "assets"):
             continue
@@ -476,6 +476,11 @@ def semantic_validation(root: Path, layout: str, *, verify_runtime: bool = True)
         "scripts/run-agent-provider.py",
         "scripts/validate-state.py",
         "scripts/check-evaluator-evidence.sh",
+        "completion-policy.json",
+        "scripts/completion.py",
+        "scripts/state_store.py",
+        "scripts/role_boundary.py",
+        "scripts/completion_evaluator.py",
         "scripts/check-failure-domains.sh",
         "prompts/work.md",
         "prompts/evaluate.md",
@@ -524,6 +529,17 @@ def semantic_validation(root: Path, layout: str, *, verify_runtime: bool = True)
             checks.append(f"{script} is not executable")
     if layout == "hidden" and (root / "init.sh").exists() and not is_executable(root / "init.sh"):
         checks.append("init.sh is not executable")
+
+    policy_path = harness_root / "completion-policy.json"
+    if policy_path.exists():
+        try:
+            policy = json.loads(policy_path.read_text())
+            for feature_id, legacy in policy.get("legacy", {}).items():
+                human = legacy.get("human_acceptance") or {}
+                if human.get("status") == "rejected" or human.get("reopen_pending"):
+                    print(f"legacy_metadata_warning={feature_id}: frozen done plus rejected/reopen metadata; not current-run evidence")
+        except (ValueError, AttributeError):
+            checks.append("invalid completion-policy.json")
 
     init_ok = run_quick_init(root) if verify_runtime else True
     if not init_ok:
@@ -601,6 +617,7 @@ def write_install_manifest(root: Path, template_root: Path, mode: str, layout: s
         "schema_version": 1,
         "template_version": TEMPLATE_VERSION,
         "layout": layout,
+        "completion_policy_version": 1,
         "installed_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "mode": mode,
         "files": {},
@@ -683,6 +700,10 @@ def initialize(args: argparse.Namespace) -> int:
     drift = classification["drift"]
 
     installed = installed_manifest(target_root)
+    if (installed and installed.get("completion_policy_version") == 1 and
+            not (layout_harness_root(target_root, layout) / "completion-policy.json").exists() and
+            args.mode != "check"):
+        raise HarnessInitError("completion-policy.json is missing from an enrolled install; restore its frozen policy from history, never re-freeze newer completions")
     semantic = semantic_validation(target_root, layout, verify_runtime=not args.dry_run)
     if args.mode == "check":
         print_summary(args.mode, layout, template_root, target_root, classification, semantic, installed, [], [], [], [])
@@ -714,6 +735,20 @@ def initialize(args: argparse.Namespace) -> int:
     created_logical = {item["logical"].as_posix() for item in created}
     prefix = "" if layout == "visible" else ".agent-harness/"
     reset = [prefix + rel for rel in fresh_project_state() if rel in created_logical]
+
+    if not args.dry_run:
+        # Migration freezes only this project's already-completed identities, once.
+        # Never copy the template's completion history into another project.
+        import importlib.util
+        runtime = template_root / "scripts"
+        sys.path.insert(0, str(runtime))
+        spec = importlib.util.spec_from_file_location("completion_migration", runtime / "completion.py")
+        migration = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(migration)
+        harness = layout_harness_root(target_root, layout)
+        state_file = harness / "feature_list.json"
+        if state_file.exists():
+            migration.freeze_policy(harness, json.loads(state_file.read_text()))
 
     removed = remove_obsolete_paths(target_root, layout, args.dry_run) if args.mode == "upgrade" else []
     ensure_runs_gitkeep(target_root, layout, args.dry_run)

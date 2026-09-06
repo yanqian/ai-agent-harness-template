@@ -1,0 +1,6 @@
+Reading progress.md and feature_list.json.
++ git log --oneline -20
+1fdba3d fixture
++ ./init.sh
+FIXTURE_OK
+Done: F001; receipt=/private/var/folders/ww/wrxzkc9n7rs60hbt_g7mgcl40000gn/T/harness-provider-smoke-pqblh6sn/runs/3071ac1cfa4c4571b8701b20182fb85c/receipt.json

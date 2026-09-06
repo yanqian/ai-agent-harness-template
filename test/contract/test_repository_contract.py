@@ -217,7 +217,7 @@ class RepositoryContractTests(unittest.TestCase):
             init: ["docs/capability-gaps.md"],
             skill: ["docs/capability-gaps.md", "local-only workarounds"],
             workflows: ["Identify required capabilities", "Check `docs/capability-gaps.md`"],
-            initializer: ["docs/capability-gaps.md", "Capability Gap Handling", "TEMPLATE_VERSION = \"0.3.9\""],
+            initializer: ["docs/capability-gaps.md", "Capability Gap Handling", "TEMPLATE_VERSION = \"0.4.0\""],
         }
         for text, phrases in checks.items():
             for phrase in phrases:
@@ -352,7 +352,7 @@ class RepositoryContractTests(unittest.TestCase):
             init: ["docs/feature-decomposition.md"],
             skill: ["docs/feature-decomposition.md", "Split independently verifiable behavior"],
             workflows: ["Use `docs/feature-decomposition.md`", "reject over-bundled features"],
-            initializer: ["docs/feature-decomposition.md", "TEMPLATE_VERSION = \"0.3.9\""],
+            initializer: ["docs/feature-decomposition.md", "TEMPLATE_VERSION = \"0.4.0\""],
         }
         if not bundled_template_available():
             checks.pop(spec, None)
@@ -568,7 +568,7 @@ class RepositoryContractTests(unittest.TestCase):
             init: ["docs/commit-messages.md"],
             skill: ["docs/commit-messages.md", "Fxxx <Action> <concise summary>"],
             workflows: ["Read `docs/commit-messages.md`", "starts with the feature ID", "Verify every feature ID referenced"],
-            initializer: ["docs/commit-messages.md", "TEMPLATE_VERSION = \"0.3.9\""],
+            initializer: ["docs/commit-messages.md", "TEMPLATE_VERSION = \"0.4.0\""],
         }
         if not bundled_template_available():
             checks.pop(spec, None)
@@ -618,7 +618,7 @@ class RepositoryContractTests(unittest.TestCase):
             init: ["docs/example-boundaries.md"],
             skill: ["docs/example-boundaries.md", "Default examples are references"],
             workflows: ["Identify project-owned implementation and verification paths", "do not use default examples as the product implementation surface"],
-            initializer: ["docs/example-boundaries.md", "TEMPLATE_VERSION = \"0.3.9\""],
+            initializer: ["docs/example-boundaries.md", "TEMPLATE_VERSION = \"0.4.0\""],
         }
         for text, phrases in checks.items():
             for phrase in phrases:
@@ -851,7 +851,7 @@ class RepositoryContractTests(unittest.TestCase):
             "next_action",
         ]:
             self.assertIn(phrase, initializer)
-        self.assertEqual(template_manifest["template_version"], "0.3.9")
+        self.assertEqual(template_manifest["template_version"], "0.4.0")
         self.assertEqual(template_manifest["default_layout"], "hidden")
         self.assertIn("hidden", template_manifest["layouts"])
         self.assertIn("visible", template_manifest["layouts"])
@@ -1024,6 +1024,17 @@ class RepositoryContractTests(unittest.TestCase):
             for phrase in phrases:
                 self.assertIn(phrase, text)
 
+    def test_current_run_receipt_gate_and_distribution(self):
+        orchestrator = (ROOT / "orchestrator.py").read_text()
+        self.assertNotIn("def fast_coding_evidence_result", orchestrator)
+        self.assertEqual(orchestrator.count("mark_done(feature_id, receipt_path)"), 1)
+        for path in ["scripts/role_boundary.py", "test/unit/test_role_boundary.py", "scripts/completion.py", "scripts/completion_evaluator.py",
+                     "scripts/smoke-completion-provider.py", "test/unit/test_completion.py",
+                     "docs/run-evidence.md"]:
+            self.assertEqual((ROOT / path).read_bytes(), template_file(path).read_bytes())
+        self.assertIn("completion.finalize", orchestrator)
+        self.assertIn("completion.verify_history", (ROOT / "scripts/check-evaluator-evidence.sh").read_text())
+
     def test_orchestrator_cli_contract_is_documented_statically(self):
         text = (ROOT / "orchestrator.py").read_text()
         for phrase in [
@@ -1034,11 +1045,11 @@ class RepositoryContractTests(unittest.TestCase):
             "EVALUATOR_AGENT_ADAPTER",
             "RUNS_DIR",
             "startup_protocol()",
-            "write_failure_run_record(feature_id, error)",
-            "run_agent(coding_prompt",
+            "write_failure_run_record(feature_id, error,",
+            "run_agent(handoff",
             "run_agent(evaluator_prompt",
             "mark_in_progress(feature_id)",
-            "mark_done(feature_id)",
+            "mark_done(feature_id, receipt_path)",
             "mark_failed(feature_id",
             "if args.eval_only:",
         ]:
@@ -1071,12 +1082,12 @@ class RepositoryContractTests(unittest.TestCase):
             continue_prompt: ["make work-fast", "FAST_CODING_EVIDENCE: Fxxx", "separate cold-start Evaluator Agent child process"],
             evaluate_prompt: ["make work-fast", "FAST_CODING_EVIDENCE: Fxxx", "coding-phase evaluator pass spoofing", "separate cold-start Evaluator Agent child process"],
             makefile: ["work-fast:", "python3 orchestrator.py --work-fast --max-rounds 1"],
-            orchestrator: ["--work-fast", "FAST_CODING_EVIDENCE_PREFIX", "FAST_CODING_HANDOFF_PREFIX", "fast_coding_evidence_result", "EVALUATOR_AGENT_ADAPTER"],
+            orchestrator: ["--work-fast", "FAST_CODING_HANDOFF_PREFIX", "completion.finalize", "EVALUATOR_AGENT_ADAPTER"],
             skill: ["make work-fast", "provider-native coding", "must not write `EVAL_PASS: Fxxx`"],
             workflows: ["make work-fast", "FAST_CODING_EVIDENCE: Fxxx", "separate cold-start Evaluator Agent child process"],
             template_agents: ["Preferred interactive mode", "make work-fast", "current agent/provider-native session", "FAST_CODING_EVIDENCE: Fxxx", "Use baseline `make work`"],
             template_makefile: ["work-fast:", "python3 orchestrator.py --work-fast --max-rounds 1"],
-            template_orchestrator: ["--work-fast", "FAST_CODING_EVIDENCE_PREFIX", "fast_coding_evidence_result"],
+            template_orchestrator: ["--work-fast", "completion.finalize"],
             template_fast_prompt: ["Work-Fast Coding Handoff", "FAST_CODING_EVIDENCE: Fxxx", "Do not write `EVAL_PASS: Fxxx`"],
             template_workflows: ["make work-fast", "FAST_CODING_EVIDENCE: Fxxx", "separate cold-start Evaluator Agent child process"],
             initializer: ["Preferred interactive mode", "make -C .agent-harness work-fast", "FAST_CODING_EVIDENCE: Fxxx", "Use baseline `make -C .agent-harness work`"],

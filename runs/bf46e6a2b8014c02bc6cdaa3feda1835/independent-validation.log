@@ -1,0 +1,75 @@
+legacy metadata contradiction: F043; frozen history only
+validated 48 features
+validating F047: Enforce dependency and lifecycle state transactions
+status=in_progress passes=False
+== Required files ==
+== Harness state ==
+legacy metadata contradiction: F043; frozen history only
+validated 48 features
+== Failure domains ==
+failure_records=33
+domain[agent_workflow_gap]=6
+domain[capability_gap]=2
+domain[environment_gap]=4
+domain[external_behavior_gap]=1
+domain[external_behavior_gap.]=1
+domain[harness_workflow]=1
+domain[implementation_gap]=1
+domain[none]=14
+domain[test_gap]=3
+missing_failure_domain=0
+missing_harness_improvement=0
+== Evaluator evidence ==
+legacy metadata contradiction: F043; frozen history only
+legacy metadata contradiction: F043 done with rejected/reopen metadata; frozen history only
+evaluator_evidence_baseline=F027
+evaluator_evidence_checked=19
+missing_evaluator_evidence=0
+== Orchestrator syntax ==
+== Tiny example ==
+..
+----------------------------------------------------------------------
+Ran 2 tests in 0.000s
+
+OK
+== Go server example ==
+ok  	example.com/ai-agent-harness-template/examples/go-server	(cached)
+== Unit tests ==
+...legacy metadata contradiction: F043; frozen history only
+legacy metadata contradiction: F043 done with rejected/reopen metadata; frozen history only
+..................s........................................
+----------------------------------------------------------------------
+Ran 62 tests in 45.962s
+
+OK (skipped=1)
+Accepted F039; it remains complete.
+Run record: /var/folders/ww/wrxzkc9n7rs60hbt_g7mgcl40000gn/T/tmpjkwll8ru/runs/20260905T142856Z-8da34c4d5c7540d9ac521483ae64a645-human-eval-batch.md
+Reopened F039; continue the same Feature.
+Recorded a new-requirement candidate for F040; no Feature was appended.
+Run record: /var/folders/ww/wrxzkc9n7rs60hbt_g7mgcl40000gn/T/tmp6cu49d1p/runs/20260905T142856Z-f768d3270cc04d2f84b750337e9ba4ba-human-eval-batch.md
+Next: normalize the requirement in SPEC.md, then let Planning Agent append a separate Feature.
+Recorded a new-requirement candidate for F039; no Feature was appended.
+Run record: /var/folders/ww/wrxzkc9n7rs60hbt_g7mgcl40000gn/T/tmpqjvpd7xj/runs/20260905T142856Z-F039-1e02af54c67f472c8b1cdf7bc5dc405e-human-eval.md
+Next: normalize the requirement in SPEC.md, then let Planning Agent append a separate Feature.
+Reopened F039; continue the same Feature.
+Run record: /var/folders/ww/wrxzkc9n7rs60hbt_g7mgcl40000gn/T/tmp_90ofjcd/runs/20260905T142856Z-F039-752ab32fd39a4f959b80aa196298a1e3-human-eval.md
+== Contract tests ==
+.................................
+----------------------------------------------------------------------
+Ran 33 tests in 0.008s
+
+OK
+== Harness tests ==
+............
+----------------------------------------------------------------------
+Ran 12 tests in 60.310s
+
+OK
+== Smoke tests ==
+..
+----------------------------------------------------------------------
+Ran 2 tests in 0.174s
+
+OK
+init verification passed
+feature validation passed: F047

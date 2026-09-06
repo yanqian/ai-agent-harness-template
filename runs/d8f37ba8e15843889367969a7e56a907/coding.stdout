@@ -1,0 +1,11 @@
+F047 编码完成：依赖调度、原子状态写入、共享锁及 reopen 证据失效机制已实现，分发副本已同步。
+
+- 修改：状态模块、协调器、Human Eval、校验、schema、测试及文档。
+- 验证：`./init.sh`、`scripts/validate-feature.sh F047`、`git diff --check` 均通过。
+- 状态：等待独立 Evaluator；未修改生命周期字段或提交。
+- 失败域：`contract_gap`，已增加持久化规则与回归测试；无能力缺口或 examples 修改。
+- 建议提交：`F047 Enforce dependency and lifecycle state transactions`
+
+[本轮证据](runs/d8f37ba8e15843889367969a7e56a907/F047-coding.md)
+
+CODING_PASS: F047

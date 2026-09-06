@@ -1,0 +1,1 @@
+{"features": [{"id": "F001", "title": "Smoke recovery", "description": "Verify the existing fixture marker through init.sh.", "acceptance": ["Project-root ./init.sh exits zero and prints FIXTURE_OK by verifying marker.txt equals ready."], "passes": false, "status": "todo", "attempts": 0, "last_error": ""}]}

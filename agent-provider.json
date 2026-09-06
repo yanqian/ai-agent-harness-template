@@ -4,21 +4,21 @@
     "codex": {
       "cwd": ".",
       "command": [
-        "codex",
+        "/Applications/ChatGPT.app/Contents/Resources/codex",
         "exec",
         "--model",
-        "gpt-5.4",
+        "gpt-6-astra",
         "-"
       ],
       "runtime_check_command": [
-        "codex",
+        "/Applications/ChatGPT.app/Contents/Resources/codex",
         "exec",
         "--model",
-        "gpt-5.4",
+        "gpt-6-astra",
         "--ephemeral",
         "-"
       ],
-      "verified": "2026-07-13: Codex CLI reads harness prompts from stdin with `-`; gpt-5.4 is specified locally to avoid inheriting an unavailable global model."
+      "verified": "2026-09-05: old Homebrew Codex 0.146.1 rejected gpt-5.4 for this account and was too old for the globally configured gpt-6-astra. Installed desktop-bundled Codex 0.153.3 exec --help and a real ephemeral stdin prompt returned PROVIDER_OK with exit 0 using gpt-6-astra; cwd remains project root. See runs/20260905-provider-runtime-recovery.md."
     }
   }
 }

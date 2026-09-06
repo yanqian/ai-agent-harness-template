@@ -1,0 +1,20 @@
+[
+  {
+    "result": "pass",
+    "classification": "current_feature",
+    "exit_code": 0,
+    "stdout": "Accepted F001; it remains complete.\nRun record: /var/folders/ww/wrxzkc9n7rs60hbt_g7mgcl40000gn/T/tmp_uzermkk/runs/20260905T140931Z-F001-f494fbefcc18475689cba1519fb36399-human-eval.md\n",
+    "history_validation": "F001: missing current-run completion receipt",
+    "policy_unchanged": true,
+    "human_status": "accepted"
+  },
+  {
+    "result": "fail",
+    "classification": "new_requirement",
+    "exit_code": 0,
+    "stdout": "Recorded a new-requirement candidate for F001; no Feature was appended.\nRun record: /var/folders/ww/wrxzkc9n7rs60hbt_g7mgcl40000gn/T/tmp3aai70cg/runs/20260905T140932Z-F001-949e9f8a3c2549e398a6bd2afbe6fcd9-human-eval.md\nNext: normalize the requirement in SPEC.md, then let Planning Agent append a separate Feature.\n",
+    "history_validation": "F001: missing current-run completion receipt",
+    "policy_unchanged": true,
+    "human_status": "new_requirement"
+  }
+]

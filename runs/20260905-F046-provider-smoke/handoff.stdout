@@ -1,0 +1,5 @@
+Reading progress.md and feature_list.json.
++ git log --oneline -20
+32100f7 fixture
++ ./init.sh
+FIXTURE_OK

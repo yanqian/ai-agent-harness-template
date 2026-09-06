@@ -5,6 +5,9 @@ import argparse
 import json
 import os
 import re
+import sys
+import uuid
+import state_store
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -15,10 +18,7 @@ FEATURE_ID_RE = re.compile(r"^F[0-9]{3,}$")
 
 
 def load_state() -> dict:
-    data = json.loads(FEATURES_PATH.read_text())
-    if not isinstance(data, dict) or not isinstance(data.get("features"), list):
-        raise SystemExit("feature_list.json must contain a top-level features array")
-    return data
+    return state_store.load(FEATURES_PATH)
 
 
 def find_feature(data: dict, feature_id: str) -> dict:
@@ -30,7 +30,7 @@ def find_feature(data: dict, feature_id: str) -> dict:
 
 def write_record(feature_id: str, result: str, classification: str, feedback: str) -> Path:
     timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    path = RUNS_DIR / f"{timestamp}-{feature_id}-human-eval.md"
+    path = RUNS_DIR / f"{timestamp}-{feature_id}-{uuid.uuid4().hex}-human-eval.md"
     RUNS_DIR.mkdir(exist_ok=True)
     if result == "fail" and classification == "current_feature":
         result_label = "fail"
@@ -66,7 +66,7 @@ def write_record(feature_id: str, result: str, classification: str, feedback: st
 
 def write_batch_record(entries: list[dict]) -> Path:
     timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    path = RUNS_DIR / f"{timestamp}-human-eval-batch.md"
+    path = RUNS_DIR / f"{timestamp}-{uuid.uuid4().hex}-human-eval-batch.md"
     RUNS_DIR.mkdir(exist_ok=True)
     lines = []
     has_current_failure = False
@@ -113,6 +113,11 @@ def write_batch_record(entries: list[dict]) -> Path:
 
 
 def main() -> int:
+    with state_store.ownership(FEATURES_PATH):
+        return record_feedback()
+
+
+def record_feedback() -> int:
     parser = argparse.ArgumentParser(description="Record optional Human Eval feedback for one or a batch of Features.")
     parser.add_argument("feature_id", nargs="?", help="Feature ID, such as F039")
     parser.add_argument("--batch-file", help="JSON array of {feature_id, result, classification, feedback} entries")
@@ -154,6 +159,7 @@ def main() -> int:
         acceptance["last_feedback"] = entry["feedback"]
         acceptance["last_recorded_at"] = now
         if entry["result"] == "fail" and entry["classification"] == "current_feature":
+            state_store.invalidate_completion(feature, "human reopen")
             feature["passes"] = False
             feature["status"] = "todo"
             feature["last_error"] = f"Human Eval: {entry['feedback']}"[:2000]
@@ -161,15 +167,28 @@ def main() -> int:
             acceptance["reopen_pending"] = True
         elif entry["result"] == "fail":
             acceptance["status"] = "new_requirement"
-            acceptance["reopen_pending"] = False
+            # Independent feedback cannot cancel an existing reopen.
+            acceptance.setdefault("reopen_pending", False)
         else:
             if feature.get("passes") is not True or feature.get("status") != "done":
                 raise SystemExit(f"cannot record Human Eval pass for {entry['feature_id']}: it is not evaluator-complete")
             acceptance["status"] = "accepted"
             acceptance["reopen_pending"] = False
 
-    FEATURES_PATH.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n")
+    harness = FEATURES_PATH.resolve().parent
+    state_store.validate(data, harness)
+    # Check the proposed state before publishing either feedback or lifecycle
+    # changes. A successful command must leave historical completion valid.
+    import completion
+    if (harness / completion.POLICY).exists():
+        try:
+            completion.verify_history(harness, data)
+        except (ValueError, OSError, KeyError) as exc:
+            raise SystemExit(f'Human Eval would invalidate completion history: {exc}. '
+                             'No feedback/state was published. Restore valid evidence or '
+                             'reopen the original Feature for a fresh independent evaluation.') from exc
     record = write_batch_record(normalized) if args.batch_file else write_record(**normalized[0])
+    state_store.save(FEATURES_PATH, data)
     for entry in normalized:
         if entry["result"] == "fail" and entry["classification"] == "current_feature":
             print(f"Reopened {entry['feature_id']}; continue the same Feature.")
@@ -188,4 +207,8 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    try:
+        raise SystemExit(main())
+    except (state_store.StateError, OSError, ValueError) as exc:
+        print(f"human-eval error: {exc}", file=sys.stderr)
+        raise SystemExit(1)

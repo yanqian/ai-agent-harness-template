@@ -2,6 +2,7 @@
 import json
 import re
 import sys
+import state_store
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -81,6 +82,10 @@ def main() -> int:
         if status == "done" and feature["passes"] is not True:
             fail(f"feature {feature_id} has status=done but passes is not true")
 
+    try:
+        state_store.validate(data, ROOT)
+    except (ValueError, OSError) as exc:
+        fail(str(exc))
     print(f"validated {len(features)} features")
     return 0
 

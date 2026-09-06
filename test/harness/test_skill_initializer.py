@@ -433,6 +433,46 @@ class SkillInitializerHarnessTests(unittest.TestCase):
             ]:
                 self.assertIn(phrase, check.stdout)
 
+    def test_receipt_policy_fresh_legacy_upgrade_and_preservation(self):
+        for layout in ("hidden", "visible"):
+            with self.subTest(layout=layout), tempfile.TemporaryDirectory() as tmp:
+                project = Path(tmp)
+                result = run_initializer(project, "new", "--layout", layout)
+                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                harness = project / ".agent-harness" if layout == "hidden" else project
+                policy_path = harness / "completion-policy.json"
+                self.assertEqual(json.loads(policy_path.read_text())["legacy"], {})
+                state_path = harness / "feature_list.json"
+                state = json.loads(state_path.read_text())
+                state["features"] = [{"id": "F043", "title": "Legacy", "description": "Legacy",
+                    "acceptance": ["legacy scope"], "passes": True, "status": "done", "attempts": 1,
+                    "last_error": "", "human_acceptance": {"status": "rejected", "reopen_pending": True}}]
+                state_path.write_text(json.dumps(state))
+                (harness / "runs/legacy.md").write_text("EVAL_PASS: F043\n")
+                # Simulate a genuinely pre-enrollment install, not a deleted policy
+                # from a new install. New installs refuse that re-freezing loophole.
+                manifest_path = project / ".agent-harness/manifest.json"
+                manifest = json.loads(manifest_path.read_text())
+                manifest.pop("completion_policy_version")
+                manifest_path.write_text(json.dumps(manifest))
+                policy_path.unlink()
+                result = run_initializer(project, "upgrade")
+                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                self.assertIn("legacy_metadata_warning=F043", result.stdout)
+                self.assertEqual(json.loads(state_path.read_text()), state)
+                frozen = policy_path.read_bytes()
+                self.assertEqual(set(json.loads(frozen)["legacy"]), {"F043"})
+                for mode in ("new", "adopt", "repair", "upgrade"):
+                    result = run_initializer(project, mode)
+                    self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                    self.assertEqual(policy_path.read_bytes(), frozen)
+                    self.assertEqual(json.loads(state_path.read_text()), state)
+                policy_path.unlink()
+                result = run_initializer(project, "upgrade")
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn("restore its frozen policy", result.stderr)
+                self.assertFalse(policy_path.exists())
+
 
 if __name__ == "__main__":
     unittest.main()

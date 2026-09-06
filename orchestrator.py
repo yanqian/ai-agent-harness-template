@@ -9,6 +9,12 @@ import sys
 from pathlib import Path
 from typing import Optional
 
+sys.path.insert(0, str(Path(__file__).resolve().parent / "scripts"))
+import completion
+import state_store
+import run_evidence
+import role_boundary
+
 FEATURES_PATH = Path("feature_list.json")
 PROGRESS_PATH = Path("progress.md")
 PROMPTS_DIR = Path("prompts")
@@ -18,7 +24,8 @@ EVALUATOR_AGENT_ADAPTER = Path("scripts/run-evaluator-agent.sh")
 INSTALL_MANIFEST_PATH = Path("manifest.json")
 MAX_ROUNDS = 1
 MAX_ATTEMPTS = 3
-FAST_CODING_EVIDENCE_PREFIX = "FAST_CODING_EVIDENCE:"
+BOUNDARY_ADOPT = []
+BOUNDARY_ALLOWED = None
 FAST_CODING_HANDOFF_PREFIX = "FAST_CODING_HANDOFF:"
 
 
@@ -37,14 +44,11 @@ def run_capture(cmd: list[str], check: bool = True) -> subprocess.CompletedProce
 
 
 def load_state() -> dict:
-    data = json.loads(FEATURES_PATH.read_text())
-    if not isinstance(data, dict) or not isinstance(data.get("features"), list):
-        raise OrchestratorError("feature_list.json must contain a top-level features array.")
-    return data
+    return state_store.load(FEATURES_PATH)
 
 
 def save_state(data: dict) -> None:
-    FEATURES_PATH.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n")
+    state_store.save(FEATURES_PATH, data)
 
 
 def features(data: dict) -> list[dict]:
@@ -68,6 +72,7 @@ def normalize_status(feature: dict) -> str:
 
 
 def pick_feature(data: dict, max_attempts: int) -> Optional[dict]:
+    state_store.validate(data, FEATURES_PATH.resolve().parent)
     priority = {"P0": 0, "P1": 1, "P2": 2}
     candidates = []
     ordered_features = features(data)
@@ -76,19 +81,20 @@ def pick_feature(data: dict, max_attempts: int) -> Optional[dict]:
         status = normalize_status(feature)
         acceptance = feature.get("human_acceptance", {})
         reopened = isinstance(acceptance, dict) and acceptance.get("reopen_pending") is True
-        if feature.get("passes") is False and status in {"todo", "in_progress"} and (attempts < max_attempts or reopened):
+        if state_store.ready(data, feature) and feature.get("passes") is False and status in {"todo", "in_progress"} and (attempts < max_attempts or reopened):
             candidates.append(feature)
     candidates.sort(key=lambda item: (priority.get(item.get("priority", "P2"), 9), ordered_features.index(item)))
     return candidates[0] if candidates else None
 
 
 def pick_fast_feature(data: dict, max_attempts: int) -> Optional[dict]:
+    state_store.validate(data, FEATURES_PATH.resolve().parent)
     priority = {"P0": 0, "P1": 1, "P2": 2}
     ordered_features = features(data)
     in_progress = [
         feature
         for feature in ordered_features
-        if feature.get("passes") is False and normalize_status(feature) == "in_progress"
+        if state_store.ready(data, feature) and feature.get("passes") is False and normalize_status(feature) == "in_progress"
     ]
     if in_progress:
         in_progress.sort(key=lambda item: (priority.get(item.get("priority", "P2"), 9), ordered_features.index(item)))
@@ -99,18 +105,31 @@ def pick_fast_feature(data: dict, max_attempts: int) -> Optional[dict]:
 def mark_in_progress(feature_id: str) -> None:
     data = load_state()
     feature = feature_by_id(data, feature_id)
+    if not state_store.ready(data, feature):
+        raise state_store.StateError("feature dependencies are not ready")
+    state_store.invalidate_completion(feature, "new attempt")
     feature["status"] = "in_progress"
     feature["attempts"] = int(feature.get("attempts", 0)) + 1
     feature["last_error"] = ""
     acceptance = feature.get("human_acceptance")
     if isinstance(acceptance, dict):
         acceptance["reopen_pending"] = False
+        if acceptance.get("status") == "rejected":
+            acceptance["status"] = "unreviewed"
     save_state(data)
 
 
-def mark_done(feature_id: str) -> None:
+def mark_done(feature_id: str, receipt_path: Path) -> None:
     data = load_state()
     feature = feature_by_id(data, feature_id)
+    if not state_store.ready(data, feature):
+        raise state_store.StateError("feature dependencies are not ready")
+    harness = Path.cwd()
+    _, run = completion.candidate(harness, feature)
+    receipt = completion.read(receipt_path)
+    run_evidence.validate_receipt(receipt, completion.paths(harness)[0], expected_run=run,
+                                  current=True, feature=feature)
+    feature["completion_receipt"] = receipt_path.relative_to(harness).as_posix()
     feature["passes"] = True
     feature["status"] = "done"
     feature["last_error"] = ""
@@ -347,67 +366,6 @@ def coding_result(feature_id: str, result: subprocess.CompletedProcess[str]) -> 
     return final_role_verdict(output, pass_line, fail_prefix)
 
 
-def fast_coding_evidence_result(feature_id: str) -> tuple[Optional[bool], str]:
-    """Return the final fast-coding verdict from durable run evidence."""
-    verdict: tuple[Optional[bool], str] = (None, "")
-    if not RUNS_DIR.exists():
-        return verdict
-
-    marker = re.compile(rf"^\s*{re.escape(FAST_CODING_EVIDENCE_PREFIX)}\s+{re.escape(feature_id)}\s*$", re.MULTILINE)
-    eval_pass = re.compile(rf"^\s*EVAL_PASS:\s+{re.escape(feature_id)}\s*$", re.MULTILINE)
-    coding_pass = f"CODING_PASS: {feature_id}"
-    coding_fail_prefix = f"CODING_FAIL: {feature_id}:"
-    for path in sorted(RUNS_DIR.glob("*.md")):
-        if path.name == "RUN_TEMPLATE.md":
-            continue
-        text = path.read_text(errors="replace")
-        if f"{FAST_CODING_HANDOFF_PREFIX} {feature_id}" in text:
-            continue
-        if not marker.search(text):
-            continue
-        if eval_pass.search(text):
-            return (
-                False,
-                f"fast coding evidence must not contain evaluator pass evidence: {path}",
-            )
-        passed, reason = final_role_verdict(text, coding_pass, coding_fail_prefix)
-        if passed is not None:
-            verdict = (passed, reason)
-    return verdict
-
-
-def write_fast_coding_handoff(feature_id: str) -> Path:
-    RUNS_DIR.mkdir(exist_ok=True)
-    timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    safe_feature = re.sub(r"[^A-Za-z0-9_-]+", "-", feature_id)
-    path = RUNS_DIR / f"{timestamp}-{safe_feature}-work-fast-handoff.md"
-    current_commit = run_capture(["git", "rev-parse", "--short", "HEAD"], check=False).stdout.strip() or "unknown"
-    status = run_capture(["git", "status", "--short"], check=False).stdout.strip() or "clean"
-    path.write_text(
-        f"# Run Record: {feature_id} - work-fast coding handoff\n\n"
-        "## Summary\n\n"
-        f"- Date: {timestamp}\n"
-        "- Agent role: Orchestrator fast handoff\n"
-        f"- Feature: {feature_id}\n"
-        "- Result: in_progress\n\n"
-        "## Repository State\n\n"
-        f"- Starting commit: {current_commit}\n"
-        f"- Ending commit: {current_commit}\n"
-        f"- Working tree status: {status}\n\n"
-        "## Commands Run\n\n"
-        "```bash\n"
-        "python3 orchestrator.py --work-fast\n"
-        "```\n\n"
-        "## Evidence\n\n"
-        f"- Fast handoff: {FAST_CODING_HANDOFF_PREFIX} {feature_id}\n"
-        "- Coding evidence required: write a separate run record containing the fast coding evidence marker "
-        "and matching coding pass verdict after implementation.\n"
-        "- Evaluator pass prohibited in coding evidence: do not write evaluator pass evidence during the fast coding phase.\n"
-    )
-    print(f"Wrote fast coding handoff: {path}", flush=True)
-    return path
-
-
 def evaluate_feature(feature_id: str, dry_run: bool) -> bool:
     print(f"\n== Evaluate: {feature_id} ==", flush=True)
     result = run_agent(evaluator_prompt(feature_id), dry_run, "Evaluator Agent", EVALUATOR_AGENT_ADAPTER)
@@ -429,83 +387,102 @@ def evaluate_feature(feature_id: str, dry_run: bool) -> bool:
     return False
 
 
-def evaluate_fast_feature(feature_id: str, dry_run: bool, max_attempts: int) -> bool:
-    print(f"\n== Work-fast evaluate: {feature_id} ==", flush=True)
-    if dry_run:
-        run_agent(evaluator_prompt(feature_id), dry_run=True, label="Evaluator Agent", adapter_path=EVALUATOR_AGENT_ADAPTER)
-        return True
-
-    evaluator = run_agent(evaluator_prompt(feature_id), dry_run=False, label="Evaluator Agent", adapter_path=EVALUATOR_AGENT_ADAPTER)
-    passed, reason = evaluator_result(feature_id, evaluator)
-    if passed:
-        if evaluator.returncode != 0:
-            print(
-                f"Evaluator emitted EVAL_PASS despite provider exit code {evaluator.returncode}; accepting final verdict.",
-                flush=True,
-            )
-        mark_done(feature_id)
-        print(f"Done: {feature_id}", flush=True)
-        return True
-
-    if evaluator.returncode != 0:
-        error = f"evaluator exited with code {evaluator.returncode}: {reason}"
-    else:
-        error = reason or "Evaluator rejected the feature."
-    mark_failed(feature_id, error, max_attempts)
-    write_failure_run_record(
-        feature_id,
-        error,
-        command="python3 orchestrator.py --work-fast",
-        failure_domain="agent_workflow_gap",
-        harness_improvement="No new harness improvement required; work-fast preserved evaluator gating and recorded the evaluator failure.",
-    )
-    print(f"Evaluation failed: {feature_id}: {reason}", flush=True)
-    return False
+def run_verified_round(round_no: int, max_attempts: int, dry_run: bool, mode: str) -> bool:
+    with state_store.ownership(FEATURES_PATH):
+        return _run_verified_round(round_no, max_attempts, dry_run, mode)
 
 
-def run_work_fast_round(round_no: int, max_attempts: int, dry_run: bool) -> bool:
+def _run_verified_round(round_no: int, max_attempts: int, dry_run: bool, mode: str) -> bool:
     data = load_state()
-    feature = pick_fast_feature(data, max_attempts)
+    feature = pick_fast_feature(data, max_attempts) if mode == "work-fast" else pick_feature(data, max_attempts)
     if not feature:
         print("No runnable unfinished feature left.", flush=True)
         return True
-    feature_id = str(feature["id"])
-    print(f"\n== Work-fast round {round_no}: {feature_id} ==", flush=True)
-
-    evidence_passed, evidence_reason = fast_coding_evidence_result(feature_id)
+    feature_id = feature["id"]
     if dry_run:
-        print("\n== Fast coding handoff prompt ==")
-        print(fast_coding_prompt(feature_id))
-        run_agent(evaluator_prompt(feature_id), dry_run=True, label="Evaluator Agent", adapter_path=EVALUATOR_AGENT_ADAPTER)
+        print(fast_coding_prompt(feature_id) if mode == "work-fast" else coding_prompt(feature_id))
+        print(evaluator_prompt(feature_id))
         return True
-
-    ensure_adapter_configured("Evaluator Agent", EVALUATOR_AGENT_ADAPTER)
-
-    if evidence_passed is True:
-        return evaluate_fast_feature(feature_id, dry_run=False, max_attempts=max_attempts)
-
-    if evidence_passed is False:
-        error = evidence_reason or "Fast coding evidence reported failure."
+    try:
+        ensure_adapter_configured("Evaluator Agent", EVALUATOR_AGENT_ADAPTER)
+        if mode == "work":
+            ensure_adapter_configured("Coding Agent", CODING_AGENT_ADAPTER)
+    except OrchestratorError as exc:
+        # Preflight must not increment attempts or mutate lifecycle state.
+        write_failure_run_record(feature_id, f"Provider preflight rejected; active run {feature.get('active_run')}: {exc}",
+                                 failure_domain="capability_gap")
+        print(str(exc), file=sys.stderr)
+        return False
+    harness = Path.cwd()
+    role_boundary.selection(completion.paths(harness)[0], BOUNDARY_ADOPT)
+    if BOUNDARY_ALLOWED is not None:
+        role_boundary.selection(completion.paths(harness)[0], BOUNDARY_ALLOWED)
+    run_id = None
+    try:
+        completion.read_policy(harness)
+        resume = feature.get("status") == "in_progress" and feature.get("active_run") and not feature.get("human_acceptance", {}).get("reopen_pending")
+        if resume:
+            if BOUNDARY_ADOPT or BOUNDARY_ALLOWED is not None:
+                raise run_evidence.EvidenceError('boundary authorization is fixed before coding; use --restart-run')
+            role_boundary.check(harness, *completion.paths(harness), feature['active_run'])
+            run_id = feature["active_run"]
+            directory, _ = completion.active(harness, feature, mode)
+        else:
+            if feature.get('active_run'):
+                old_directory = completion.directory(harness, feature['active_run'])
+                if list(old_directory.glob('violation-*.json')):
+                    raise run_evidence.EvidenceError('boundary violation requires explicit --restart-run')
+            role_boundary.selection(completion.paths(harness)[0], BOUNDARY_ADOPT)
+            if BOUNDARY_ALLOWED is not None:
+                role_boundary.selection(completion.paths(harness)[0], BOUNDARY_ALLOWED)
+            mark_in_progress(feature_id)
+            data = load_state()
+            feature = feature_by_id(data, feature_id)
+            run_id = completion.start(harness, feature, mode)
+            feature["active_run"] = run_id
+            save_state(data)
+            role_boundary.capture(harness, *completion.paths(harness), run_id, BOUNDARY_ADOPT, BOUNDARY_ALLOWED)
+            directory = completion.directory(harness, run_id)
+            handoff = (fast_coding_prompt(feature_id) if mode == "work-fast" else coding_prompt(feature_id))
+            handoff += (f"\nActive run ID: {run_id}\nRun handoff: {directory}/handoff.json\n"
+                        "Do not change lifecycle fields or write evaluator approval. "
+                        "For work-fast only, after coding record evidence with "
+                        f"python3 orchestrator.py --record-coding {feature_id} --run-id {run_id} --evidence-file <run-note-path>.\n")
+            (directory / 'coding-prompt.txt').write_text(handoff)
+            if mode == "work":
+                coding = run_agent(handoff, False, "Coding Agent", CODING_AGENT_ADAPTER)
+                (directory / 'coding.stdout').write_text(coding.stdout or '')
+                (directory / 'coding.stderr').write_text(coding.stderr or '')
+                role_boundary.check(harness, *completion.paths(harness), run_id)
+                if coding.returncode != 0:
+                    raise run_evidence.EvidenceError(f"coding adapter exited {coding.returncode}")
+                current = feature_by_id(load_state(), feature_id)
+                completion.record_coding(harness, current, run_id, 'runner-coding-child-v1', coding.stdout or '')
+        if mode == "work-fast" and not (directory / 'coding.json').exists():
+            print(f"{FAST_CODING_HANDOFF_PREFIX} {feature_id}; run_id={run_id}")
+            print((directory / 'coding-prompt.txt').read_text())
+            return True
+        receipt_path = completion.finalize(harness, feature_by_id(load_state(), feature_id), evaluator_prompt(feature_id))
+        mark_done(feature_id, receipt_path)
+        print(f"Done: {feature_id}; receipt={receipt_path}", flush=True)
+        return True
+    except (run_evidence.EvidenceError, OSError, ValueError, KeyError, StopIteration) as exc:
+        error = f"run {run_id or 'not-created'}: {exc}"
+        if run_id:
+            try:
+                directory = completion.directory(harness, run_id)
+                if directory.exists() and not (directory / 'failure.json').exists():
+                    run_evidence._write_new(directory / 'failure.json', {'run_id': run_id, 'reason': str(exc)})
+            except (run_evidence.EvidenceError, OSError):
+                pass  # Unsafe/missing run paths are diagnosed in the top-level failure record below.
         mark_failed(feature_id, error, max_attempts)
-        write_failure_run_record(
-            feature_id,
-            error,
-            command="python3 orchestrator.py --work-fast",
-            failure_domain="agent_workflow_gap",
-            harness_improvement="No new harness improvement required; work-fast rejected invalid coding evidence before evaluator completion.",
-        )
+        write_failure_run_record(feature_id, error, command=f"python3 orchestrator.py --{mode}")
+        print(error, file=sys.stderr)
         return False
 
-    if normalize_status(feature) != "in_progress":
-        mark_in_progress(feature_id)
-    write_fast_coding_handoff(feature_id)
-    print(f"{FAST_CODING_HANDOFF_PREFIX} {feature_id}", flush=True)
-    print(
-        "Fast coding evidence is required before evaluator execution. "
-        f"Record `{FAST_CODING_EVIDENCE_PREFIX} {feature_id}` and `CODING_PASS: {feature_id}` in runs/ after coding.",
-        flush=True,
-    )
-    return True
+
+def run_work_fast_round(round_no: int, max_attempts: int, dry_run: bool) -> bool:
+    return run_verified_round(round_no, max_attempts, dry_run, "work-fast")
 
 
 def feature_ids_for_eval(target: str) -> list[str]:
@@ -521,6 +498,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--max-rounds", type=int, default=MAX_ROUNDS)
     parser.add_argument("--max-attempts", type=int, default=MAX_ATTEMPTS)
     parser.add_argument("--eval-only", metavar="FEATURE_ID|all")
+    parser.add_argument("--adopt-dirty", action="append", default=[], metavar="PATH")
+    parser.add_argument("--allow-path", action="append", default=None, metavar="PATH")
+    parser.add_argument("--restart-run", metavar="FEATURE_ID")
+    parser.add_argument("--record-coding", metavar="FEATURE_ID")
+    parser.add_argument("--run-id")
+    parser.add_argument("--evidence-file", type=Path)
     parser.add_argument("--work-fast", action="store_true", help="run evaluator-gated fast work mode")
     parser.add_argument(
         "--render-prompt",
@@ -532,8 +515,60 @@ def parse_args() -> argparse.Namespace:
 
 
 def main() -> int:
+    global BOUNDARY_ADOPT, BOUNDARY_ALLOWED
     args = parse_args()
+    BOUNDARY_ADOPT, BOUNDARY_ALLOWED = args.adopt_dirty, args.allow_path
+    if args.restart_run:
+        if not args.run_id:
+            raise OrchestratorError('--restart-run requires --run-id')
+        with state_store.ownership(FEATURES_PATH):
+            data = load_state()
+            feature = feature_by_id(data, args.restart_run)
+            if feature.get('active_run') != args.run_id or feature.get('passes'):
+                raise OrchestratorError('restart requires matching incomplete active run; restore unauthorized state edits first')
+            directory = completion.directory(Path.cwd(), args.run_id)
+            run_evidence._write_new(directory / ('restart-' + __import__('uuid').uuid4().hex + '.json'),
+                                    {'run_id': args.run_id, 'action': 'explicit restart; working tree preserved'})
+            state_store.invalidate_completion(feature, 'explicit boundary recovery')
+            feature['status'] = 'todo'
+            feature['last_error'] = ''
+            save_state(data)
+        print('Run archived; inspect preserved edits and start a new round with any required --adopt-dirty/--allow-path declarations.')
+        return 0
+    # Check roles before startup can fail on their state edits or selection can skip early done.
+    with state_store.ownership(FEATURES_PATH):
+        for marker in sorted(RUNS_DIR.glob('*/boundary-required.json')):
+            directory = marker.parent
+            if (directory / 'receipt.json').exists() or (directory / 'failure.json').exists() or list(directory.glob('restart-*.json')):
+                continue
+            enrolled = completion.read(marker)
+            rid = directory.name
+            try:
+                role_boundary.check(Path.cwd(), *completion.paths(Path.cwd()), rid)
+            except run_evidence.EvidenceError:
+                try:
+                    mark_failed(enrolled['feature_id'], f'run {rid}: role boundary violation; inspect reports and --restart-run', args.max_attempts)
+                except (ValueError, OSError, OrchestratorError):
+                    pass  # Preserve malformed state for explicit recovery; never overwrite other Features.
+                raise
     startup_protocol()
+
+    if args.record_coding:
+        if not args.run_id or not args.evidence_file:
+            raise OrchestratorError("--record-coding requires --run-id and --evidence-file")
+        feature = feature_by_id(load_state(), args.record_coding)
+        try:
+            with state_store.ownership(FEATURES_PATH):
+                feature = feature_by_id(load_state(), args.record_coding)
+                if not state_store.ready(load_state(), feature):
+                    raise state_store.StateError('feature dependencies are not ready')
+                completion.record_coding(Path.cwd(), feature, args.run_id, 'provider-native-v1', args.evidence_file.read_text())
+        except (run_evidence.EvidenceError, OSError, ValueError) as exc:
+            write_failure_run_record(feature['id'], f"Coding receipt rejected for requested run {args.run_id}; active run {feature.get('active_run')}: {exc}")
+            raise
+
+        print(f"Coding receipt recorded for {args.record_coding}, run {args.run_id}")
+        return 0
 
     if args.render_prompt:
         prompt_names = {
@@ -554,67 +589,14 @@ def main() -> int:
         results = [run_work_fast_round(round_no, args.max_attempts, args.dry_run) for round_no in range(1, args.max_rounds + 1)]
         return 0 if all(results) else 1
 
-    for round_no in range(1, args.max_rounds + 1):
-        data = load_state()
-        feature = pick_feature(data, args.max_attempts)
-        if not feature:
-            print("No runnable unfinished feature left.", flush=True)
-            return 0
-        feature_id = str(feature["id"])
-        print(f"\n== Round {round_no}: {feature_id} ==", flush=True)
-
-        if args.dry_run:
-            run_agent(coding_prompt(feature_id), dry_run=True, label="Coding Agent", adapter_path=CODING_AGENT_ADAPTER)
-            run_agent(evaluator_prompt(feature_id), dry_run=True, label="Evaluator Agent", adapter_path=EVALUATOR_AGENT_ADAPTER)
-            continue
-
-        ensure_adapter_configured("Coding Agent", CODING_AGENT_ADAPTER)
-        ensure_adapter_configured("Evaluator Agent", EVALUATOR_AGENT_ADAPTER)
-        mark_in_progress(feature_id)
-        coding = run_agent(coding_prompt(feature_id), dry_run=False, label="Coding Agent", adapter_path=CODING_AGENT_ADAPTER)
-        coding_passed, coding_reason = coding_result(feature_id, coding)
-        if coding_passed is False:
-            error = coding_reason or "Coding Agent reported failure."
-            mark_failed(feature_id, error, args.max_attempts)
-            write_failure_run_record(feature_id, error)
-            continue
-        if coding.returncode != 0:
-            if coding_passed is True:
-                print(
-                    f"Coding Agent emitted CODING_PASS despite provider exit code {coding.returncode}; continuing.",
-                    flush=True,
-                )
-            else:
-                error = f"coding agent exited with code {coding.returncode}"
-                mark_failed(feature_id, error, args.max_attempts)
-                write_failure_run_record(feature_id, error)
-                continue
-
-        evaluator = run_agent(evaluator_prompt(feature_id), dry_run=False, label="Evaluator Agent", adapter_path=EVALUATOR_AGENT_ADAPTER)
-        passed, reason = evaluator_result(feature_id, evaluator)
-        if passed:
-            if evaluator.returncode != 0:
-                print(
-                    f"Evaluator emitted EVAL_PASS despite provider exit code {evaluator.returncode}; accepting final verdict.",
-                    flush=True,
-                )
-            mark_done(feature_id)
-            print(f"Done: {feature_id}", flush=True)
-        else:
-            if evaluator.returncode != 0:
-                error = f"evaluator exited with code {evaluator.returncode}: {reason}"
-            else:
-                error = reason or "Evaluator rejected the feature."
-            mark_failed(feature_id, error, args.max_attempts)
-            write_failure_run_record(feature_id, error)
-            print(f"Evaluation failed: {feature_id}: {reason}", flush=True)
-
-    return 0
+    results = [run_verified_round(round_no, args.max_attempts, args.dry_run, "work")
+               for round_no in range(1, args.max_rounds + 1)]
+    return 0 if all(results) else 1
 
 
 if __name__ == "__main__":
     try:
         raise SystemExit(main())
-    except OrchestratorError as exc:
+    except (OrchestratorError, run_evidence.EvidenceError, OSError, ValueError) as exc:
         print(f"orchestrator error: {exc}", file=sys.stderr)
         raise SystemExit(1)

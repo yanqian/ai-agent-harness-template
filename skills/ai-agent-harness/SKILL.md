@@ -112,3 +112,26 @@ Before committing:
 6. Commit with a subject that follows `docs/commit-messages.md`, normally `Fxxx <Action> <concise summary>`.
 
 Default to commit only. Push or pull request creation requires a separate explicit request.
+
+
+## Run-scoped completion
+
+New orchestrator runs use the receipt contract in `docs/run-evidence.md`.
+Use only the active run printed in the handoff. Old PASS text cannot complete a
+Feature. Work-fast must use `orchestrator.py --record-coding` with that run ID after
+coding, then rerun work-fast. Only the runner records command outcomes and links a
+validated receipt before marking done. Receipt evaluator prompts explicitly replace
+the legacy final text verdict with strict per-criterion JSON; follow the rendered
+current-run prompt. Do not copy old receipts or mutate the completion policy.
+
+
+## Role boundary recovery
+
+New runs freeze protected state and initial dirty paths before coding. Use
+`--adopt-dirty PATH` and optional `--allow-path PATH` only when starting a new run;
+paths are project-relative, including in hidden layout. Roles must not edit
+feature_list.json, SPEC.md, QUALITY.md or completion-policy.json during a run.
+Read `docs/run-evidence.md` for changes.json, mandatory evaluator scope relevance,
+violation reports and explicit `--restart-run FEATURE --run-id RUN` recovery.
+Preserve the tree after violations; never auto-stash, reset, delete or force commit.
+Restart the coordinator after upgrading to template 0.4.0.

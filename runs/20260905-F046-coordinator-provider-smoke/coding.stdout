@@ -1,0 +1,6 @@
+Reading progress.md and feature_list.json.
++ git log --oneline -20
+1fdba3d fixture
++ ./init.sh
+FIXTURE_OK
+Coding receipt recorded for F001, run 3071ac1cfa4c4571b8701b20182fb85c

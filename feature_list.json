@@ -839,6 +839,108 @@
       "attempts": 1,
       "last_error": "",
       "priority": "P0"
+    },
+    {
+      "id": "F045",
+      "title": "Record run-scoped completion evidence",
+      "description": "Add deterministic run identity, contract/source fingerprints and structured verification/evaluation receipt primitives, independently testable before orchestration enrollment.",
+      "acceptance": [
+        "Provide strictly validated run and receipt schemas binding Feature, unique run, attempt, criteria fingerprint, code snapshot, runner-owned command outcomes and evaluator criterion evidence; malformed or cross-run records fail closed.",
+        "Snapshot real Git workspaces including tracked, staged, unstaged, deleted and untracked source with documented narrow exclusions, symlink safety, file modes and unusual path regression coverage; support visible and hidden layouts without requiring a commit.",
+        "Provide non-shell required-command execution with durable stdout/stderr and exit-code evidence, and helpers verifying unchanged snapshots and complete per-criterion evaluator results; runner fields are assembled by code rather than accepted from agent claims.",
+        "Document trust boundaries and historical-vs-current snapshot semantics; add real temporary Git/process tests, keep bundled runtime/schema/docs/tests synchronized, and keep existing workflows runnable.",
+        "./init.sh and selected-feature validation pass with durable EVAL_PASS: F045 from a separate Evaluator Agent."
+      ],
+      "passes": true,
+      "status": "done",
+      "attempts": 1,
+      "last_error": "",
+      "priority": "P0",
+      "coding_evidence": "runs/20260905-F045-coding.md",
+      "depends_on": [
+        "F044"
+      ]
+    },
+    {
+      "id": "F046",
+      "title": "Gate completion on the current verified run",
+      "description": "Integrate run-scoped evidence into a single completion path for work and work-fast, with fail-closed resume and compatible installation of receipt enforcement.",
+      "acceptance": [
+        "Both work modes start/resume unique durable runs, bind coding handoffs/evidence to the active run, and use one finalization gate checking criteria, snapshot, required runner checks, independent evaluator criterion evidence and source immutability.",
+        "Old PASS text, old/cross-run coding receipts, missing checks, verification failure, changed code/criteria or incomplete evaluator evidence cannot set done; every rejected run returns non-success and retains attributable diagnostics and files.",
+        "Persist a validated runner-generated receipt before marking done, link it from the selected Feature, and validate historical receipt integrity without comparing all old snapshots to the current tree. Interrupted finalization can recover without inventing completion.",
+        "Fresh installs enforce receipts from their first Feature; upgrades preserve known legacy completions using an explicit frozen compatibility policy and surface contradictory legacy metadata without silently editing it; bundled templates, prompts, init and installer lifecycle tests agree.",
+        "Regression tests cover both real subprocess fake-role flows and a real configured evaluator run, hidden layout, resume/reopen and legacy migration; ./init.sh and selected-feature validation pass with independent EVAL_PASS: F046."
+      ],
+      "passes": true,
+      "status": "done",
+      "attempts": 2,
+      "last_error": "",
+      "priority": "P0",
+      "depends_on": [
+        "F045"
+      ],
+      "coding_evidence": "runs/20260905-F046-coding.md",
+      "active_run": "0a849903224541bb910486c1eaba3236",
+      "completion_receipt": "runs/0a849903224541bb910486c1eaba3236/receipt.json"
+    },
+    {
+      "id": "F047",
+      "title": "Enforce dependency and lifecycle state transactions",
+      "description": "Make dependency readiness, lifecycle consistency and single-writer atomic state mutation program-enforced across orchestrator and Human Eval.",
+      "acceptance": [
+        "Validate dependency IDs/types/duplicates/self-dependencies/cycles and schedule only Features whose dependencies are complete and not pending reopen, including work-fast resume; invalid graphs fail before state mutation.",
+        "Centralize atomic state replacement and a single-writer lock shared by orchestrator and Human Eval, preserve unknown fields/order/history, and detect lock contention or stale-state writes without corrupting JSON or overwriting another writer.",
+        "Only the harness updates lifecycle fields; contradictory new done/reopen states fail validation and finalization, while historical inconsistency is explicitly diagnosed under the documented migration boundary. Human reopen preserves history and invalidates reuse of old active completion evidence.",
+        "Tests exercise real competing subprocesses and interrupted write behavior, dependency readiness, preservation and reopen/retry invariants. Documentation, schema, bundled distribution and command failure behavior stay consistent.",
+        "./init.sh and selected-feature validation pass with independent EVAL_PASS: F047."
+      ],
+      "passes": true,
+      "status": "done",
+      "attempts": 2,
+      "last_error": "",
+      "priority": "P0",
+      "depends_on": [
+        "F046"
+      ],
+      "completion_history": [
+        {
+          "active_run": "d8f37ba8e15843889367969a7e56a907",
+          "reason": "new attempt",
+          "attempt": 1
+        }
+      ],
+      "active_run": "bf46e6a2b8014c02bc6cdaa3feda1835",
+      "completion_receipt": "runs/bf46e6a2b8014c02bc6cdaa3feda1835/receipt.json"
+    },
+    {
+      "id": "F048",
+      "title": "Reject completion after unauthorized role changes",
+      "description": "Detect role changes to protected state, contracts or unrelated existing edits and require explicit recovery while preserving the working tree.",
+      "acceptance": [
+        "Capture and compare protected Feature/contract/lifecycle state around coding and evaluation in both work modes; reject unauthorized unrelated Feature edits, relaxed criteria, early done writes and evaluator implementation edits before finalization.",
+        "Protect pre-existing dirty paths by default, offer a documented explicit include/adopt mechanism recorded before coding, and support optional project-relative allowed paths with validation; never auto-stash, rollback, delete user files or force a commit.",
+        "Provide clear durable violation reports and an explicit restart/recovery path; evaluator sees the attributable full diff and must report scope relevance when no allowlist exists. Missing or violated boundaries leave the target incomplete.",
+        "Add adversarial subprocess/real-Git coverage for both modes, hidden layout, dirty planning/prior-feature edits, source changes during evaluation, new/deleted paths and successful authorized changes; retain evidence/trust exclusions explicitly.",
+        "Synchronize docs/prompts/skill/template/install upgrades and version sources, run full ./init.sh and selected-feature validation, and obtain independent EVAL_PASS: F048 before completion."
+      ],
+      "passes": true,
+      "status": "done",
+      "attempts": 2,
+      "last_error": "",
+      "priority": "P0",
+      "depends_on": [
+        "F047"
+      ],
+      "completion_history": [
+        {
+          "active_run": "3211a673a7e04b68a8a7f7c2ad93eb0f",
+          "reason": "new attempt",
+          "attempt": 1
+        }
+      ],
+      "active_run": "5770fe94333346629908d706d81e9aea",
+      "completion_receipt": "runs/5770fe94333346629908d706d81e9aea/receipt.json"
     }
   ]
 }

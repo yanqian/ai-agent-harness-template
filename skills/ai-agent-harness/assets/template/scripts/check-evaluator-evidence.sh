@@ -11,6 +11,9 @@ import re
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path("scripts").resolve()))
+import completion
+
 features_path = Path(os.environ.get("HARNESS_FEATURE_LIST", "feature_list.json"))
 runs_dir = Path(os.environ.get("HARNESS_RUNS_DIR", "runs"))
 baseline = os.environ.get("HARNESS_EVALUATOR_EVIDENCE_BASELINE", "F027")
@@ -38,6 +41,12 @@ except json.JSONDecodeError as exc:
     print(f"evaluator evidence check failed: invalid JSON in {features_path}: {exc}", file=sys.stderr)
     raise SystemExit(1)
 
+try:
+    completion.verify_history(features_path.resolve().parent, data)
+except (ValueError, OSError, KeyError) as exc:
+    print(f"completion evidence check failed: {exc}", file=sys.stderr)
+    raise SystemExit(1)
+
 records = []
 if runs_dir.exists():
     records = [
@@ -57,6 +66,8 @@ for feature in data.get("features", []):
     if number < baseline_number:
         continue
     if feature.get("passes") is True and feature.get("status") == "done":
+        if feature.get("completion_receipt"):
+            continue
         checked.append(feature_id)
         pass_line = f"EVAL_PASS: {feature_id}"
         if pass_line not in run_text:
